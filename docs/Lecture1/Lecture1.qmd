@@ -360,10 +360,10 @@ print(not(x > y)()
 * Print the `type()` of: 
 
 ::: {style="font-size: 150%;"}
-    - 153
-    - 8.8354
-    - Windy
-    - False
+  - 153
+  - 8.8354
+  - Windy
+  - False
 
 :::
 
