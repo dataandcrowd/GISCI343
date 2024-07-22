@@ -50,11 +50,8 @@ include-in-header:
 ## How will we cover it?
 
 * Install Python on your machine
-* Jupyter lab / Notebook
-* <p><b><span style="color:red;">Google Colab</span></b></p>
-    - "Another" Free service provided by Google
-    - Live code, text and graphics in one place
-    - Compatible with multiple languages
+* Jupyter lab / Notebook / VS Code
+* Google Colab (just in case)
 
 ![](Figs/colab.png){.absolute top=100 right=150 width="200" height="200"}
 
@@ -122,20 +119,20 @@ print("Ronaldo" > "Messi")
 
 
 
-## 
-&nbsp;  
+<!-- ##  -->
+<!-- &nbsp;   -->
 
-### Let's Take a Quality Break!{style="text-align: center;"}
+<!-- ### Let's Take a Quality Break!{style="text-align: center;"} -->
 
-&nbsp;  
+<!-- &nbsp;   -->
 
-Make sure you are well set up with Google Colab using the URL below:
-<center><span style="color:blue;">https://colab.research.google.com</span></center>
+<!-- Make sure you are well set up with Google Colab using the URL below: -->
+<!-- <center><span style="color:blue;">https://colab.research.google.com</span></center> -->
 
-&nbsp;
+<!-- &nbsp; -->
 
 
-I will code here: https://tinyurl.com/gisci242
+<!-- I will code here: https://tinyurl.com/gisci242 -->
 
 
 ## Basic Programming Concepts 
@@ -194,14 +191,15 @@ We will cover:
 
 5 * 7
 
-2**3
+4000 - 3210
 ```
 
 :::
 
----
 
-### Strings
+## Strings
+Strings (str) represent sequences of characters, e.g. I love GIS, Python is awesome, 1990. Note that a number will be of the type string when declared within quotations marks ("").
+
 
 ::: {style="font-size: 150%;"}
 
@@ -209,92 +207,35 @@ We will cover:
 print("hello world") # print strings
 
 len("hello world") # to count text in Python Shell
-print(len("hello world")) # in Google Colab
+print(len("hello world")) # in Python Notebook
 ```
 
 :::
 
-## Maths with modules
+
+---
+
+### Example
 
 ::: {style="font-size: 150%;"}
 
 ```python
-sin(3)
-sqrt(4)
+temp_celsius = 10.0
+myname = "Hyesop"
 ```
-
-&nbsp;  
-&nbsp; 
-
-Did you get the result you expected?
-
-:::
-
----
-
-### Facing Errors can be daunting
-
-```
-sin(3)
----------------------------------------------------------------------------
-NameError                                 Traceback (most recent call last)
-<ipython-input-1-acdde95a6016> in <cell line: 1>()
-----> 1 sin(3)
-NameError: name 'sin' is not defined
-```
-
-
-```
----------------------------------------------------------------------------
-NameError                                 Traceback (most recent call last)
-<ipython-input-2-317e033d29d5> in <cell line: 1>()
-----> 1 sqrt(4)
-
-NameError: name 'sqrt' is not defined
-```
-
-&nbsp; 
-
-Python can’t calculate square roots or do basic stats? <br> Of course it can, but we need one more step.
-
-
----
-
-### Solution
-
-::: {style="font-size: 150%;"}
-
-```{.python code-line-numbers="3,4"}
-import math
-
-math.sin(3)
-math.sqrt(4)
-```
-
-:::
-
-&nbsp;
-
-Well done! You have just managed to use a `math` module too!
-
----
-
-### Combining Functions
-
-Functions can also be combined. 
-The `print()` function returns values within the parentheses as text on the screen. 
-Let’s print the value of the square root of four.
-
-
-::: {style="font-size: 150%;"}
+<br>
 
 ```python
-print(math.sqrt(4))
+print(temp_celsius)
+print(myname)
 ```
 
-```python
-print("The square root of 4 is", math.sqrt(4))
 ```
+10
+Hyesop
+```
+
+
 :::
 
 
@@ -304,38 +245,25 @@ print("The square root of 4 is", math.sqrt(4))
 
 ![](Figs/variable-diagram-different-values.png){fig-align="center"}
 
----
+```python
+weather = "Freezing"
 
-###
-
-::: {style="font-size: 150%;"}
-
-```{python}
-#| echo: true
-
-temp_celsius = 10.0
-
-print(temp_celsius)
+print(weather)
 ```
-
-:::
 
 ---
 
 ### _mutability_
 * Mutability mean that variables can be changed without being erased. 
-* Some types of variables like integers are *immutable*
+* Some types of variables like integers are *immutable* (you got to throwing away the old one)
   - This means if we change them, they get a different memory address, and the old memory address gets recycled (thanks python!)
 
----
-
-### We can see what the actual address of a variable we create is with id:
-
 ```python
-x = 5 # first we can create a new variable, and give it the name 'x'
+weather = "Sunny"
 
-print ("The variable x =" +str(x)+ 
-      " and this variable's physical memory address is "+str(id(x))) 
+print(weather)
+
+
 ```
 
 ---
@@ -355,8 +283,6 @@ print ("The variable x =" +str(x)+
 
 ### Data types: Strings
 
-::: {style="font-size: 150%;"}
-
 ```{python}
 #| echo: true
 
@@ -364,7 +290,52 @@ weatherForecast = "Freezing"
 type(weatherForecast)
 
 ```
-:::
+
+
+* We can concatenate strings using the addition operator:
+
+```python
+print(weatherForecast+weatherForecast)
+
+```
+
+* We als can perform upper and lower case transformations:
+
+
+```python
+print(weatherForecast.upper())
+print(weatherForecast.lower())
+```
+
+---
+
+### Data types: Numeric
+* Addition
+* Subtraction
+* Multiplication
+* Division
+
+```python
+my_int= 2
+my_float= 24.3
+
+my_int+my_float
+my_int-my_float
+
+```
+---
+
+### Data types: Numeric (more)
+
+* Floor Division: `//` operator is used to perform integer division (rounding down to the nearest integer).
+* Modulo: `%` operator returns the remainder of the division operation.
+* Exponentiation
+
+```python
+10//3
+10%3
+2**3
+```
 
 ---
 
@@ -376,8 +347,8 @@ type(weatherForecast)
 ```python
 x = 5
 y = 4
-print(x != y)
-
+print(x > y)
+print(not(x > y)()
 
 ```
 
@@ -388,8 +359,8 @@ print(x != y)
 * Print the `type()` of: 
 
 ::: {style="font-size: 150%;"}
-    - 33
-    - 8.394
+    - 153
+    - 8.8354
     - Windy
     - False
 
@@ -435,23 +406,23 @@ Let’s first create a list of selected station_name values and print it to the 
 ```{python}
 #| echo: true
 
-station_names = [
+western_line = [
     "Britomart",
-    "Ōrākei",
-    "Meadowbank",
-    "Purewa",
-    "Glen Innes",
-    "Tamaki",
-    "Panmure",
-    "Sylvia Park"
+    "Parnell",
+    "Newmarket",
+    "Grafton",
+    "Mt Eden",
+    "Kingsland",
+    "Morningside",
+    "Baldwin Ave"
 ]
 
-station_names
+western_line
 ```
 
 ```{python}
 #| echo: true
-type(station_names)
+type(western_line)
 ```
 
 ---
@@ -462,10 +433,10 @@ To access an individual value in the list we need to use an **index** value.
 ```{python}
 #| echo: true
 
-station_names[1]
+western_line[1]
 ```
 
-Python returns 'Ōrākei' instead of 'Britomart'. Can anybody guess why?
+Python returns 'Parnell' instead of 'Waitematā'. Can anybody guess why?
 
 ---
 
@@ -474,10 +445,10 @@ Python returns 'Ōrākei' instead of 'Britomart'. Can anybody guess why?
 ```{python}
 #| echo: true
 
-station_names[2]
-station_names[2:5]
-station_names[-1]
-station_names[-8]
+western_line[2]
+western_line[2:5]
+western_line[-1]
+western_line[-8]
 ```
 
 ---
@@ -488,55 +459,41 @@ station_names[-8]
 
 ```{python}
 #| echo: true
-station_names[-1] = 'Shopping Mall'
-station_names
+western_line[3] = 'Auckland City'
+western_line
 ```
 
 :::
 
----
 
-### Modifying list values
-
-::: {style="font-size: 150%;"}
-
-```{python}
-#| echo: true
-station_names[-1] = 'Shopping Mall'
-station_names
-
-station_names.reverse()
-station_names
-```
-:::
 
 ---
 
-### Modifying list values
+### Adding list values
 
 ::: {style="font-size: 150%;"}
 
 ```{python}
 #| echo: true
 
-station_names.append("new station")
-print(station_names)
+western_line.append("new station")
+print(western_line)
 ```
 
 :::
 
 
 ## <span style="color:green;">Your Turn!</span> {.smaller}
-1. Define `station_names` in your environment
-2. Add **Otahuhu, Middlemore, Papatoetoe, Puhinui, Manukau** as a list (you can Google "Auckland Eastern Line" and find the Wikipedia)
+1. Define `western_line` in your environment
+2. Add **Mt Albert, Avondale, New Lynn, Fruitvale Rd, Glen Eden** as a list (you can Google "Auckland Western Line" and find the Wikipedia)
 3. Assign that in your environment as `more_eastern`
 4. This time, try `extend` to combine the two lists
 
 ::: {style="font-size: 150%;"}
 
 ```python
-station_names = ["Britomart", "Ōrākei", "Meadowbank", "Purewa", 
-  "Glen Innes", "Tamaki", "Panmure", "Sylvia Park"]
+western_line = ["Britomart", "Parnell", "Newmarket", "Grafton",
+    "Mt Eden", "Kingsland", "Morningside", "Baldwin Ave"]
 ```
 
 :::
@@ -604,7 +561,7 @@ Let’s break down the code above to see some essential aspect of `for` loops:
 ```{python}
 #| echo: true
 
-station_names = [
+western_line = [
     "Britomart", "Ōrākei", "Meadowbank", "Purewa",
     "Glen Innes", "Tamaki", "Panmure", "Sylvia Park"
 ]
@@ -614,8 +571,8 @@ station_names = [
 
 ```{python}
 #| echo: true
-station_names[0]
-station_names[1]
+western_line[0]
+western_line[1]
 ```
 ```
 .
@@ -647,12 +604,22 @@ for day in my_life:
 
 ::: {style="font-size: 150%;"}
 
-```{python}
-#| echo: true
-
-for name in station_names:
+```python
+for name in western_line:
     print(name)
 ```
+```
+Britomart 
+Parnell
+Newmarket 
+Grafton
+Mt Eden
+Kingsland
+Morningside
+Baldwin Ave
+```
+
+
 :::
 
 ---
@@ -965,11 +932,10 @@ for temperature in temperatures:
 
 ::: {.incremental}
 * Programming is not too difficult than you think. They are easy to understand and share (and fun!)
-* Programmes keep a log of the changes you make to your programmes - open science
 * Python is one of the popular programming languages - we are going to nail this!
 * Basics of Python
    - Basic programming
-   - Fucntions
+   - Functions
    - for loops
    - Conditional statements
    - Combos of the above
@@ -978,9 +944,10 @@ for temperature in temperatures:
 :::
 
 ## Next week
-* How to import spreadsheet data
-* How to clean and use data
-* How to play with GIS data
+* Recap of today's work + working on conditions
+* How to import spreadsheet data: dataframe
+* How to clean and use dataframes
+* How to play with GIS dataset
 
 
 ## References
