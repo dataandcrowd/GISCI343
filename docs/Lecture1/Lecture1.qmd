@@ -30,9 +30,10 @@ include-in-header:
 ---
 
 ## Helpdesk
-
+* Friday 2pm - Lab Sessions
 * Piazza is the place to go!
 
+![](Figs/crowdstrike.png){.absolute top=100 right=100 width="300" height="300"}
 
 
 ## What will we cover for today?
@@ -53,7 +54,7 @@ include-in-header:
 * Jupyter lab / Notebook / VS Code
 * Google Colab (just in case)
 
-![](Figs/colab.png){.absolute top=100 right=150 width="200" height="200"}
+![](Figs/vscode-logo.png){.absolute top=100 right=150 width="200" height="200"}
 
 
 
