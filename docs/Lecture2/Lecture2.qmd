@@ -1,0 +1,538 @@
+---
+title: "Programming Part 2"
+subtitle: ": GIS with Pandas & Geopandas"
+date: 07/30/2024
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Recap of Previous Lecture
+
+-   Maths
+-   How to assign variables, lists
+-   For loops
+-   Conditional statements
+-   How to call packages using `import pkg_name`
+- spacing is important
+
+## Terminology - Brackets
+
+* To avoid any confusion between NZ and US English, I will use:
+    - [ ] as square brackets
+    - ( ) as round brackets
+    - { } as curly brackets
+    - < > as angle(d) brackets 
+
+## What will we cover today?
+- How can we better understand the code structure to query complicated datasets?
+- How can we utilse Python Packages in GIS Tasks
+- How does programming open up new methods for spatial analysis that are not possible through manual processes
+
+
+
+## What will we "really" cover today?
+- How do we learn dictionaries?
+-   How to import spreadsheet data with `pandas`
+-   How to clean and explore data
+-   Data Visualisation
+-   How to play with GIS data with `geopandas`
+
+::: notes
+:::
+
+
+## Dictionaries
+- A dictionary is another type of variable
+- It is useful for storing loosely structured information
+- It uses a key:value structure
+- Denoted using curly brackets {}
+- Often combined with a list
+  
+---
+
+### Example
+
+```python
+GISCI_dictionary = {
+                        "apple":"a delicious round fruit",
+                        "bench":"a place to sit next to the footpath",
+                        "candy":"something thats tastey but causes cavities",
+                        "door":"a portal to another room",
+                        "entomologist":"somone that studies bugs",
+                        "farce":"a sausage meat mixture",
+                        "gas":"a petrochemical nearing end of life",
+                        "hatchback":"a car with a rear that enitrely opens",
+                        "ice":"the solid state of water",
+                        "juice":"a sugary taste fruit drink",
+                        "k****":"asdfasdf",
+                     }
+GISCI_dictionary["bench"]
+
+```
+
+## Dictionary functions
+- `mydict.keys()` gives you the 'key' of the key:value pairing
+- `mydict.items()` give you the contents as a list
+- `mydict.values()` gives you the values
+
+
+```python
+GISCI_dictionary.keys()
+GISCI_dictionary.values()
+GISCI_dictionary.items()
+
+```
+
+---
+
+### We can use a for loop to run through the keys in dictionary:
+
+```python
+for i in GISCI_dictionary.keys():
+    print(i)
+```
+
+---
+
+### Or we could use it as a way to format a printing of the entire dictionary
+
+```python
+for i in GISCI_dictionary.keys(): # using the key we get from this line...
+    print (i + ":\n\t" + GISCI_dictionary[i]) # ...to call the item/value from the dictionary as we loop through it
+```
+
+---
+
+### Dictionaries are often multi layered (multi-dimensional)
+- Often dictionaries contain lists of dictionaries
+- Yes, it is confusing, but creates more freedom
+
+::: {style="font-size: 70%;"}
+
+```python
+mydict = {"people":[
+            {
+                "name":"Hyesop",
+                 "role":"teacher"
+            },
+            {
+                "name":"Sila",
+                 "role":"teacher"
+            },
+            {
+                "name":"Oliver",
+                 "role":"tutor"
+            }    
+            ]}
+# print(mydict)
+print(mydict["people"])
+```
+:::
+
+---
+
+
+### We can add another dictionary within that first one, that contains a totally different set of information...
+
+```python
+mydict = {"people":[
+            {"name":"hyesop","role":"teacher"},
+            {"name":"sila","role":"teacher"},
+            {"name":"oliver","role":"tutor"},    
+        ],
+         "mascots":[
+             {"name":"pepper","species":"dog"},
+             {"name":"pip","species":"dog"},
+             {"name":"harriet","species":"cat"}
+         ]}
+# print(mydict)
+print(mydict["people"])
+```
+
+
+## Why use dictionaries?
+
+::: {style="font-size: 80%;"}
+- Dictionaries are really useful as they create a bit more freedom in our data strucutre.
+- In comparison, in array its a really bad idea to have mixed data types and uneven arrays, however dictionaries are great for this type of data.
+- This moves us towards 'unstructured' data. Lots of the info we get from the web is fairly unstrucutred becasue it relies on non-complete datasets. 
+  - For example: some data from Twitter (or X as it is now known, booooo) has geolocation, and some does not. 
+- Having said that, using a dictionary doesn't mean _no_ structure, it just means that not all elements of the structure will be there. 
+  - For example:
+:::
+
+
+---
+
+###
+
+![](Figs/geojson_io.png)
+
+
+---
+
+
+## Getting started with Pandas
+* Reading in files
+* Filtering columns and rows
+* `Group by` and `Aggregation`
+* Merging dataframes
+* Visulisation
+
+
+
+## What is a dataframe
+
+![](https://media.geeksforgeeks.org/wp-content/uploads/finallpandas.png){fig-align=center}
+
+::: {style="font-size: 50%;"}
+source: geeksforgeeks.org
+:::
+
+* Tabular array 
+* Might be a stack of lists (recap of last lecture) 
+* A combined data series
+
+
+## DataFrame vs Data series?
+
+* A Series is a 1-dimensional data structure used to represent a single column or row of data within a DataFrame or as a standalone data structure.
+* A DataFrame is a 2-dimensional data structure designed for handling tabular data with multiple columns
+
+![](https://av-eks-blogoptimized.s3.amazonaws.com/series-and-dataframe.png){fig-align=center}
+
+
+
+
+## Reading in Files
+
+![](https://pandas.pydata.org/docs/_images/02_io_readwrite.svg)
+
+::: {style="font-size: 100%;"}
+```python 
+import pandas as pd
+
+df = pd.read_csv('file_name')
+```
+:::
+
+
+* Disclaimer: 
+    - loading files in your machine is different to how you would uploaded in on **Google Colab**.
+    - Visit the <span style="color:blue;">Live Coding Tab</span> for examples
+
+---
+
+### Example
+
+```python
+#| echo: true
+import pandas as pd
+
+# intialise data of lists.
+data = {'Name':['Tom', 'nick', 'krish', 'jack'],
+        'Age':[20, 21, 19, 18]}
+        
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Print the output.
+print(df)
+```
+
+```
+    Name  Age
+0    Tom   20
+1   nick   21
+2  krish   19
+3   jack   18
+```
+
+::: {style="font-size: 70%;"}
+* Pandas has assigned a key for each person as the numerical values 0 through 3
+* If you would like to have different index values, say, the person's initial, you can do that easily as well.
+:::
+
+---
+
+### Import/Export different file types
+* `.csv`
+* `.txt`
+* `.xlsx`
+* `.json`
+* ...
+
+```python
+df = read_csv('file')
+df.to_csv(file_name, sep='\t', encoding='utf-8')
+df.to_excel("output.xlsx") 
+```
+
+---
+
+### Import dataset
+
+```python
+df = pd.read_csv('data/Age.csv')
+print(df)
+
+
+```
+
+
+
+----
+
+
+### Understanding the data structure
+* The info methods and the dtypes attribute are convenient for a first check.
+
+
+```python
+df.info() ## technical summary (e.g. dataframe, rows/columnns and their names)
+df.dtypes ## generic summary
+```
+
+<br>
+
+* `head`/`tail` to check how the dataframe actually looks like
+
+
+```python
+df.head()
+df.tail()
+```
+
+## Indexing DataFrames
+
+::: {style="font-size: 80%;"}
+* When selecting subsets of data, `[]` are used.
+* Inside `[]`, you can use a single column/row label, a list of column/row labels, a slice of labels, a conditional expression or a colon.
+* `loc` when selecting the row and column names e.g. df["age"]
+* `iloc` when specifying the positions in the table e.g. df[2:5]
+* You can assign new values to a selection based on `loc`/`iloc.`
+:::
+
+
+---
+
+### Subsetting the data frame: Columns
+
+![](https://pandas.pydata.org/docs/_images/03_subset_columns.svg)
+
+* Selecting a single column
+* Selecting multiple columns
+
+```python
+df["Name"]
+df[["Name", "pop23_ov65"]]
+df.iloc[:, 3]
+```
+
+---
+
+### Subsetting the data frame: Rows
+
+![](https://pandas.pydata.org/docs/_images/03_subset_rows.svg)
+
+```python
+df[df["pop23_ov65"] > 5000]
+df[df["Name"] == "Waitemata Local Board Area"]
+
+ov10m_old = df[(df["pop23_ov65"] > 5000) & (df["Name"] == "Waitemata Local Board Area") ]
+
+df.iloc[0:4, 2:5]
+```
+
+## Your Turn
+
+::: {style="font-size: 80%;"}
+* call the library: `import pandas as pd`
+* Import a spread sheet
+* Have a look at the `info()`, `describe()`, `shape`
+* Query top 20 rows and bottom 5 rows
+* Assign a variable `over_5000` by filtering "2023 Census" and over 5000
+
+
+:::
+
+
+---
+
+## Creating New Columns from Existing Data in `df`
+
+![](https://pandas.pydata.org/docs/_images/05_newcolumn_1.svg){fig-align=center}
+
+* Required for performing calculations across columns.
+* Essential for data manipulation.
+
+
+---
+
+### Example
+
+
+```python
+import pandas as pd
+
+# Creating the dataset with student names
+df1 = pd.DataFrame({
+    'Student': ['Alice', 'Bob', 'Charlie'],
+    'Maths': [9, 8, 7],
+    'English': [4, 10, 6],
+    'Science': [8, 7, 8],
+    'History': [9, 6, 5]
+})
+
+# Calculating the total score for each student and adding it as a new column 'Total'
+df1['Total'] = df1[['Maths', 'English', 
+                    'Science', 'History']].sum(axis=1)
+# Display the updated dataset
+print(df1)
+```
+
+```
+   Student  Maths  English  Science  History  Total
+0    Alice      9        4        8        9     30
+1      Bob      8       10        7        6     31
+2  Charlie      7        6        8        5     26
+```
+
+
+
+## <br> Grouping and Aggregation
+
+---
+
+### Grouping (in `Pandas`)
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiUr0NSceFvB3vYV39lO01DRDld0HGEONzBiPZZCGUUQ&s){width=100%}
+
+::: {style="font-size: 50%;"}
+Source: Soner Yıldırım [Towards Data Science](https://towardsdatascience.com/all-about-pandas-groupby-explained-with-25-examples-494e04a8ef56)
+:::
+:::
+
+::: {.column width="15%"}
+
+:::
+
+::: {.column width="45%"}
+::: {style="font-size: 80%;"}
+
+Grouping is used to group data using some criteria from our dataset. It is used as split-apply-combine strategy.
+
+* *Splitting* the data into groups based on some criteria e.g. Brand
+* *Applying* a function to each group independently e.g. Mean
+* *Combining* the results into a data structure e,g, Price
+
+:::
+:::
+::::
+
+## Merge df's
+* Concatenate DataFrames along row and column.
+* Merge DataFrames on specific keys by different join logics like `left join`, `inner join`, etc.
+* Join DataFrames by index.
+
+![](https://media.geeksforgeeks.org/wp-content/uploads/joinimages.png){fig-align=center}
+
+
+## <br> Break Time
+
+
+## Geospatial data and GeoPandas
+
+![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
+
+* Geospatial data are data with location information
+* The geometry variable indicates where the *data* is located
+
+* New Zealand population using code
+
+![](https://newzealandmap360.com/img/1200/new%20zealand-population-density-map.jpg){fig-align=center width=120%}
+
+---
+
+## How we record the real world
+:::: {.columns}
+
+::: {.column width="60%"}
+![](Figs/howwemap.png){fig-align=center width=120%}
+:::
+
+::: {.column width="40%"}
+::: {style="font-size: 80%;"}
+- Point (2, 10)
+- LineString ([(1,2), (1,5)...])
+- Polygons ([(13,2), (15,4)...])
+- Pixels
+:::
+:::
+
+::::
+
+## Vector attribute data
+* Vector features have attributes that look like a table
+* Watch out for the projections
+
+![](Figs/attribute.png){fig-align=center width=70%}
+
+## Projections
+* Coordinate reference systems (CRS): a consistent way to represent locations in space ([Land Information NZ](https://www.linz.govt.nz/guidance/geodetic-system/coordinate-systems-used-new-zealand))
+* Geographic coordinate systems (Global): Longitude/Latitude, UTM
+* Projected coordinate systems (Local): 2D maps.
+* Each projection provides a unique code starting with EPSG
+    - Long/Lat decimal points (EPSG: 4326)
+    - NZ transverse mercator (EPSG: 2193)
+
+
+## <br> Let's get our hands dirty with `geopandas`!
+
+
+
+## As Geographers/Scientists we can also look into:
+
+![](https://dragonflyintelligence.com/wp-content/uploads/2024/01/2024-01-Paris-Theft.png){width=40%}
+
+
+
+## Summary
+* To navigate complex datasets effectively, it's crucial to structure your code in a way that enhances readability and maintainability
+* Python offers a rich ecosystem of libraries specifically designed for GIS and spatial analysis. We explored some key packages such as GeoPandas for spatial data frames
+* The actual programming:
+    - Pandas: Indexing, Filtering, Grouping, Join between dataframes
+    - Geopandas: Hands-on experience in GIS using codes
+
+
+
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
