@@ -298,11 +298,7 @@ df.to_excel("output.xlsx")
 ```python
 df = pd.read_csv('data/Age.csv')
 print(df)
-
-
 ```
-
-
 
 ----
 
@@ -375,8 +371,6 @@ df.iloc[0:4, 2:5]
 * Have a look at the `info()`, `describe()`, `shape`
 * Query top 20 rows and bottom 5 rows
 * Assign a variable `over_5000` by filtering "2023 Census" and over 5000
-
-
 :::
 
 
