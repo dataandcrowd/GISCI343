@@ -223,8 +223,6 @@ source: geeksforgeeks.org
 ![](https://av-eks-blogoptimized.s3.amazonaws.com/series-and-dataframe.png){fig-align=center}
 
 
-
-
 ## Reading in Files
 
 ![](https://pandas.pydata.org/docs/_images/02_io_readwrite.svg)
@@ -442,8 +440,19 @@ Grouping is used to group data using some criteria from our dataset. It is used 
 
 ---
 
+### Excel Example
+
+* Go to `data/Age.csv`
+* Open MS Excel
+
+![](Figs/pivot.png)
+
+
+
+---
+
 ### `Groupby` function
-- `groupby` allows us to summarize categorical values in a serries
+- `groupby` allows us to summarize categorical values in a series
     - Excel has this function...
     - Pandas does it better/on more data!
 
@@ -603,9 +612,6 @@ print(outer_merge)
 
 
 ## <br> Let's get our hands dirty with `geopandas`!
-
-## 
-
 
 
 
