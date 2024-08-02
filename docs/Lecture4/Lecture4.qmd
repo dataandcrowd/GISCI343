@@ -1,0 +1,84 @@
+---
+title: "Programming Part 3"
+subtitle: ": GIS with Geopandas"
+date: 08/06/2024
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Recap of Previous Lecture
+
+- Descriptive Statistics
+- Aggregation using `groupby`
+- Merging dataframes
+
+## Geospatial data and GeoPandas
+
+![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
+
+* Geospatial data are data with location information
+* The geometry variable indicates where the *data* is located
+
+---
+
+* New Zealand population using code
+
+![](https://newzealandmap360.com/img/1200/new%20zealand-population-density-map.jpg){fig-align=center width=120%}
+
+
+## Today's Lecture (1hr)
+* We have a lot of GIS functions
+* We are not going into the deep functions today
+   - Intersect
+   - Buffer
+   - Clip
+   - Interpolation
+   - ....
+* Instead, we want to choose a topic and explore functions from there
+
+---
+
+### Population Distribution and Demographics: Census NZ 2023
+* What are the age distribution patterns across different regions in New Zealand?
+* How is the population of Māori descendants distributed across urban and rural areas?
+* What are the key differences in population density among various ethnic groups?
+
+
+
+
+
+
+## Summary
+* To navigate complex datasets effectively, it's crucial to structure your code in a way that enhances readability and maintainability
+* Python offers a rich ecosystem of libraries specifically designed for GIS and spatial analysis. We explored some key packages such as GeoPandas for spatial data frames
+* The actual programming:
+    - Pandas: Indexing, Filtering, Grouping, Join between dataframes
+    - Geopandas: Hands-on experience in GIS using codes
+
+
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
