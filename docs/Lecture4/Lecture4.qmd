@@ -1,6 +1,6 @@
 ---
-title: "Programming Part 3"
-subtitle: ": GIS with Geopandas"
+title: "GeoPandas and New Zealand Census Data"
+subtitle: ": An Introduction to Geospatial Analysis with Python"
 date: 08/06/2024
 date-format: long
 author:
@@ -35,19 +35,6 @@ include-in-header:
 - Aggregation using `groupby`
 - Merging dataframes
 
-## Geospatial data and GeoPandas
-
-![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
-
-* Geospatial data are data with location information
-* The geometry variable indicates where the *data* is located
-
----
-
-* New Zealand population using code
-
-![](https://newzealandmap360.com/img/1200/new%20zealand-population-density-map.jpg){fig-align=center width=120%}
-
 
 ## Today's Lecture (1hr)
 * We have a lot of GIS functions
@@ -59,9 +46,46 @@ include-in-header:
    - ....
 * Instead, we want to choose a topic and explore functions from there
 
+## Geospatial data and GeoPandas
+
+![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
+
+* Geospatial data are data with location information
+* The geometry variable indicates where the *data* is located
+
+
+## Reading and Writing Spatial Data
+
+### Reading Data
+- Use `gpd.read_file()` to read various spatial data formats (e.g., Shapefiles, GeoJSON)
+
+```python
+  import geopandas as gpd
+  data = gpd.read_file('path_to_file.shp')
+```
+
 ---
 
-### Population Distribution and Demographics: Census NZ 2023
+### Writing Data
+
+Use `gpd.to_file()` to write GeoDataFrames to different formats
+
+```python
+data.to_file('path_to_save_file.shp')
+```
+
+---
+
+### Coordinate Reference Systems (CRS)
+- Importance of CRS in spatial data
+- Using `.crs` to check CRS
+- Setting CRS during data read/write operations
+
+
+
+
+
+## Population Distribution and Demographics: Census NZ 2023
 * What are the age distribution patterns across different regions in New Zealand?
 * How is the population of Māori descendants distributed across urban and rural areas?
 * What are the key differences in population density among various ethnic groups?
