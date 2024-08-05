@@ -1,6 +1,6 @@
 ---
-title: "GeoPandas and New Zealand Census Data"
-subtitle: ": An Introduction to Geospatial Analysis with Python"
+title: "An Introduction to Geospatial Analysis with Python - GeoPandas"
+subtitle: ": Examples with Census NZ"
 date: 08/06/2024
 date-format: long
 author:
@@ -37,8 +37,8 @@ include-in-header:
 
 
 ## Today's Lecture (1hr)
-* We have a lot of GIS functions
-* We are not going into the deep functions today
+* Lots of GIS functions exist
+* We are not going to cover everything such as:
    - Intersect
    - Buffer
    - Clip
@@ -46,7 +46,7 @@ include-in-header:
    - ....
 * Instead, we want to choose a topic and explore functions from there
 
-## Geospatial data and GeoPandas
+## Geospatial data and GeoPandas: A Recap
 
 ![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
 
@@ -61,7 +61,7 @@ include-in-header:
 
 ```python
   import geopandas as gpd
-  data = gpd.read_file('path_to_file.shp')
+  nzpop = gpd.read_file('path_to_file.shp')
 ```
 
 ---
@@ -71,7 +71,7 @@ include-in-header:
 Use `gpd.to_file()` to write GeoDataFrames to different formats
 
 ```python
-data.to_file('path_to_save_file.shp')
+nzpop.to_file('path_to_save_file.shp')
 ```
 
 ---
@@ -80,19 +80,214 @@ data.to_file('path_to_save_file.shp')
 - Importance of CRS in spatial data
 - Using `.crs` to check CRS
 - Setting CRS during data read/write operations
+- `print(nzpop.crs)`
+- Transform to a different CRS: `gdf = gdf.to_crs(3857)`
+
+
+## Mapping and plotting tools
+
+GeoPandas provides a high-level interface to the `matplotlib` library for making maps. Mapping shapes is as easy as using the `plot()` method on a `GeoSeries` or `GeoDataFrame.`
+
+```python
+nzpop.plot()
+
+nzpop.boundary.plot()
+
+```
+
+![](Figs/boundary.png){fig-align="center"}
 
 
 
+---
+
+### Choropleth maps
+::: {style="font-size: 80%;"}
+- Choropleth maps use the Counts and amounts (Colour) smart mapping symbol type to show data as shaded points, lines, or areas. (source: ArcGIS)
+- Choropleth maps help answer questions about data, such as: How do rates or percentages compare by geographic feature?
+- Unemployment and Crime
+:::
+
+![](Figs/unemployment.png){fig-align="center"}
+
+---
+
+### With our own data
+
+```python
+nzpop.plot(column="VAR_1_23")
+```
+
+![](Figs/choroplethmap_colour.png){fig-align="center"}
 
 
-## Population Distribution and Demographics: Census NZ 2023
+---
+
+### With our own data 2
+
+```python
+nzpop.plot(column='VAR_1_23', legend=True,
+           legend_kwds={'label': "Population in 2023",
+                        'orientation': "vertical"},
+           cmap='OrRd')
+plt.title('Choropleth Map of Population in 2023')
+plt.show()
+```
+
+---
+
+### With our own data 3: Classification
+
+::: {style="font-size: 70%;"}
+- The scheme option can be set to any scheme provided by mapclassify 
+- e.g. `box_plot`, `equal_interval`, `fisher_jenks`, `fisher_jenks_sampled`, `headtail_breaks`, `jenks_caspall`, `jenks_caspall_forced`, `jenks_caspall_sampled`, `max_p_classifier`, `maximum_breaks`, `natural_breaks`, `quantiles`, `percentiles`, `std_mean` or `user_defined`
+- https://pysal.org/mapclassify/
+
+:::
+
+
+```python
+import mapclassify as mc
+
+nzpop.plot(column="VAR_1_23", cmap='OrRd', scheme='quantiles')
+
+```
+
+---
+
+### With our own data 4
+
+```python
+classifier = mc.NaturalBreaks(y=nzpop["VAR_1_23"], k=5)  # k is the number of classes
+
+fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+nzpop.plot(column="VAR_1_23", cmap='OrRd', linewidth=0.8, ax=ax, edgecolor='0.8', 
+           scheme='NaturalBreaks', classification_kwds={'k': 5}, legend=True)
+
+plt.title('Choropleth Map of Population with Natural Breaks')
+plt.show()
+```
+
+
+## Pandas plots
+::: {style="font-size: 70%;"}
+
+Plotting methods also allow for different plot styles from pandas along with the default `geo` plot. These methods can be accessed using the `kind` keyword argument in `plot()`, and include:
+
+- `geo` for mapping
+- `line` for line plots
+- `bar` or `barh` for bar plots
+- `hist` for histogram
+- `box` for boxplot
+- `kde` or `density` for density plots
+- `area` for area plots
+- `scatter` for scatter plots
+- `hexbin` for hexagonal bin plots
+- `pie` for pie plots
+:::
+
+
+
+--- 
+
+### Scatter plot and Histogram
+
+```python
+nzpop.plot(kind="scatter", x="VAR_1_15", y="VAR_1_23")
+
+nzpop.plot[["VAR_1_15", "VAR_1_23", "geometry"]].plot.hist(alpha=.4)
+```
+
+<br>
+
+::: {style="font-size: 70%;"}
+
+- If you want to change the name of the variable, `nzpop.rename(columns={'VAR_1_15': 'NewName_15', 'VAR_1_23': 'NewName_23'}, inplace=True)`
+
+:::
+
+
+## Population Distribution and Demographics: Census NZ 2023 vs 2018
+
+::: {style="font-size: 70%;"}
+
+```python
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+# First variable
+nzpop.plot(column='VAR_1_15', ax=ax1, legend=True, cmap='OrRd')
+ax1.set_title('Population 2018')
+cbar1 = ax1.get_figure().get_axes()[2]  # Get the first colorbar axis
+cbar1.ticklabel_format(style='plain') # Access the colorbars (legends) and apply ticklabel_format
+
+# Second variable
+nzpop.plot(column='VAR_1_23', ax=ax2, legend=True, cmap='YlGn')
+ax2.set_title('Population 2023')
+cbar2 = ax2.get_figure().get_axes()[3]  # Get the second colorbar axis
+cbar2.ticklabel_format(style='plain')
+
+# Adjust layout to prevent overlap
+plt.tight_layout()
+# Show the plot
+plt.show()
+```
+:::
+
+---
+
+### Output
+
+![](Figs/pop1823.png)
+
+- Can you now add the total population of 2013 next to these plots?
+
+
+## Merging data
+
+There are two ways to combine datasets in GeoPandas – <span style="color:blue;">attribute joins</span> and <span style="color:red;">spatial joins</span>.
+
+```python
+#pip install geodatasets
+import geodatasets
+```
+
+---
+
+### Attribute joins
+- Attribute joins are accomplished using the `merge()` method. In general, it is recommended to use the `merge()` method called from the spatial dataset.
+- With that said, the stand-alone `pandas.merge()` function will work if the GeoDataFrame is in the `left` argument
+
+```python
+chicago_shapes.head()
+chicago_names.head()
+
+chicago_shapes = chicago_shapes.merge(chicago_names, on='NID')
+```
+
+---
+
+### Spatial joins
+
+In a spatial join, two geometry objects are merged based on their spatial relationship to one another.
+GeoPandas provides two spatial-join functions:
+
+- GeoDataFrame.sjoin(): joins based on binary predicates (intersects, contains, etc.)
+- GeoDataFrame.sjoin_nearest(): joins based on proximity, with the ability to set a maximum search radius.
+
+
+```python
+chicago.head()
+groceries.head()
+
+groceries_with_community = groceries.sjoin(chicago, how="inner", predicate='intersects')
+```
+
+## Thoughts
+
 * What are the age distribution patterns across different regions in New Zealand?
-* How is the population of Māori descendants distributed across urban and rural areas?
-* What are the key differences in population density among various ethnic groups?
+* How has the ethnic diversity in New Zealand evolved over the past three censuses, and what are the notable trends in Auckland?
 
-
-
-
+![](Figs/further.jpg)
 
 
 ## Summary
@@ -101,7 +296,6 @@ data.to_file('path_to_save_file.shp')
 * The actual programming:
     - Pandas: Indexing, Filtering, Grouping, Join between dataframes
     - Geopandas: Hands-on experience in GIS using codes
-
 
 
 
