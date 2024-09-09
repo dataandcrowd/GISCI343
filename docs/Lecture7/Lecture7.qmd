@@ -82,6 +82,7 @@ You will likely end up in a complex code you can never explain to others (aka. S
 
 
 ## Object
+* An element (or instance) of a class
 * Attributes: What an object is/has
     - name, age, height
 * Methods: what an object can co
@@ -209,15 +210,6 @@ class Car:
 
 ![](Figs/encapsulation.png){fig-align="center"}
 
-## Encapsulation
-![](Figs/encapsulation2.png){fig-align="center"}
-
-::: {style="font-size: 50%;"}
-* Private Attribute: The dog's name (`__name`) is private, meaning it can't be accessed directly from outside the class.
-* Public Methods: The `get_name` and `set_name` methods allow you to safely access and change the dog's name.
-* Controlled Access: You can only change or get the dog's name using the methods provided (`set_name` and `get_name`), which keeps the data safe and consistent.
-:::
-
 
 ## Why is it helpful to make some attributes private in a class?
 ::: {style="font-size: 80%;"}
@@ -235,6 +227,16 @@ class Car:
 :::
 
 ![](https://www.tasteofhome.com/wp-content/uploads/2020/02/Types-of-Coffee-Drinks_1200X1200.jpg){fig-align="center"}
+
+## Encapsulation
+![](Figs/encapsulation2.png){fig-align="center"}
+
+::: {style="font-size: 50%;"}
+* Private Attribute: The dog's name (`__name`) is private, meaning it can't be accessed directly from outside the class.
+* Public Methods: The `get_name` and `set_name` methods allow you to safely access and change the dog's name.
+* Controlled Access: You can only change or get the dog's name using the methods provided (`set_name` and `get_name`), which keeps the data safe and consistent.
+:::
+
 
 ## Abstraction
 ::: {style="font-size: 70%;"}
