@@ -70,15 +70,7 @@ You will likely end up in a complex code you can never explain to others (aka. S
 
 :::
 
-
-## Object
-* Attributes: What an object is/has
-    - name, age, height
-* Methods: what an object can co
-    - east, sleep, play
-
-
-## Class
+## Class 
 
 ::: {style="font-size: 70%;"}
 * A class is a user-defined data type. 
@@ -89,9 +81,18 @@ You will likely end up in a complex code you can never explain to others (aka. S
 ![](https://journey.prog-8.com/static/5748589d653e7fa14ddc50b5181dcfa9/illustration.svg){fig-align="center"}
 
 
-## Class
-* In an empty `.py` file, you can write:
+## Object
+* Attributes: What an object is/has
+    - name, age, height
+* Methods: what an object can co
+    - east, sleep, play
 
+![](https://cdn.ttgtmedia.com/rms/onlineimages/whatis-object_oriented_programming_half_column_mobile.png){fig-align="center"}
+
+
+
+## Examples
+* In an empty `.py` file, you can write:
 
 ```python
 class Car:
@@ -99,7 +100,7 @@ class Car:
 
 ```
 
-* If the file is small, you can keep it in the main `python` file
+* If the file is small, you can keep it in the main script
 * But if the file gets bigger, you might want to consider creating a separate file.
 
 ```python
@@ -121,6 +122,59 @@ class Car:
 
 ```
 
+<!--
+
+### Stage 1: 
+class Car:
+        make = None
+        model = None
+        year = None
+        colour = None
+
+    def drive(self):
+        print("This car is driving")
+
+    def stop(self):
+        print("This car is stopped")
+RUN
+
+### Stage 2: 
+class Car:
+
+  def __init__(self, make, model, year, colour): instance/constructor
+      self.make = make
+      self.model = model
+      self.year = year
+      self.colour = colour
+
+    def drive(self):
+        print("This car is driving")
+
+    def stop(self):
+        print("This car is stopped")
+RUN
+
+car_1 = Car()
+car_1 = Car("Corolla", "Toyota", 2024, "Pearl White")
+
+### Stage 3:
+class Car:
+
+    def __init__(self,make,model,year,colour):
+        self.make = make
+        self.model = model
+        self.year = year
+        self.colour = colour
+
+    def drive(self):
+        print("This "+self.model+" is driving")
+
+    def stop(self):
+        print("This "+self.model+" is stopped")
+-->
+
+
+
 
 ## Four pillars in OOP
 
@@ -130,7 +184,7 @@ class Car:
 ## Inheritance
 * To create an object that inherits the methods and properties of another object
 * A parent class and a child class
-* Use `super()` to inherit parent classin
+* Use `super()` to inherit parent class
 
 ![](Figs/inherit.png){fig-align="center"}
 
@@ -166,9 +220,12 @@ class Car:
 
 
 ## Why is it helpful to make some attributes private in a class?
+::: {style="font-size: 80%;"}
 * Because it allows you to control how those attributes are accessed and modified. 
 * You can ensure that it's only changed in specific, intended ways. 
-* Prevents accidental or harmful changes to the data, which can lead to bugs or unexpected behaviour in your program.
+* Prevents accidental or harmful changes to the data, which can lead to bugs or unexpected behaviour in your programme.
+:::
+
 
 ## Real-World Example of Encapsulation:
 ::: {style="font-size: 50%;"}
@@ -189,11 +246,11 @@ class Car:
 
 ![](Figs/abstraction.png){fig-align="center"}
 
-## Abstraction
-* **Key Takeaway**: Abstraction enforces a contract. Every car must have a model, but the specifics are determined by each subclass.
-* **Abstract Class (Car)**: Sets a standard that every car subclass must have a car_model method.
-* **Purpose of Abstract Class**: Ensures the focus is on WHAT should be implemented, not HOW.
-* **Subclasses (Tesla and BMW)**: Implement the car_model method, defining HOW it should work for each specific car.
+<!-- ## Abstraction -->
+<!-- * **Key Takeaway**: Abstraction enforces a contract. Every car must have a model, but the specifics are determined by each subclass. -->
+<!-- * **Abstract Class (Car)**: Sets a standard that every car subclass must have a car_model method. -->
+<!-- * **Purpose of Abstract Class**: Ensures the focus is on WHAT should be implemented, not HOW. -->
+<!-- * **Subclasses (Tesla and BMW)**: Implement the car_model method, defining HOW it should work for each specific car. -->
 
 
 ## Summary
