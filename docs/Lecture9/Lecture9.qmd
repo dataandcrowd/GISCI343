@@ -1,7 +1,7 @@
 ---
 title: "Object Oriented Programming for GIS Dummies"
 # subtitle: ": Examples with Census NZ"
-date: 09/10/2024
+date: 09/24/2024
 date-format: long
 author:
   - name: Hyesop Shin
