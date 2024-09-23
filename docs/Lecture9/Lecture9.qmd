@@ -1,0 +1,157 @@
+---
+title: "Object Oriented Programming for GIS Dummies"
+# subtitle: ": Examples with Census NZ"
+date: 09/10/2024
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Today's Lecture (1hr)
+* A tiny recap on last lecture
+* Some examples (in class)
+* More on Friday and homeworks
+
+
+
+## What is Object Oriented Programming?
+::: {.incremental}
+
+* Object-oriented programming (OOP) is a programming paradigm based on the concept of objects ([Wiki](https://en.wikipedia.org/wiki/Object-oriented_programming))
+* OOP is a programming paradigm that treats data and functions as attributes and methods of objects, which are instances of classes
+* Classes are templates that define the properties and behaviours of objects, and can inherit from other classes or implement interfaces. 
+* OOP allows you to create modular, reusable, and extensible code that can handle complex problems and reduce errors. 
+* <p style="color:MediumSeaGreen;">For GIS, OOP can help you model spatial features, perform spatial analysis, and create interactive maps and applications.</p>
+
+
+:::
+
+
+## How to design classes and objects for GIS?
+One of the first steps to use OOP for GIS is to design your classes and objects is using the four pillars
+
+
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*okWMvihm_bOETOFjHJ_NJw.png){fig-align="center"}
+
+
+## Inheritance
+* To create an object that inherits the methods and properties of another object
+* A parent class and a child class
+* Use `super()` to inherit parent class
+
+![](Figs/inherit.png){fig-align="center"}
+
+
+## Polymorphism
+::: {style="font-size: 80%;"}
+* Poly = many / morph = forms
+* process of using for more than one purpose
+* You can have one function or object that can be used in different ways
+
+:::
+
+
+![](https://miro.medium.com/v2/resize:fit:720/format:webp/1*N7cKjbtQzpU3jCx_00OYRg.png){fig-align="center"}
+
+
+## Polymorphism
+* Example: `+` operator
+
+![](Figs/polymorphism.png){fig-align="center"}
+
+
+## Encapsulation
+::: {style="font-size: 80%;"}
+* Encapsulation is the process of making data private by wrapping data and its methods in a ‘capsule’ or unit
+* It can not be accessed or modified outside of that unit
+* In Python, we can make variables private by prefixing the variable name with a double underscore `__`
+
+:::
+
+
+
+![](Figs/encapsulation.png){fig-align="center"}
+
+
+## Why is it helpful to make some attributes private in a class?
+::: {style="font-size: 80%;"}
+* Because it allows you to control how those attributes are accessed and modified. 
+* You can ensure that it's only changed in specific, intended ways. 
+* Prevents accidental or harmful changes to the data, which can lead to bugs or unexpected behaviour in your programme.
+:::
+
+
+## Real-World Example of Encapsulation:
+::: {style="font-size: 50%;"}
+* Imagine you’re building software for a coffee shop. You might have a class that represents a coffee machine. 
+* The coffee machine has many internal components, like water levels, temperature settings, and a coffee bean grinder.
+* `water_level`, `temp`, `set_grind_for_espresso()`
+:::
+
+![](https://www.tasteofhome.com/wp-content/uploads/2020/02/Types-of-Coffee-Drinks_1200X1200.jpg){fig-align="center"}
+
+## Encapsulation
+![](Figs/encapsulation2.png){fig-align="center"}
+
+::: {style="font-size: 50%;"}
+* Private Attribute: The dog's name (`__name`) is private, meaning it can't be accessed directly from outside the class.
+* Public Methods: The `get_name` and `set_name` methods allow you to safely access and change the dog's name.
+* Controlled Access: You can only change or get the dog's name using the methods provided (`set_name` and `get_name`), which keeps the data safe and consistent.
+:::
+
+
+## Abstraction
+::: {style="font-size: 70%;"}
+* Abstraction is about keeping the process simple by hiding unnecessary details from the user
+* e.g. Car
+* Abstraction is about keeping the internal mechanics of the code hidden from the user. 
+* This reduces the complexity of the code, and ensures that we only concentrate on what is important.
+:::
+
+![](Figs/abstraction.png){fig-align="center"}
+
+<!-- ## Abstraction -->
+<!-- * **Key Takeaway**: Abstraction enforces a contract. Every car must have a model, but the specifics are determined by each subclass. -->
+<!-- * **Abstract Class (Car)**: Sets a standard that every car subclass must have a car_model method. -->
+<!-- * **Purpose of Abstract Class**: Ensures the focus is on WHAT should be implemented, not HOW. -->
+<!-- * **Subclasses (Tesla and BMW)**: Implement the car_model method, defining HOW it should work for each specific car. -->
+
+
+## Summary
+
+![](https://miro.medium.com/v2/resize:fit:720/format:webp/1*pKlZddECirQAm2bZiOrU1A.png)
+
+<!-- https://medium.com/@kalanamalshan98/oop-concepts-mastering-basics-with-real-life-examples-for-easy-understanding-part-1-da5b8fc21036 -->
+
+
+## A 🎁 in your Canvas page...
+* Week 7
+* File name: OOP 2
+* OOP with some GIS examples
+
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
