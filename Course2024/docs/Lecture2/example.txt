@@ -1,0 +1,21 @@
+print("hello world")
+len("hello world") 
+print(len("hello world")) 
+
+temp_celsius = 10.0
+myname = "Hyesop"
+
+weatherForecast = "Freezing"
+type(weatherForecast)
+
+western_line = ["Britomart", "Parnell", "Newmarket", "Grafton",
+    "Mt Eden", "Kingsland", "Morningside", "Baldwin Ave"]
+    
+european_cities = ["Amsterdam", "Brussels", "London", "Rome"]
+
+
+cities = ["Helsinki", "Stockholm", "Oslo", "Reykjavik", "Copenhagen"]
+countries = ["Finland", "Sweden", "Norway", "Iceland", "Denmark"]
+
+
+temperatures = [0, 12, 17, 28, 30]

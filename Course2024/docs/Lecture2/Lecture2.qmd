@@ -1,0 +1,970 @@
+---
+title: "Python Data Bootcamp"
+subtitle: ": for GIS Dummies"
+date: 07/23/2024
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+#format: html
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+## Helpdesk
+* Friday 2pm - Lab Sessions
+* Piazza is the place to go!
+
+![](Figs/crowdstrike.png){.absolute top=100 right=100 width="300" height="300"}
+
+
+## What will we cover for today?
+* Simple Python maths
+* Functions
+* `for` loops
+* Conditional Statements
+* Import files
+- Everything up until pandas we saw in 242, but now we will go a little deeper
+- We don't have enough time to get into everything in this class, but we will try to nerd out a little today
+ 
+
+
+
+## How will we cover it?
+
+* Install Python on your machine
+* Jupyter lab / Notebook / VS Code
+* Google Colab (just in case)
+
+![](Figs/vscode-logo.png){.absolute top=100 right=150 width="200" height="200"}
+
+
+
+## Why do we learn to code? 
+
+::: {.incremental}
+* We are not computer scientists (I am not at least)
+* GISci and Geography disciplines are becoming increasingly quantitative
+* Large datasets
+* We want to do our job quickly and do less of the same work.
+* Programming can also be fun
+* Programming can help make us better scientists - <span style="color:blue;">Open Science</span>
+:::
+
+
+## What are computers <span style="color:blue;">good</span> at?
+
+Tasks computers are good at include ^[Introduction to Python for GIS https://pythongis.org/index.html]:
+
+* Well-defined tasks (i.e. Clear aim, Low Risk of Failure)
+* Data storage and manipulation
+* Repetitive calculations
+* Processing data or instructions (Important!)
+
+
+
+## What are computers <span style="color:#A23F29;">bad</span> at?
+:::: {.columns .incremental}
+
+::: {.column width="50%"}
+1. Abstract or poorly defined tasks
+
+```{python}
+#| echo: true
+
+print("Python" > "R")
+print("Ronaldo" > "Messi")
+```
+
+:::
+
+::: {.column width="50%"}
+2. Tasks requiring impossible computing power (intractable tasks)
+
+```python
+## True Pi
+3.14159265358979323846264338327
+
+
+>>> from mpmath import mp
+>>> mp.dps = 20    # set number of digits
+>>> print(mp.pi)
+3.1415926535897932385
+```
+:::
+
+3. Can't remember what you've written (unless you wrote it down somewhere)
+
+::::
+
+
+
+
+
+
+<!-- ##  -->
+<!-- &nbsp;   -->
+
+<!-- ### Let's Take a Quality Break!{style="text-align: center;"} -->
+
+<!-- &nbsp;   -->
+
+<!-- Make sure you are well set up with Google Colab using the URL below: -->
+<!-- <center><span style="color:blue;">https://colab.research.google.com</span></center> -->
+
+<!-- &nbsp; -->
+
+
+<!-- I will code here: https://tinyurl.com/gisci242 -->
+
+
+## Basic Programming Concepts 
+We will cover:
+
+* Simple Python maths
+* Functions
+* `for` loops
+* Conditional Statements
+* Import files
+
+
+## Relative paths{.smaller}
+- How they work:
+  - Whenever I am using an image or data in a notebook like this, it is pointed to by a relative path:
+  - `![](images/IMAGE_name.JPG)`
+
+- The path is relative to the location in which I am running the notebook from.
+- When you download these lectures to follow along, this is why they are zipped up and have a sub-folder within them for images/data. 
+- When you submit your code to us, write a notebook like these and zip it into a folder as we have done. Making sure that all your paths to data, images etc are relative, as demonstrated above. And the data is contained in what you have zipped up.
+
+---
+
+### 
+
+`![](images/IMAGE_name.JPG)`
+
+![](Figs/directory.png)
+
+
+## Simple Python maths
+
+::: {style="font-size: 250%;"}
+
+```python 
+1 + 1
+
+5 * 7
+
+2**3
+
+10 % 2
+```
+:::
+
+---
+
+### Simple Python maths - answers
+
+::: {style="font-size: 250%;"}
+
+```{python}
+#| echo: true
+
+1 + 1
+
+5 * 7
+
+4000 - 3210
+```
+
+:::
+
+
+## Strings
+Strings (str) represent sequences of characters, e.g. I love GIS, Python is awesome, 1990. Note that a number will be of the type string when declared within quotations marks ("").
+
+
+::: {style="font-size: 150%;"}
+
+```python
+print("hello world") # print strings
+
+len("hello world") # to count text in Python Shell
+print(len("hello world")) # in Python Notebook
+```
+
+:::
+
+
+---
+
+### Example
+
+::: {style="font-size: 150%;"}
+
+```python
+temp_celsius = 10.0
+myname = "Hyesop"
+```
+<br>
+
+```python
+print(temp_celsius)
+print(myname)
+```
+
+```
+10
+Hyesop
+```
+
+
+:::
+
+
+## Variables
+* A <span style="color:blue;">**variable**</span> can be used to store values calculated in expressions and used for other calculations
+* A variable is a location in memory.
+
+![](Figs/variable-diagram-different-values.png){fig-align="center"}
+
+```python
+weather = "Freezing"
+
+print(weather)
+```
+
+---
+
+### _mutability_
+* Mutability mean that variables can be changed without being erased. 
+* Some types of variables like integers are *immutable* (you got to throwing away the old one)
+  - This means if we change them, they get a different memory address, and the old memory address gets recycled (thanks python!)
+
+```python
+weather = "Sunny"
+
+print(weather)
+
+
+```
+
+---
+
+### Data types
+* A <span style="color:blue;">*data type*</span> determines the characteristics of data in a programme
+* Basic data types in Python.
+
+| Data type name | Data type            | Example |
+|----------------|----------------------|---------|
+| `int`            | Whole integer values | 4       |
+| `float`          | Decimal values       | 3.1415  |
+| `str`            | Character strings    | 'Freezing'   |
+| `bool`           | True/false values    | True    |
+
+---
+
+### Data types: Strings
+
+```{python}
+#| echo: true
+
+weatherForecast = "Freezing"
+type(weatherForecast)
+
+```
+
+
+* We can concatenate strings using the addition operator:
+
+```python
+print(weatherForecast+weatherForecast)
+
+```
+
+* We als can perform upper and lower case transformations:
+
+
+```python
+print(weatherForecast.upper())
+print(weatherForecast.lower())
+```
+
+---
+
+### Data types: Numeric
+* Addition
+* Subtraction
+* Multiplication
+* Division
+
+```python
+my_int= 2
+my_float= 24.3
+
+my_int+my_float
+my_int-my_float
+
+```
+---
+
+### Data types: Numeric (more)
+
+* Floor Division: `//` operator is used to perform integer division (rounding down to the nearest integer).
+* Modulo: `%` operator returns the remainder of the division operation.
+* Exponentiation
+
+```python
+10//3
+10%3
+2**3
+```
+
+---
+
+### Data types: Boolean
+
+- booleans allow us to test logic
+- booleans give us the power of conditionals
+
+```python
+x = 5
+y = 4
+print(x > y)
+print(not(x > y)()
+
+```
+
+---
+
+### Your Turn
+
+* Print the `type()` of: 
+
+::: {style="font-size: 150%;"}
+  - 153
+  - 8.8354
+  - Windy
+  - False
+
+:::
+
+---
+
+### Lists
+When we have more clothes/items we would like to align similar types of clothes into a drawer
+
+![](Figs/drawer.png){fig-align="center"}
+
+---
+
+### List Example 1
+
+::: {style="font-size: 150%;"}
+
+```python
+top = ["socks", "underwear", "handkerchief"]
+middle = ["T-shirts", "Pajamas", "Trousers", "Shorts"]
+bottom = [30, 73, 100, 62]
+```
+&nbsp;
+
+```python
+print(top[0])
+print(min(bottom))
+```
+
+```
+socks  # <- index "an element of a list"
+30     # <- the smallest element of the list
+```
+:::
+
+---
+
+### List Example 2
+
+Let’s first create a list of selected station_name values and print it to the screen.
+
+```{python}
+#| echo: true
+
+western_line = [
+    "Britomart",
+    "Parnell",
+    "Newmarket",
+    "Grafton",
+    "Mt Eden",
+    "Kingsland",
+    "Morningside",
+    "Baldwin Ave"
+]
+
+western_line
+```
+
+```{python}
+#| echo: true
+type(western_line)
+```
+
+---
+
+### Index values
+To access an individual value in the list we need to use an **index** value.
+
+```{python}
+#| echo: true
+
+western_line[1]
+```
+
+Python returns 'Parnell' instead of 'Waitematā'. Can anybody guess why?
+
+---
+
+### Index values
+
+```{python}
+#| echo: true
+
+western_line[2]
+western_line[2:5]
+western_line[-1]
+western_line[-8]
+```
+
+---
+
+### Modifying list values
+
+::: {style="font-size: 150%;"}
+
+```{python}
+#| echo: true
+western_line[3] = 'Auckland City'
+western_line
+```
+
+:::
+
+
+
+---
+
+### Adding list values
+
+::: {style="font-size: 150%;"}
+
+```{python}
+#| echo: true
+
+western_line.append("new station")
+print(western_line)
+```
+
+:::
+
+
+## <span style="color:green;">Your Turn!</span> {.smaller}
+1. Define `western_line` in your environment
+2. Add **Mt Albert, Avondale, New Lynn, Fruitvale Rd, Glen Eden** as a list (you can Google "Auckland Western Line" and find the Wikipedia)
+3. Assign that in your environment as `more_eastern`
+4. This time, try `extend` to combine the two lists
+
+::: {style="font-size: 150%;"}
+
+```python
+western_line = ["Britomart", "Parnell", "Newmarket", "Grafton",
+    "Mt Eden", "Kingsland", "Morningside", "Baldwin Ave"]
+```
+
+:::
+
+## Documentation
+* At this point, you might think, *Hang on, do I have to memorise everything?*
+* The answer is **NO**
+* If you are stuck, visit https://www.python.org/doc
+* Google your problem (Stackoverflow)
+* ChatGPT and Gemini (🧐)
+
+
+
+
+## `for` loop
+* Loops allow parts of code to be repeated some number of times
+* Iterates over all of the items in a Python list and performing a calculation on each item.
+
+
+<div id="contentframe" style="position:absolute; top: 400px; left: 0px;">
+<iframe src="https://giphy.com/embed/ifMxbaTDxAi3kUraHa" width="300" height="230" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+ </div>
+
+<div id="contentframe" style="position:absolute; top: 450px; left: 320px;">
+vs
+</div>
+
+<div id="contentframe" style="position:absolute; top: 400px; left: 400px;">
+<iframe src="https://giphy.com/embed/ZB1snEzf9Njveo73w2" width="300" height="230" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+</div>
+
+
+---
+
+### `for` loop: concept
+
+&nbsp;
+
+::: {style="font-size: 150%;"}
+
+```python
+for variable in collection:
+    do things with variable
+```
+:::
+
+
+::: {style="font-size: 70%;"}
+Let’s break down the code above to see some essential aspect of `for` loops:
+
+* The `variable` can be any name you like.
+* The statement of the `for` loop must end with a colon (:)
+* The code that should be executed as part of the loop must be indented beneath the `for` loop statement. 
+* The typical indentation is **4 spaces**.
+* There is no additional special word needed to end the loop, you simply change the indentation back to normal.
+
+:::
+
+---
+
+<!--
+### Hand-picked works: When we do loops manually
+<span style="color:red;">Bad example</span>
+
+```{python}
+#| echo: true
+
+western_line = [
+    "Britomart", "Ōrākei", "Meadowbank", "Purewa",
+    "Glen Innes", "Tamaki", "Panmure", "Sylvia Park"
+]
+
+```
+
+
+```{python}
+#| echo: true
+western_line[0]
+western_line[1]
+```
+```
+.
+.
+.
+
+```
+---
+-->
+
+### Your daily for loop
+
+```python
+for day in my_life:
+    wake_up()
+    take_shower()
+    eat_breakfast()
+    brush_teeth()
+    ride_beam()
+    come_to_lecture()
+    ...
+```
+
+![](Figs/schedule.jpg){.absolute top=150 right=0 width=40%}
+
+---
+
+### for loop: an example
+
+::: {style="font-size: 150%;"}
+
+```python
+for name in western_line:
+    print(name)
+```
+```
+Britomart 
+Parnell
+Newmarket 
+Grafton
+Mt Eden
+Kingsland
+Morningside
+Baldwin Ave
+```
+
+
+:::
+
+---
+
+### Different example
+::: {style="font-size: 110%;"}
+```python
+european_cities = ["Amsterdam", "Brussels", "London", "Rome"]
+
+for city in european_cities:
+    print(city)
+```
+:::
+
+---
+
+### Examples using `range`
+
+::: {style="font-size: 150%;"}
+```{python}
+#| echo: true
+
+for value in range(5):
+    print(value)
+```
+:::
+
+---
+
+### Examples using `range`
+
+::: {style="font-size: 150%;"}
+```{python}
+#| echo: true
+
+group1 = [1, 3, 5]
+group2 = [0, 1, 2]
+
+for i in range(2):
+    print(group1[i], group2[i])
+```
+:::
+
+---
+
+## Your Turn!
+
+::: {style="font-size: 105%;"}
+
+```python
+cities = ["Helsinki", "Stockholm", "Oslo", "Reykjavik", "Copenhagen"]
+countries = ["Finland", "Sweden", "Norway", "Iceland", "Denmark"]
+
+```
+:::
+
+* The indices of the cities and countries are in the same order
+* For example, Helsinki and Finland are in index 0
+* Create a `for` loop that describes something like *Helsinki is the capital of Finland*
+
+
+---
+
+### Examples using two lists - Answers
+::: {style="font-size: 120%;"}
+
+```python
+for i in range(5):
+    print(cities[i], "is the capital of", countries[i])
+    
+for i in range(len(cities)):
+    print(cities[i], "is the capital of", countries[i])
+```
+:::
+
+
+&nbsp; 
+
+```
+Helsinki is the capital of Finland
+Stockholm is the capital of Sweden
+Oslo is the capital of Norway
+Reykjavik is the capital of Iceland
+Copenhagen is the capital of Denmark
+```
+
+
+
+## Conditional statements
+* We will learn how to make choices in our code using conditional statements (`if`, `else`) and Boolean values (`True`, `False`).
+* Conditional statements can change the code behaviour based on certain conditions. 
+* The idea is simple: **IF** a condition is met, **THEN** a set of actions is performed.
+
+---
+
+### if else Example 1
+
+::: {style="font-size: 200%;"}
+
+```python
+temperature = 17
+
+if temperature > 25:
+    print("it is hot!")
+else:
+    print("it is not hot!")
+    
+print(temperature)    
+```
+
+```
+it is not hot
+```
+:::
+
+---
+
+### if else Example 2
+
+::: {style="font-size: 200%;"}
+
+```python
+temperature = 30
+
+if temperature > 25:
+    print("it is hot!")
+else:
+    print("it is not hot!")
+    
+print(temperature)    
+```
+
+```
+it is hot
+```
+:::
+
+---
+
+### `if` statement without `else`
+
+* The code indented under the if-statement is not executed if the condition is not True. Instead, code under the else-statement gets executed.
+* How about if without else?
+
+
+::: {style="font-size: 140%;"}
+
+```python
+temperature = 17
+
+if temperature > 25:
+    print(temperature, "is greater than 25")
+```
+
+:::
+
+---
+
+### Conditional operator
+
+::: {style="font-size: 140%;"}
+
+```python
+weather = "rain"
+
+if weather == "rain":
+    print("Wear a raincoat!")
+else:
+    print("No raincoat needed.")
+```
+
+```
+Wear a raincoat!
+```
+
+:::
+
+---
+
+### Comparison operators
+
+| Operator | Description              |
+|----------|--------------------------|
+| <        | Less than                |
+| <=       | Less than or equal to    |
+| ==       | Equal to                 |
+| >=       | Greater than or equal to |
+| >        | Greater than             |
+| !=       | Not equal to             |
+
+---
+
+### Boolean values
+
+* Comparison operations yield Boolean values (`True` or `False`). 
+* In Python, the words True and False are reserved for these Boolean values, and can’t be used for anything else.
+
+::: {style="font-size: 140%;"}
+
+```python
+temperature > 25
+```
+```
+False
+```
+:::
+
+
+
+<!--
+### if, elif and else
+
+::: {style="font-size: 70%;"}
+* We can link several conditions together using the “else if” -statement `elif.` 
+* Python checks the `elif` and else statements only if previous conditions were False. 
+* You can have multiple `elif` statements to check for additional conditions.
+
+:::
+
+
+::: {style="font-size: 120%;"}
+
+```python
+temperature = -3
+
+if temperature > 0:
+    print(temperature, "degrees celsius is above freezing")
+elif temperature == 0:
+    print(temperature, "degrees celsius is at the freezing point")
+else:
+    print(temperature, "degrees celsius is below freezing")
+```
+
+```
+-3 degrees celsius is below freezing
+```
+:::
+
+---
+-->
+
+## Combinations
+### Combining conditions
+
+* We can also use and and or to combine multiple conditions on boolean values
+
+| Keyword | Example | Description                   |
+|---------|---------|-------------------------------|
+| and     | a and b | True if both a and b are True |
+| or      | a or b  | True if either a or b is True |
+
+
+---
+
+### Combination Example
+
+::: {style="font-size: 120%;"}
+
+```python
+weather = "rain"
+wind_speed = 14
+comfort_limit = 10
+
+# If it is windy or raining, print "stay at home",
+# otherwise (else) print "go out and enjoy the weather!"
+if (weather == "rain") or (wind_speed >= comfort_limit):
+    print("Just stay at home")
+else:
+    print("Go out and enjoy the weather! :)")
+```
+
+```
+Just stay at home
+```
+
+:::
+
+---
+
+### Combining for-loops and conditional statements
+
+::: {style="font-size: 80%;"}
+* We can also combine for-loops and conditional statements. 
+* Let’s iterate over a list of temperatures, and check if the temperature is hot or not
+:::
+
+```python
+temperatures = [0, 12, 17, 28, 30]
+
+# For each temperature, if the temperature is greater than 25, print "..is hot"
+for temperature in temperatures:
+    if temperature > 25:
+        print(temperature, "is hot")
+    else:
+        print(temperature, "is not hot")
+```
+
+```python
+0 is not hot
+12 is not hot
+17 is not hot
+28 is hot
+30 is hot
+```
+
+
+## Summary - What have we learned? 
+
+::: {style="font-size: 85%;"}
+
+::: {.incremental}
+* Programming is not too difficult than you think. They are easy to understand and share (and fun!)
+* Python is one of the popular programming languages - we are going to nail this!
+* Basics of Python
+   - Basic programming
+   - Functions
+   - for loops
+   - Conditional statements
+   - Combos of the above
+
+:::
+:::
+
+## Next week
+* Recap of today's work + working on conditions
+* How to import spreadsheet data: dataframe
+* How to clean and use dataframes
+* How to play with GIS dataset
+
+
+## References
+
+* Tekanen et al. (2022), Introduction to Python for Geographic Data Analysis, https://pythongis.org/
+* Rey et al. (2020), Geographic Data Science with Python, https://geographicdata.science/book 
+* Dorman et al (2023), Geocomputation with Python, https://py.geocompx.org/
+
+
+## Thanks! <br> Q & A{style="text-align: center;"}
+
+
+<div style="width:840px"><iframe allow="fullscreen" frameBorder="0" height="480" src="https://giphy.com/embed/PwSkiR02N3960AC5c1/video" width="840"></iframe></div>
+
+<!--
+<div class="center-link" style="width:960px">
+  <iframe allow="fullscreen" frameBorder="0" height="480" src="https://giphy.com/embed/PwSkiR02N3960AC5c1/video" width="840"></iframe>
+</div>
+-->
