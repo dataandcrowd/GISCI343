@@ -11,6 +11,11 @@ type(weatherForecast)
 western_line = ["Britomart", "Parnell", "Newmarket", "Grafton",
     "Mt Eden", "Kingsland", "Morningside", "Baldwin Ave"]
     
+more_western = [Mt Albert, Avondale, New Lynn, Fruitvale Rd, Glen Eden]
+
+western_line.extend(more_eastern)
+
+
 european_cities = ["Amsterdam", "Brussels", "London", "Rome"]
 
 

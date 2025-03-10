@@ -1,0 +1,1 @@
+https://uwgda-jupyterbook.readthedocs.io/en/latest/modules/02_Python_Jupyter/02_Python_Jupyter_exercises.html

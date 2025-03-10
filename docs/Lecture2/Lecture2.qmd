@@ -1,7 +1,7 @@
 ---
 title: "Python Data Bootcamp"
 subtitle: ": for GIS Dummies"
-date: 07/23/2024
+date: 03/10/2024
 date-format: long
 author:
   - name: Hyesop Shin
@@ -29,11 +29,25 @@ include-in-header:
       </style>
 ---
 
-## Helpdesk
-* Friday 2pm - Lab Sessions
-* Piazza is the place to go!
+## How will we cover it?
 
-![](Figs/crowdstrike.png){.absolute top=100 right=100 width="300" height="300"}
+* **<span style="color:blue">Google Colab (by default)</span>**
+* Install Python on your machine (Optional)
+* Jupyter lab / Notebook / VS Code (Optional)
+
+![](Figs/colab.png){.absolute top=50 right=100 width="300" height="200"}
+
+&nbsp;
+
+Make sure you are well set up with Google Colab using the URL below:
+<center><span style="color:blue;">https://colab.research.google.com</span></center>
+
+
+
+## Helpdesk
+* Wednesday 12pm-2pm: Lab Sessions
+* Ed discussion is the place to go!
+
 
 
 ## What will we cover for today?
@@ -46,122 +60,14 @@ include-in-header:
 - We don't have enough time to get into everything in this class, but we will try to nerd out a little today
  
 
-
-
-## How will we cover it?
-
-* Install Python on your machine
-* Jupyter lab / Notebook / VS Code
-* Google Colab (just in case)
-
-![](Figs/vscode-logo.png){.absolute top=100 right=150 width="200" height="200"}
-
-
-
-## Why do we learn to code? 
-
-::: {.incremental}
-* We are not computer scientists (I am not at least)
-* GISci and Geography disciplines are becoming increasingly quantitative
-* Large datasets
-* We want to do our job quickly and do less of the same work.
-* Programming can also be fun
-* Programming can help make us better scientists - <span style="color:blue;">Open Science</span>
-:::
-
-
-## What are computers <span style="color:blue;">good</span> at?
-
-Tasks computers are good at include ^[Introduction to Python for GIS https://pythongis.org/index.html]:
-
-* Well-defined tasks (i.e. Clear aim, Low Risk of Failure)
-* Data storage and manipulation
-* Repetitive calculations
-* Processing data or instructions (Important!)
-
-
-
-## What are computers <span style="color:#A23F29;">bad</span> at?
-:::: {.columns .incremental}
-
-::: {.column width="50%"}
-1. Abstract or poorly defined tasks
-
-```{python}
-#| echo: true
-
-print("Python" > "R")
-print("Ronaldo" > "Messi")
-```
-
-:::
-
-::: {.column width="50%"}
-2. Tasks requiring impossible computing power (intractable tasks)
+## For the first time
+* Let's type
 
 ```python
-## True Pi
-3.14159265358979323846264338327
-
-
->>> from mpmath import mp
->>> mp.dps = 20    # set number of digits
->>> print(mp.pi)
-3.1415926535897932385
+print("Hello World")
 ```
-:::
-
-3. Can't remember what you've written (unless you wrote it down somewhere)
-
-::::
 
 
-
-
-
-
-<!-- ##  -->
-<!-- &nbsp;   -->
-
-<!-- ### Let's Take a Quality Break!{style="text-align: center;"} -->
-
-<!-- &nbsp;   -->
-
-<!-- Make sure you are well set up with Google Colab using the URL below: -->
-<!-- <center><span style="color:blue;">https://colab.research.google.com</span></center> -->
-
-<!-- &nbsp; -->
-
-
-<!-- I will code here: https://tinyurl.com/gisci242 -->
-
-
-## Basic Programming Concepts 
-We will cover:
-
-* Simple Python maths
-* Functions
-* `for` loops
-* Conditional Statements
-* Import files
-
-
-## Relative paths{.smaller}
-- How they work:
-  - Whenever I am using an image or data in a notebook like this, it is pointed to by a relative path:
-  - `![](images/IMAGE_name.JPG)`
-
-- The path is relative to the location in which I am running the notebook from.
-- When you download these lectures to follow along, this is why they are zipped up and have a sub-folder within them for images/data. 
-- When you submit your code to us, write a notebook like these and zip it into a folder as we have done. Making sure that all your paths to data, images etc are relative, as demonstrated above. And the data is contained in what you have zipped up.
-
----
-
-### 
-
-`![](images/IMAGE_name.JPG)`
-
-![](Figs/directory.png)
 
 
 ## Simple Python maths
@@ -197,8 +103,232 @@ We will cover:
 
 :::
 
+## End-of-Line Terminates a statement
 
-## Strings
+```python
+temperature = 5
+```
+
+* This is an assignment operation, where we've created a variable named `temperature` and assigned it the value 5. 
+* Notice that the end of this statement is simply marked by the end of the line.
+
+
+::: {.incremental}
+
+```python
+x = 1 + 2 + 3 + 4 +\
+    5 + 6 + 7 + 8
+```
+
+* In Python, if you'd like a statement to continue to the next line, it is possible to use the &#92; marker to indicate this:
+
+:::
+
+
+
+
+
+## Whitespace Within Lines Does Not Matter
+* `White space` within lines of Python code does not matter. 
+* For example, all three of these expressions are equivalent
+
+```python
+x=1+2
+x = 1 + 2
+x             =        1    +                2
+```
+
+::: {.incremental}
+
+* Which line of code do you think is more <span style="color:blue">readable</span>?
+
+:::
+
+
+## Round brackets (Parentheses)
+
+```python
+2 * (3 + 4)
+```
+* They can be used in the typical way to group statements or mathematical operations
+
+```python
+print('first value:', 1)
+```
+
+* Indicate that a function is being called. `print()`
+
+```python
+L = [4,2,3,1]
+L.sort()
+print(L)
+```
+
+* The "()" after sort indicates that the function should be executed
+* required even if no arguments are necessary
+
+
+
+
+
+## Python Semantics: Variables
+* A <span style="color:blue;">**variable**</span> can be used to store values calculated in expressions and used for other calculations
+* A variable is a location in memory.
+
+![](Figs/variable-diagram-different-values.png){fig-align="center"}
+
+```python
+weather = "Freezing"
+
+print(weather)
+```
+
+
+---
+
+### Variable as pointer
+
+```python
+x = [1, 2, 3]
+y = x
+```
+* You have created two variables x and y which both point to the same object.
+
+```python
+x = 'something else'
+print(y)  # y is unchanged
+```
+* This makes perfect sense if you think of x and y as pointers
+* The "=" operator as an operation that changes what the name points to.
+
+
+## Everything Is an Object
+
+* Python is an object-oriented programming language, and in Python everything is an object.
+* What does this mean?
+
+
+```python
+x = 4
+type(x)
+
+x = 'hello'
+type(x)
+
+x = 3.14159
+type(x)
+
+```
+
+
+
+::: {.incremental}
+
+* Python everything is an object
+* This means every entity has some metadata (called attributes) and associated functionality (called methods). 
+* These attributes and methods are accessed via the dot syntax.
+
+:::
+
+
+---
+
+### `append` method
+
+```python
+L = [1, 2, 3]
+L.append(100)
+print(L)
+```
+* For example, before we saw that lists have an append method, which adds an item to the list, and is accessed via the dot (`.`) syntax:
+
+&nbsp;
+
+* Try this
+
+```python
+x = 4.5
+x.is_integer()
+
+x = 4.0
+x.is_integer()
+```
+
+## Operators {.smaller}
+
+
+
+- **Addition (`a + b`)** – Sum of `a` and `b`
+- **Subtraction (`a - b`)** – Difference of `a` and `b`
+- **Multiplication (`a * b`)** – Product of `a` and `b`
+- **True division (`a / b`)** – Quotient of `a` and `b`
+- **Floor division (`a // b`)** – Quotient of `a` and `b`, removing fractional parts
+- **Modulus (`a % b`)** – Integer remainder after division of `a` by `b`
+- **Exponentiation (`a ** b`)** – `a` raised to the power of `b`
+- **Negation (`-a`)** – The negative of `a`
+- **Unary plus (`+a`)** – `a` unchanged (rarely used)
+
+
+```python
+# True division
+print(11 / 2)
+
+# Floor division
+print(11 // 2)
+```
+
+## Comparison Operations
+* Another type of operation which can be very useful is comparison of different values.
+
+
+- **Equality (`a == b`)** – `a` is equal to `b`
+- **Inequality (`a != b`)** – `a` is not equal to `b`
+- **Less than (`a < b`)** – `a` is less than `b`
+- **Greater than (`a > b`)** – `a` is greater than `b`
+- **Less than or equal to (`a <= b`)** – `a` is less than or equal to `b`
+- **Greater than or equal to (`a >= b`)** – `a` is greater than or equal to `b`
+
+
+
+```python
+# 25 is odd?
+25 % 2 == 1
+
+# 66 is odd?
+66 % 2 == 1
+```
+
+## Boolean Operations (and or not)
+
+When working with Boolean values, Python provides operators to combine the values using the standard concepts of "and", "or", and "not". 
+
+```python
+
+x = 4
+(x < 6) and (x > 2)
+
+(x > 10) or (x % 2 == 0)
+
+not (x < 6)
+```
+
+
+
+## Built-In Types: Simple values
+* A <span style="color:blue;">*data type*</span> determines the characteristics of data in a programme
+* Basic data types in Python.
+
+| Data type name | Data type            | Example |
+|----------------|----------------------|---------|
+| `int`            | Whole integer values | 4       |
+| `float`          | Decimal values       | 3.1415  |
+| `str`            | Character strings    | 'Freezing'   |
+| `bool`           | True/false values    | True    |
+
+---
+
+### Data types: Strings
+
 Strings (str) represent sequences of characters, e.g. I love GIS, Python is awesome, 1990. Note that a number will be of the type string when declared within quotations marks ("").
 
 
@@ -213,76 +343,7 @@ print(len("hello world")) # in Python Notebook
 
 :::
 
-
 ---
-
-### Example
-
-::: {style="font-size: 150%;"}
-
-```python
-temp_celsius = 10.0
-myname = "Hyesop"
-```
-<br>
-
-```python
-print(temp_celsius)
-print(myname)
-```
-
-```
-10
-Hyesop
-```
-
-
-:::
-
-
-## Variables
-* A <span style="color:blue;">**variable**</span> can be used to store values calculated in expressions and used for other calculations
-* A variable is a location in memory.
-
-![](Figs/variable-diagram-different-values.png){fig-align="center"}
-
-```python
-weather = "Freezing"
-
-print(weather)
-```
-
----
-
-### _mutability_
-* Mutability mean that variables can be changed without being erased. 
-* Some types of variables like integers are *immutable* (you got to throwing away the old one)
-  - This means if we change them, they get a different memory address, and the old memory address gets recycled (thanks python!)
-
-```python
-weather = "Sunny"
-
-print(weather)
-
-
-```
-
----
-
-### Data types
-* A <span style="color:blue;">*data type*</span> determines the characteristics of data in a programme
-* Basic data types in Python.
-
-| Data type name | Data type            | Example |
-|----------------|----------------------|---------|
-| `int`            | Whole integer values | 4       |
-| `float`          | Decimal values       | 3.1415  |
-| `str`            | Character strings    | 'Freezing'   |
-| `bool`           | True/false values    | True    |
-
----
-
-### Data types: Strings
 
 ```{python}
 #| echo: true
@@ -298,9 +359,11 @@ type(weatherForecast)
 ```python
 print(weatherForecast+weatherForecast)
 
+print(5 * weatherForecast)
+
 ```
 
-* We als can perform upper and lower case transformations:
+* We also can perform upper and lower case transformations:
 
 
 ```python
@@ -366,6 +429,15 @@ print(not(x > y)()
   - False
 
 :::
+
+
+## Built-In Data Structures
+
+* Python has several built-in compound types, which act as containers for other types. 
+* These compound types are:
+  - **List (`list`)** – Example: `[1, 2, 3]` – Ordered collection
+  - **Tuple (`tuple`)** – Example: `(1, 2, 3]` – Immutable ordered collection
+  - **Dictionary (`dict`)** – Example: `{'a':1, 'b':2, 'c':3}` – Unordered (key, value) mapping
 
 ---
 
@@ -487,7 +559,7 @@ print(western_line)
 ## <span style="color:green;">Your Turn!</span> {.smaller}
 1. Define `western_line` in your environment
 2. Add **Mt Albert, Avondale, New Lynn, Fruitvale Rd, Glen Eden** as a list (you can Google "Auckland Western Line" and find the Wikipedia)
-3. Assign that in your environment as `more_eastern`
+3. Assign that in your environment as `more_western`
 4. This time, try `extend` to combine the two lists
 
 ::: {style="font-size: 150%;"}
@@ -505,6 +577,9 @@ western_line = ["Britomart", "Parnell", "Newmarket", "Grafton",
 * If you are stuck, visit https://www.python.org/doc
 * Google your problem (Stackoverflow)
 * ChatGPT and Gemini (🧐)
+
+
+## 
 
 
 
@@ -555,34 +630,6 @@ Let’s break down the code above to see some essential aspect of `for` loops:
 
 ---
 
-<!--
-### Hand-picked works: When we do loops manually
-<span style="color:red;">Bad example</span>
-
-```{python}
-#| echo: true
-
-western_line = [
-    "Britomart", "Ōrākei", "Meadowbank", "Purewa",
-    "Glen Innes", "Tamaki", "Panmure", "Sylvia Park"
-]
-
-```
-
-
-```{python}
-#| echo: true
-western_line[0]
-western_line[1]
-```
-```
-.
-.
-.
-
-```
----
--->
 
 ### Your daily for loop
 
@@ -798,44 +845,14 @@ Wear a raincoat!
 
 :::
 
----
-
-### Comparison operators
-
-| Operator | Description              |
-|----------|--------------------------|
-| <        | Less than                |
-| <=       | Less than or equal to    |
-| ==       | Equal to                 |
-| >=       | Greater than or equal to |
-| >        | Greater than             |
-| !=       | Not equal to             |
 
 ---
 
-### Boolean values
-
-* Comparison operations yield Boolean values (`True` or `False`). 
-* In Python, the words True and False are reserved for these Boolean values, and can’t be used for anything else.
-
-::: {style="font-size: 140%;"}
-
-```python
-temperature > 25
-```
-```
-False
-```
-:::
-
-
-
-<!--
 ### if, elif and else
 
 ::: {style="font-size: 70%;"}
-* We can link several conditions together using the “else if” -statement `elif.` 
-* Python checks the `elif` and else statements only if previous conditions were False. 
+* We can link several conditions together using the “else if” -statement `elif.`
+* Python checks the `elif` and else statements only if previous conditions were False.
 * You can have multiple `elif` statements to check for additional conditions.
 
 :::
@@ -860,7 +877,7 @@ else:
 :::
 
 ---
--->
+
 
 ## Combinations
 ### Combining conditions
@@ -946,9 +963,8 @@ for temperature in temperatures:
 
 ## Next week
 * Recap of today's work + working on conditions
-* How to import spreadsheet data: dataframe
+* How to import spreadsheet data on Colab: dataframe
 * How to clean and use dataframes
-* How to play with GIS dataset
 
 
 ## References
