@@ -49,16 +49,14 @@ Make sure you are well set up with Google Colab using the URL below:
 * Ed discussion is the place to go!
 
 
-
 ## What will we cover for today?
-* Simple Python maths
-* Functions
+* Simple Python 
+* Variables
+* Data types
+* Lists
 * `for` loops
 * Conditional Statements
-* Import files
-- Everything up until pandas we saw in 242, but now we will go a little deeper
-- We don't have enough time to get into everything in this class, but we will try to nerd out a little today
- 
+
 
 ## For the first time
 * Let's type
@@ -72,7 +70,6 @@ print("Hello World")
 
 ## Simple Python maths
 
-::: {style="font-size: 250%;"}
 
 ```python 
 1 + 1
@@ -83,25 +80,8 @@ print("Hello World")
 
 10 % 2
 ```
-:::
 
----
 
-### Simple Python maths - answers
-
-::: {style="font-size: 250%;"}
-
-```{python}
-#| echo: true
-
-1 + 1
-
-5 * 7
-
-4000 - 3210
-```
-
-:::
 
 ## End-of-Line Terminates a statement
 
@@ -123,8 +103,6 @@ x = 1 + 2 + 3 + 4 +\
 * In Python, if you'd like a statement to continue to the next line, it is possible to use the &#92; marker to indicate this:
 
 :::
-
-
 
 
 
@@ -166,9 +144,6 @@ print(L)
 
 * The "()" after sort indicates that the function should be executed
 * required even if no arguments are necessary
-
-
-
 
 
 ## Python Semantics: Variables
@@ -266,7 +241,6 @@ x.is_integer()
 - **Modulus (`a % b`)** – Integer remainder after division of `a` by `b`
 - **Exponentiation (`a ** b`)** – `a` raised to the power of `b`
 - **Negation (`-a`)** – The negative of `a`
-- **Unary plus (`+a`)** – `a` unchanged (rarely used)
 
 
 ```python
@@ -439,6 +413,11 @@ print(not(x > y)()
   - **Tuple (`tuple`)** – Example: `(1, 2, 3]` – Immutable ordered collection
   - **Dictionary (`dict`)** – Example: `{'a':1, 'b':2, 'c':3}` – Unordered (key, value) mapping
 
+&nbsp;
+
+* We will cover list in the lecture, and other in lab hours
+
+
 ---
 
 ### Lists
@@ -579,7 +558,6 @@ western_line = ["Britomart", "Parnell", "Newmarket", "Grafton",
 * ChatGPT and Gemini (🧐)
 
 
-## 
 
 
 
