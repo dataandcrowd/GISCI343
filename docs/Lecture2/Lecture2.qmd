@@ -65,7 +65,19 @@ Make sure you are well set up with Google Colab using the URL below:
 print("Hello World")
 ```
 
+* Add a text cell for markdown
+* Commenting on a Python Notebook or Google Colab
 
+
+```python
+'''
+This is multi line comment
+Line 1
+Line 2
+'''
+
+print('Hello World!')
+```
 
 
 ## Simple Python maths
@@ -177,7 +189,7 @@ print(y)  # y is unchanged
 * The "=" operator as an operation that changes what the name points to.
 
 
-## Everything Is an Object
+## Everything Is an Object {.smaller}
 
 * Python is an object-oriented programming language, and in Python everything is an object.
 * What does this mean?
@@ -186,10 +198,16 @@ print(y)  # y is unchanged
 ```python
 x = 4
 type(x)
+```
+&nbsp;
 
+```python
 x = 'hello'
 type(x)
+```
+&nbsp;
 
+```python
 x = 3.14159
 type(x)
 
@@ -200,8 +218,8 @@ type(x)
 ::: {.incremental}
 
 * Python everything is an object
-* This means every entity has some metadata (called attributes) and associated functionality (called methods). 
-* These attributes and methods are accessed via the dot syntax.
+* This means every entity has some metadata called attributes, and associated functionality called methods. 
+* These attributes and methods are accessed via the dot syntax. e.g. `print((5).__str__())`
 
 :::
 
@@ -233,14 +251,14 @@ x.is_integer()
 
 
 
-- **Addition (`a + b`)** – Sum of `a` and `b`
-- **Subtraction (`a - b`)** – Difference of `a` and `b`
-- **Multiplication (`a * b`)** – Product of `a` and `b`
-- **True division (`a / b`)** – Quotient of `a` and `b`
-- **Floor division (`a // b`)** – Quotient of `a` and `b`, removing fractional parts
-- **Modulus (`a % b`)** – Integer remainder after division of `a` by `b`
-- **Exponentiation (`a ** b`)** – `a` raised to the power of `b`
-- **Negation (`-a`)** – The negative of `a`
+- **Addition (`a + b`)**: Sum of `a` and `b`
+- **Subtraction (`a - b`)**: Difference of `a` and `b`
+- **Multiplication (`a * b`)**: Product of `a` and `b`
+- **True division (`a / b`)**: Quotient of `a` and `b`
+- **Floor division (`a // b`)**: Quotient of `a` and `b`, removing fractional parts
+- **Modulus (`a % b`)**: Integer remainder after division of `a` by `b`
+- **Exponentiation (`a ** b`)**: `a` raised to the power of `b`
+- **Negation (`-a`)**: The negative of `a`
 
 
 ```python
@@ -255,12 +273,12 @@ print(11 // 2)
 * Another type of operation which can be very useful is comparison of different values.
 
 
-- **Equality (`a == b`)** – `a` is equal to `b`
-- **Inequality (`a != b`)** – `a` is not equal to `b`
-- **Less than (`a < b`)** – `a` is less than `b`
-- **Greater than (`a > b`)** – `a` is greater than `b`
-- **Less than or equal to (`a <= b`)** – `a` is less than or equal to `b`
-- **Greater than or equal to (`a >= b`)** – `a` is greater than or equal to `b`
+- **Equality (`a == b`)**: `a` is equal to `b`
+- **Inequality (`a != b`)**: `a` is not equal to `b`
+- **Less than (`a < b`)**: `a` is less than `b`
+- **Greater than (`a > b`)**: `a` is greater than `b`
+- **Less than or equal to (`a <= b`)**: `a` is less than or equal to `b`
+- **Greater than or equal to (`a >= b`)**: `a` is greater than or equal to `b`
 
 
 
