@@ -22,5 +22,7 @@ european_cities = ["Amsterdam", "Brussels", "London", "Rome"]
 cities = ["Helsinki", "Stockholm", "Oslo", "Reykjavik", "Copenhagen"]
 countries = ["Finland", "Sweden", "Norway", "Iceland", "Denmark"]
 
+for i in range(5):
+    print(cities[i], "is the capital of", countries[i])
 
 temperatures = [0, 12, 17, 28, 30]
