@@ -561,67 +561,117 @@ pandas_df
 
 ![](https://pandas.pydata.org/docs/_images/03_subset_rows.svg)
 
+* Pandas Series objects: you can ask logical questions of them (side-note: this does not work with python lists, but it does with with pandas Series objects):
+
 ```python
-census[census["pop23_ov65"] > 5000]
-census[census["Name"] == "Waitemata Local Board Area"]
-
-old23 = census[(census["pop23_ov65"] > 5000) & (census["Name"] == "Waitemata Local Board Area") ]
-
-census.iloc[0:4, 2:5]
+# ask which entries in the column "a" are greater than 1
+pandas_df['a'] > 1
 ```
+
+```
+0    False
+1     True
+2     True
+3     True
+Name: a, dtype: bool
+```
+
+## The Logic of location `loc` {.smaller}
+
+1. employ the .loc method and
+2. provide : to the column dimension (which says to “return all of the columns”), then we get the expected result:
+
+```python
+pandas_df.loc[pandas_df.a > 1,:]
+```
+
+```
+   a  b
+1  2  6
+2  3  7
+3  4  8
+```
+
+* Note that loc isn’t a normal function per se in that it is not followed by round brackets (), but it is followed by the square brackets [].
+
+* If we wanted to just return the second column, we would provide the second column’s name ('b') into the second dimension of the .loc[,] square brackets
+
+```python
+pandas_df.loc[pandas_df.a > 1,'b']
+```
+```
+1    6
+2    7
+3    8
+Name: b, dtype: int64
+```
+
+## `iloc`
+
+However, loc expects either a Boolean series or a name in its index. The iloc method, on the other hand, takes integer index positions. The following code will extract the second, third, and fourth rows of the second column (remember zero-indexing!).
+
+```python
+pandas_df.iloc[[1,2,3],1]
+```
+
+```
+1    6
+2    7
+3    8
+Name: b, dtype: int64
+```
+
+It’s a bit annoying that you can’t use the same syntax to do both named (`.loc`) and integer (`.iloc`) indexing for pandas DataFrames.
+
+## The `query()` method {.smaller}
+
+Since this type of square bracket syntax for indexing feels clunky in Python, you can alternatively use the `query()` method of a pandas DataFrame similar to the `filter()` function in the polar package
+
+For pandas DataFrame, the `query()` syntax looks like
+
+```python
+pandas_df.query('a > 1')
+```
+
+```
+   a  b
+1  2  6
+2  3  7
+3  4  8
+```
+
+If you want to use an external variable, you need to access it using @ within the query argument:
+
+```python
+thresh = 1
+pandas_df.query('a > @thresh')
+```
+
 
 ## Your Turn
 
-::: {style="font-size: 80%;"}
-* call the library: `import pandas as pd`
-* Import a spread sheet
-* Have a look at the `info()`, `describe()`, `shape`
-* Query top 20 rows and bottom 5 rows
-* Assign a variable `rodney_over_5k` by filtering _2023 Census and over 5000_ and _"Rodney Local Board Area"_
-:::
-
-
----
-
-## Creating New Columns from Existing Data in `df`
-
-![](https://pandas.pydata.org/docs/_images/05_newcolumn_1.svg){fig-align=center}
-
-* Required for performing calculations across columns.
-* Essential for data manipulation.
-
-
----
-
-### Example
-
+1. Create a dictionary with New Zealand city names as keys and their populations as values.
 
 ```python
-import pandas as pd
-
-# Creating the dataset with student names
-data = {
-    'Student': ['Alice', 'Bob', 'Charlie'],
-    'Maths': [9, 8, 7],
-    'English': [4, 10, 6],
-    'Science': [8, 7, 8],
-    'History': [9, 6, 5]
+nz_cities = {
+    "Auckland": 1672000,
+    "Wellington": 217200,
+    "Christchurch": 389700,
+    "Hamilton": 185000,
+    "Tauranga": 158000,
+    "Dunedin": 134600
 }
-df1 = pd.DataFrame(data)
-
-# Calculating the total score for each student and adding it as a new column 'Total'
-df1['Total'] = df1[['Maths', 'English', 
-                    'Science', 'History']].sum(axis=1)
-# Display the updated dataset
-print(df1)
 ```
 
+2. Convert this to a dataframe
+
+```python
+`nzpop = pd.DataFrame(nz_cities.items(), columns=['city', 'population'])`
 ```
-   Student  Maths  English  Science  History  Total
-0    Alice      9        4        8        9     30
-1      Bob      8       10        7        6     31
-2  Charlie      7        6        8        5     26
-```
+
+3. Use three methods to extract the Auckland population. Hint: use `loc`, `iloc`, and `query`
+
+
 
 
 
@@ -659,16 +709,6 @@ Grouping is used to group data using some criteria from our dataset. It is used 
 :::
 ::::
 
----
-
-### Excel Example
-
-* Go to `data/Age.csv`
-* Open MS Excel
-
-![](Figs/pivot.png)
-
-
 
 ---
 
@@ -678,47 +718,113 @@ Grouping is used to group data using some criteria from our dataset. It is used 
     - Pandas does it better/on more data!
 
 ```python
-census.groupby("City")["pop23_tot"].mean().round(2)
-census.groupby("City")["pop23_tot"].mean().round(2)
-
+pandas_df = pd.DataFrame({'a': [1,2,3,4], 
+                          'b': [5,6,7,8]})
+pandas_df["cat"] = ["red","red","yellow","yellow"] # add a new categorical column to pandas_df
+print(pandas_df)
 ```
-
-
-## Plots
 
 ```python
-import matplotlib.pyplot as plt
-
-census["pop18_u15"].plot(kind="bar")
-plt.xlabel("Index")
-plt.ylabel("Population under 15 in 2018")
-plt.title("Population under 15 in 2018")
-plt.show()
+pandas_df.groupby('cat')["a"].mean()
+pandas_df.groupby('cat').mean()
 ```
 
-![](Figs/awful.png)
 
---- 
+## Data Visualisation {.smaller}
 
-### Assigning new variables to plot with a simple dataset
+In python there are many different libraries for doing data visualization. The two you are most likely to have heard of include matplotlib and seaborn.
+
+
+Seaborn is a little prettier than matplotlib, but all I’m going to show in this tutorial is the inbuilt data visualisation methods for pandas Series and DataFrame objects that are built on matplotlib.
+
+
+![](https://media.geeksforgeeks.org/wp-content/uploads/20210120122658/seaborntutorialpairplot.png){fig-align=center}
+
+
+
+## Example: Gapminder
+
+To do some more interesting vis, let’s load the gapminder dataset (from a URL) into a pandas DataFrame using the pd.read_csv() pandas function. This pd.read_csv() function can also be used to load a local .csv file.
 
 ```python
-census_selected = census[['Name', 'pop18_u15']]
+gapminder = pd.read_csv("https://raw.githubusercontent.com/rlbarter/gapminder-data/main/gapminder.csv")
+```
+Let’s use the head() DataFrame method to look at the first 5 rows:
 
-# Sort the DataFrame by the 'pop18_u15' column
-census_sorted = census_selected.sort_values(by='pop18_u15')
-
-# Set the 'Name' column as the index but keep it as a column
-census_sorted.set_index('Name', drop=False, inplace=True)
-
-# Plot the sorted DataFrame
-census_sorted['pop18_u15'].plot(kind='bar')
-plt.xlabel("Name")
-plt.ylabel("Population under 15 in 2018")
-plt.title("Population under 15 in 2018 (Sorted)")
-plt.show()
+```python
+gapminder.head()
+```
 
 ```
+       country continent  year  lifeExp       pop   gdpPercap
+0  Afghanistan      Asia  1952   28.801   8425333  779.445314
+1  Afghanistan      Asia  1957   30.332   9240934  820.853030
+2  Afghanistan      Asia  1962   31.997  10267083  853.100710
+3  Afghanistan      Asia  1967   34.020  11537966  836.197138
+4  Afghanistan      Asia  1972   36.088  13079460  739.981106
+```
+
+---
+
+### Let's practise some of our new python skills
+
+The following code will filter to the data for Australia and compute the mean life expectancy:
+
+```python
+gapminder.query('country == "Australia"')['lifeExp'].mean()
+# 74.66291666666667
+```
+
+And the following will compute the average gdpPercap by continent:
+
+
+```python
+gdp_by_continent = gapminder.groupby('continent')['gdpPercap'].mean()
+print(gdp_by_continent)
+```
+
+```
+continent
+Africa       2193.754578
+Americas     7136.110356
+Asia         7902.150428
+Europe      14469.475533
+Oceania     18621.609223
+Name: gdpPercap, dtype: float64
+```
+
+## Shall we plot now?
+
+Notice that the output of this last piece of code is a Series object. Notice also that the (row) index is the continent:
+
+```
+gdp_by_continent.index
+```
+
+```
+Index(['Africa', 'Americas', 'Asia', 'Europe', 'Oceania'], dtype='object', name='continent')
+```
+
+What will happen if we apply the plot() method to this Series object?
+
+```
+gdp_by_continent.plot()
+```
+
+![](https://rebeccabarter.com/blog/2023-09-11-from_r_to_python_files/figure-html/unnamed-chunk-60-1.png){fig-align=center}
+
+## Bar plot
+
+* By default a line plot is created and the row index is used as the x-axis labels by default. The DataFrame’s `plot()` method here acts as a wrapper for the matplotlib library’s plotting function.
+
+* If I wanted a bar chart instead of a line plot, I could create one using the plot.bar() method (instead of just the `plot()` method):
+
+```python
+gdp_by_continent.plot.bar()
+```
+
+![](https://rebeccabarter.com/blog/2023-09-11-from_r_to_python_files/figure-html/unnamed-chunk-61-3.png){fig-align=center}
+
 
 ## Merge df's
 * Concatenate DataFrames along row and column.
@@ -768,6 +874,7 @@ print(inner_merge)
 
 A left merge includes all rows from the left DataFrame and the matched rows from the right DataFrame.
 
+
 ```python
 left_merge = pd.merge(df1, df2, on='ID', how='left')
 print(left_merge)
@@ -782,57 +889,6 @@ outer_merge = pd.merge(df1, df2, on='ID', how='outer')
 print(outer_merge)
 ```
 
-
-----
-
-## Geospatial data and GeoPandas
-
-![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
-
-* Geospatial data are data with location information
-* The geometry variable indicates where the *data* is located
-
----
-
-* New Zealand population using code
-
-![](https://newzealandmap360.com/img/1200/new%20zealand-population-density-map.jpg){fig-align=center width=120%}
-
-
-## How we record the real world
-:::: {.columns}
-
-::: {.column width="60%"}
-![](Figs/howwemap.png){fig-align=center width=120%}
-:::
-
-::: {.column width="40%"}
-::: {style="font-size: 80%;"}
-- Point (2, 10)
-- LineString ([(1,2), (1,5)...])
-- Polygons ([(13,2), (15,4)...])
-- Pixels
-:::
-:::
-
-::::
-
-## Vector attribute data
-* Vector features have attributes that look like a table
-* Watch out for the projections
-
-![](Figs/attribute.png){fig-align=center width=70%}
-
-## Projections
-* Coordinate reference systems (CRS): a consistent way to represent locations in space ([Land Information NZ](https://www.linz.govt.nz/guidance/geodetic-system/coordinate-systems-used-new-zealand))
-* Geographic coordinate systems (Global): Longitude/Latitude, UTM
-* Projected coordinate systems (Local): 2D maps.
-* Each projection provides a unique code starting with EPSG
-    - Long/Lat decimal points (EPSG: 4326)
-    - NZ transverse mercator (EPSG: 2193)
-
-
-## <br> Let's get our hands dirty with `geopandas`!
 
 
 

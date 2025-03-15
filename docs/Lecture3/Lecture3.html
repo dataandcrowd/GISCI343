@@ -903,57 +903,81 @@ New DataFrame:
 <section id="filtering-subsetting-rows" class="slide level2">
 <h2>Filtering (subsetting rows)</h2>
 
-<img data-src="https://pandas.pydata.org/docs/_images/03_subset_rows.svg" class="r-stretch"><div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a>census[census[<span class="st">"pop23_ov65"</span>] <span class="op">&gt;</span> <span class="dv">5000</span>]</span>
-<span id="cb28-2"><a href=""></a>census[census[<span class="st">"Name"</span>] <span class="op">==</span> <span class="st">"Waitemata Local Board Area"</span>]</span>
-<span id="cb28-3"><a href=""></a></span>
-<span id="cb28-4"><a href=""></a>old23 <span class="op">=</span> census[(census[<span class="st">"pop23_ov65"</span>] <span class="op">&gt;</span> <span class="dv">5000</span>) <span class="op">&amp;</span> (census[<span class="st">"Name"</span>] <span class="op">==</span> <span class="st">"Waitemata Local Board Area"</span>) ]</span>
-<span id="cb28-5"><a href=""></a></span>
-<span id="cb28-6"><a href=""></a>census.iloc[<span class="dv">0</span>:<span class="dv">4</span>, <span class="dv">2</span>:<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<img data-src="https://pandas.pydata.org/docs/_images/03_subset_rows.svg" class="r-stretch"><ul>
+<li>Pandas Series objects: you can ask logical questions of them (side-note: this does not work with python lists, but it does with with pandas Series objects):</li>
+</ul>
+<div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="co"># ask which entries in the column "a" are greater than 1</span></span>
+<span id="cb28-2"><a href=""></a>pandas_df[<span class="st">'a'</span>] <span class="op">&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>0    False
+1     True
+2     True
+3     True
+Name: a, dtype: bool</code></pre>
+</section>
+<section id="the-logic-of-location-loc" class="slide level2 smaller">
+<h2>The Logic of location <code>loc</code></h2>
+<ol type="1">
+<li>employ the .loc method and</li>
+<li>provide : to the column dimension (which says to “return all of the columns”), then we get the expected result:</li>
+</ol>
+<div class="sourceCode" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href=""></a>pandas_df.loc[pandas_df.a <span class="op">&gt;</span> <span class="dv">1</span>,:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>   a  b
+1  2  6
+2  3  7
+3  4  8</code></pre>
+<ul>
+<li><p>Note that loc isn’t a normal function per se in that it is not followed by round brackets (), but it is followed by the square brackets [].</p></li>
+<li><p>If we wanted to just return the second column, we would provide the second column’s name (‘b’) into the second dimension of the .loc[,] square brackets</p></li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href=""></a>pandas_df.loc[pandas_df.a <span class="op">&gt;</span> <span class="dv">1</span>,<span class="st">'b'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>1    6
+2    7
+3    8
+Name: b, dtype: int64</code></pre>
+</section>
+<section id="iloc" class="slide level2">
+<h2><code>iloc</code></h2>
+<p>However, loc expects either a Boolean series or a name in its index. The iloc method, on the other hand, takes integer index positions. The following code will extract the second, third, and fourth rows of the second column (remember zero-indexing!).</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a>pandas_df.iloc[[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>],<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>1    6
+2    7
+3    8
+Name: b, dtype: int64</code></pre>
+<p>It’s a bit annoying that you can’t use the same syntax to do both named (<code>.loc</code>) and integer (<code>.iloc</code>) indexing for pandas DataFrames.</p>
+</section>
+<section id="the-query-method" class="slide level2 smaller">
+<h2>The <code>query()</code> method</h2>
+<p>Since this type of square bracket syntax for indexing feels clunky in Python, you can alternatively use the <code>query()</code> method of a pandas DataFrame similar to the <code>filter()</code> function in the polar package</p>
+<p>For pandas DataFrame, the <code>query()</code> syntax looks like</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href=""></a>pandas_df.query(<span class="st">'a &gt; 1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>   a  b
+1  2  6
+2  3  7
+3  4  8</code></pre>
+<p>If you want to use an external variable, you need to access it using @ within the query argument:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href=""></a>thresh <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb38-2"><a href=""></a>pandas_df.query(<span class="st">'a &gt; @thresh'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="your-turn-2" class="slide level2">
 <h2>Your Turn</h2>
-<div style="font-size: 80%;">
-<ul>
-<li>call the library: <code>import pandas as pd</code></li>
-<li>Import a spread sheet</li>
-<li>Have a look at the <code>info()</code>, <code>describe()</code>, <code>shape</code></li>
-<li>Query top 20 rows and bottom 5 rows</li>
-<li>Assign a variable <code>rodney_over_5k</code> by filtering <em>2023 Census and over 5000</em> and <em>“Rodney Local Board Area”</em></li>
-</ul>
-</div>
-</section>
-<section id="creating-new-columns-from-existing-data-in-df" class="slide level2">
-<h2>Creating New Columns from Existing Data in <code>df</code></h2>
-
-<img data-src="https://pandas.pydata.org/docs/_images/05_newcolumn_1.svg" class="quarto-figure quarto-figure-center r-stretch"><ul>
-<li>Required for performing calculations across columns.</li>
-<li>Essential for data manipulation.</li>
-</ul>
-</section>
-<section class="slide level2">
-
-<h3 id="example-1">Example</h3>
-<div class="sourceCode" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb29-2"><a href=""></a></span>
-<span id="cb29-3"><a href=""></a><span class="co"># Creating the dataset with student names</span></span>
-<span id="cb29-4"><a href=""></a>data <span class="op">=</span> {</span>
-<span id="cb29-5"><a href=""></a>    <span class="st">'Student'</span>: [<span class="st">'Alice'</span>, <span class="st">'Bob'</span>, <span class="st">'Charlie'</span>],</span>
-<span id="cb29-6"><a href=""></a>    <span class="st">'Maths'</span>: [<span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">7</span>],</span>
-<span id="cb29-7"><a href=""></a>    <span class="st">'English'</span>: [<span class="dv">4</span>, <span class="dv">10</span>, <span class="dv">6</span>],</span>
-<span id="cb29-8"><a href=""></a>    <span class="st">'Science'</span>: [<span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">8</span>],</span>
-<span id="cb29-9"><a href=""></a>    <span class="st">'History'</span>: [<span class="dv">9</span>, <span class="dv">6</span>, <span class="dv">5</span>]</span>
-<span id="cb29-10"><a href=""></a>}</span>
-<span id="cb29-11"><a href=""></a>df1 <span class="op">=</span> pd.DataFrame(data)</span>
-<span id="cb29-12"><a href=""></a></span>
-<span id="cb29-13"><a href=""></a><span class="co"># Calculating the total score for each student and adding it as a new column 'Total'</span></span>
-<span id="cb29-14"><a href=""></a>df1[<span class="st">'Total'</span>] <span class="op">=</span> df1[[<span class="st">'Maths'</span>, <span class="st">'English'</span>, </span>
-<span id="cb29-15"><a href=""></a>                    <span class="st">'Science'</span>, <span class="st">'History'</span>]].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb29-16"><a href=""></a><span class="co"># Display the updated dataset</span></span>
-<span id="cb29-17"><a href=""></a><span class="bu">print</span>(df1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<pre><code>   Student  Maths  English  Science  History  Total
-0    Alice      9        4        8        9     30
-1      Bob      8       10        7        6     31
-2  Charlie      7        6        8        5     26</code></pre>
+<ol type="1">
+<li>Create a dictionary with New Zealand city names as keys and their populations as values.</li>
+</ol>
+<div class="sourceCode" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href=""></a>nz_cities <span class="op">=</span> {</span>
+<span id="cb39-2"><a href=""></a>    <span class="st">"Auckland"</span>: <span class="dv">1672000</span>,</span>
+<span id="cb39-3"><a href=""></a>    <span class="st">"Wellington"</span>: <span class="dv">217200</span>,</span>
+<span id="cb39-4"><a href=""></a>    <span class="st">"Christchurch"</span>: <span class="dv">389700</span>,</span>
+<span id="cb39-5"><a href=""></a>    <span class="st">"Hamilton"</span>: <span class="dv">185000</span>,</span>
+<span id="cb39-6"><a href=""></a>    <span class="st">"Tauranga"</span>: <span class="dv">158000</span>,</span>
+<span id="cb39-7"><a href=""></a>    <span class="st">"Dunedin"</span>: <span class="dv">134600</span></span>
+<span id="cb39-8"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li>Convert this to a dataframe</li>
+</ol>
+<div class="sourceCode" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href=""></a>`nzpop <span class="op">=</span> pd.DataFrame(nz_cities.items(), columns<span class="op">=</span>[<span class="st">'city'</span>, <span class="st">'population'</span>])`</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li>Use three methods to extract the Auckland population. Hint: use <code>loc</code>, <code>iloc</code>, and <code>query</code></li>
+</ol>
 </section>
 <section id="grouping-and-aggregation" class="slide level2">
 <h2><br> Grouping and Aggregation</h2>
@@ -983,15 +1007,6 @@ New DataFrame:
 </section>
 <section class="slide level2">
 
-<h3 id="excel-example">Excel Example</h3>
-<ul>
-<li>Go to <code>data/Age.csv</code></li>
-<li>Open MS Excel</li>
-</ul>
-
-<img data-src="Figs/pivot.png" class="r-stretch"></section>
-<section class="slide level2">
-
 <h3 id="groupby-function"><code>Groupby</code> function</h3>
 <ul>
 <li><code>groupby</code> allows us to summarize categorical values in a series
@@ -1000,38 +1015,67 @@ New DataFrame:
 <li>Pandas does it better/on more data!</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>census.groupby(<span class="st">"City"</span>)[<span class="st">"pop23_tot"</span>].mean().<span class="bu">round</span>(<span class="dv">2</span>)</span>
-<span id="cb31-2"><a href=""></a>census.groupby(<span class="st">"City"</span>)[<span class="st">"pop23_tot"</span>].mean().<span class="bu">round</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href=""></a>pandas_df <span class="op">=</span> pd.DataFrame({<span class="st">'a'</span>: [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>], </span>
+<span id="cb41-2"><a href=""></a>                          <span class="st">'b'</span>: [<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>]})</span>
+<span id="cb41-3"><a href=""></a>pandas_df[<span class="st">"cat"</span>] <span class="op">=</span> [<span class="st">"red"</span>,<span class="st">"red"</span>,<span class="st">"yellow"</span>,<span class="st">"yellow"</span>] <span class="co"># add a new categorical column to pandas_df</span></span>
+<span id="cb41-4"><a href=""></a><span class="bu">print</span>(pandas_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href=""></a>pandas_df.groupby(<span class="st">'cat'</span>)[<span class="st">"a"</span>].mean()</span>
+<span id="cb42-2"><a href=""></a>pandas_df.groupby(<span class="st">'cat'</span>).mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="plots" class="slide level2">
-<h2>Plots</h2>
-<div class="sourceCode" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb32-2"><a href=""></a></span>
-<span id="cb32-3"><a href=""></a>census[<span class="st">"pop18_u15"</span>].plot(kind<span class="op">=</span><span class="st">"bar"</span>)</span>
-<span id="cb32-4"><a href=""></a>plt.xlabel(<span class="st">"Index"</span>)</span>
-<span id="cb32-5"><a href=""></a>plt.ylabel(<span class="st">"Population under 15 in 2018"</span>)</span>
-<span id="cb32-6"><a href=""></a>plt.title(<span class="st">"Population under 15 in 2018"</span>)</span>
-<span id="cb32-7"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="data-visualisation" class="slide level2 smaller">
+<h2>Data Visualisation</h2>
+<p>In python there are many different libraries for doing data visualization. The two you are most likely to have heard of include matplotlib and seaborn.</p>
+<p>Seaborn is a little prettier than matplotlib, but all I’m going to show in this tutorial is the inbuilt data visualisation methods for pandas Series and DataFrame objects that are built on matplotlib.</p>
 
-<img data-src="Figs/awful.png" class="r-stretch"></section>
+<img data-src="https://media.geeksforgeeks.org/wp-content/uploads/20210120122658/seaborntutorialpairplot.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="example-gapminder" class="slide level2">
+<h2>Example: Gapminder</h2>
+<p>To do some more interesting vis, let’s load the gapminder dataset (from a URL) into a pandas DataFrame using the pd.read_csv() pandas function. This pd.read_csv() function can also be used to load a local .csv file.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href=""></a>gapminder <span class="op">=</span> pd.read_csv(<span class="st">"https://raw.githubusercontent.com/rlbarter/gapminder-data/main/gapminder.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Let’s use the head() DataFrame method to look at the first 5 rows:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href=""></a>gapminder.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>       country continent  year  lifeExp       pop   gdpPercap
+0  Afghanistan      Asia  1952   28.801   8425333  779.445314
+1  Afghanistan      Asia  1957   30.332   9240934  820.853030
+2  Afghanistan      Asia  1962   31.997  10267083  853.100710
+3  Afghanistan      Asia  1967   34.020  11537966  836.197138
+4  Afghanistan      Asia  1972   36.088  13079460  739.981106</code></pre>
+</section>
 <section class="slide level2">
 
-<h3 id="assigning-new-variables-to-plot-with-a-simple-dataset">Assigning new variables to plot with a simple dataset</h3>
-<div class="sourceCode" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>census_selected <span class="op">=</span> census[[<span class="st">'Name'</span>, <span class="st">'pop18_u15'</span>]]</span>
-<span id="cb33-2"><a href=""></a></span>
-<span id="cb33-3"><a href=""></a><span class="co"># Sort the DataFrame by the 'pop18_u15' column</span></span>
-<span id="cb33-4"><a href=""></a>census_sorted <span class="op">=</span> census_selected.sort_values(by<span class="op">=</span><span class="st">'pop18_u15'</span>)</span>
-<span id="cb33-5"><a href=""></a></span>
-<span id="cb33-6"><a href=""></a><span class="co"># Set the 'Name' column as the index but keep it as a column</span></span>
-<span id="cb33-7"><a href=""></a>census_sorted.set_index(<span class="st">'Name'</span>, drop<span class="op">=</span><span class="va">False</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb33-8"><a href=""></a></span>
-<span id="cb33-9"><a href=""></a><span class="co"># Plot the sorted DataFrame</span></span>
-<span id="cb33-10"><a href=""></a>census_sorted[<span class="st">'pop18_u15'</span>].plot(kind<span class="op">=</span><span class="st">'bar'</span>)</span>
-<span id="cb33-11"><a href=""></a>plt.xlabel(<span class="st">"Name"</span>)</span>
-<span id="cb33-12"><a href=""></a>plt.ylabel(<span class="st">"Population under 15 in 2018"</span>)</span>
-<span id="cb33-13"><a href=""></a>plt.title(<span class="st">"Population under 15 in 2018 (Sorted)"</span>)</span>
-<span id="cb33-14"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<h3 id="lets-practise-some-of-our-new-python-skills">Let’s practise some of our new python skills</h3>
+<p>The following code will filter to the data for Australia and compute the mean life expectancy:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href=""></a>gapminder.query(<span class="st">'country == "Australia"'</span>)[<span class="st">'lifeExp'</span>].mean()</span>
+<span id="cb46-2"><a href=""></a><span class="co"># 74.66291666666667</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And the following will compute the average gdpPercap by continent:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href=""></a>gdp_by_continent <span class="op">=</span> gapminder.groupby(<span class="st">'continent'</span>)[<span class="st">'gdpPercap'</span>].mean()</span>
+<span id="cb47-2"><a href=""></a><span class="bu">print</span>(gdp_by_continent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>continent
+Africa       2193.754578
+Americas     7136.110356
+Asia         7902.150428
+Europe      14469.475533
+Oceania     18621.609223
+Name: gdpPercap, dtype: float64</code></pre>
 </section>
+<section id="shall-we-plot-now" class="slide level2">
+<h2>Shall we plot now?</h2>
+<p>Notice that the output of this last piece of code is a Series object. Notice also that the (row) index is the continent:</p>
+<pre><code>gdp_by_continent.index</code></pre>
+<pre><code>Index(['Africa', 'Americas', 'Asia', 'Europe', 'Oceania'], dtype='object', name='continent')</code></pre>
+<p>What will happen if we apply the plot() method to this Series object?</p>
+<pre><code>gdp_by_continent.plot()</code></pre>
+
+<img data-src="https://rebeccabarter.com/blog/2023-09-11-from_r_to_python_files/figure-html/unnamed-chunk-60-1.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="bar-plot" class="slide level2">
+<h2>Bar plot</h2>
+<ul>
+<li><p>By default a line plot is created and the row index is used as the x-axis labels by default. The DataFrame’s <code>plot()</code> method here acts as a wrapper for the matplotlib library’s plotting function.</p></li>
+<li><p>If I wanted a bar chart instead of a line plot, I could create one using the plot.bar() method (instead of just the <code>plot()</code> method):</p></li>
+</ul>
+<div class="sourceCode" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href=""></a>gdp_by_continent.plot.bar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="https://rebeccabarter.com/blog/2023-09-11-from_r_to_python_files/figure-html/unnamed-chunk-61-3.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="merge-dfs" class="slide level2">
 <h2>Merge df’s</h2>
 <ul>
@@ -1044,104 +1088,44 @@ New DataFrame:
 <section class="slide level2">
 
 <h3 id="we-have-two-dataframes">We have two dataframes</h3>
-<div class="sourceCode" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a><span class="co"># Creating the first DataFrame</span></span>
-<span id="cb34-2"><a href=""></a>df1 <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb34-3"><a href=""></a>    <span class="st">'ID'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],</span>
-<span id="cb34-4"><a href=""></a>    <span class="st">'Name'</span>: [<span class="st">'Tom'</span>, <span class="st">'Nick'</span>, <span class="st">'Krish'</span>, <span class="st">'Jack'</span>],</span>
-<span id="cb34-5"><a href=""></a>    <span class="st">'Age'</span>: [<span class="dv">20</span>, <span class="dv">21</span>, <span class="dv">19</span>, <span class="dv">18</span>]</span>
-<span id="cb34-6"><a href=""></a>})</span>
-<span id="cb34-7"><a href=""></a></span>
-<span id="cb34-8"><a href=""></a><span class="co"># Creating the second DataFrame</span></span>
-<span id="cb34-9"><a href=""></a>df2 <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb34-10"><a href=""></a>    <span class="st">'ID'</span>: [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>],</span>
-<span id="cb34-11"><a href=""></a>    <span class="st">'Subject'</span>: [<span class="st">'Maths'</span>, <span class="st">'English'</span>, <span class="st">'Science'</span>, <span class="st">'History'</span>],</span>
-<span id="cb34-12"><a href=""></a>    <span class="st">'Score'</span>: [<span class="dv">88</span>, <span class="dv">75</span>, <span class="dv">90</span>, <span class="dv">85</span>]</span>
-<span id="cb34-13"><a href=""></a>})</span>
-<span id="cb34-14"><a href=""></a></span>
-<span id="cb34-15"><a href=""></a><span class="bu">print</span>(<span class="st">"DataFrame 1:"</span>)</span>
-<span id="cb34-16"><a href=""></a><span class="bu">print</span>(df1)</span>
-<span id="cb34-17"><a href=""></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">DataFrame 2:"</span>)</span>
-<span id="cb34-18"><a href=""></a><span class="bu">print</span>(df2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href=""></a><span class="co"># Creating the first DataFrame</span></span>
+<span id="cb53-2"><a href=""></a>df1 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb53-3"><a href=""></a>    <span class="st">'ID'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>],</span>
+<span id="cb53-4"><a href=""></a>    <span class="st">'Name'</span>: [<span class="st">'Tom'</span>, <span class="st">'Nick'</span>, <span class="st">'Krish'</span>, <span class="st">'Jack'</span>],</span>
+<span id="cb53-5"><a href=""></a>    <span class="st">'Age'</span>: [<span class="dv">20</span>, <span class="dv">21</span>, <span class="dv">19</span>, <span class="dv">18</span>]</span>
+<span id="cb53-6"><a href=""></a>})</span>
+<span id="cb53-7"><a href=""></a></span>
+<span id="cb53-8"><a href=""></a><span class="co"># Creating the second DataFrame</span></span>
+<span id="cb53-9"><a href=""></a>df2 <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb53-10"><a href=""></a>    <span class="st">'ID'</span>: [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>],</span>
+<span id="cb53-11"><a href=""></a>    <span class="st">'Subject'</span>: [<span class="st">'Maths'</span>, <span class="st">'English'</span>, <span class="st">'Science'</span>, <span class="st">'History'</span>],</span>
+<span id="cb53-12"><a href=""></a>    <span class="st">'Score'</span>: [<span class="dv">88</span>, <span class="dv">75</span>, <span class="dv">90</span>, <span class="dv">85</span>]</span>
+<span id="cb53-13"><a href=""></a>})</span>
+<span id="cb53-14"><a href=""></a></span>
+<span id="cb53-15"><a href=""></a><span class="bu">print</span>(<span class="st">"DataFrame 1:"</span>)</span>
+<span id="cb53-16"><a href=""></a><span class="bu">print</span>(df1)</span>
+<span id="cb53-17"><a href=""></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">DataFrame 2:"</span>)</span>
+<span id="cb53-18"><a href=""></a><span class="bu">print</span>(df2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
 <h3 id="inner-merge">Inner Merge</h3>
 <p>An inner merge combines DataFrames based on the intersection of their keys.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href=""></a>inner_merge <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span><span class="st">'ID'</span>, how<span class="op">=</span><span class="st">'inner'</span>)</span>
-<span id="cb35-2"><a href=""></a><span class="bu">print</span>(inner_merge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href=""></a>inner_merge <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span><span class="st">'ID'</span>, how<span class="op">=</span><span class="st">'inner'</span>)</span>
+<span id="cb54-2"><a href=""></a><span class="bu">print</span>(inner_merge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
 <h3 id="leftright-merge">Left/Right Merge</h3>
 <p>A left merge includes all rows from the left DataFrame and the matched rows from the right DataFrame.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href=""></a>left_merge <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span><span class="st">'ID'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span>
-<span id="cb36-2"><a href=""></a><span class="bu">print</span>(left_merge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href=""></a>left_merge <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span><span class="st">'ID'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb55-2"><a href=""></a><span class="bu">print</span>(left_merge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
 <h3 id="outer-merge">Outer Merge</h3>
-<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a>outer_merge <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span><span class="st">'ID'</span>, how<span class="op">=</span><span class="st">'outer'</span>)</span>
-<span id="cb37-2"><a href=""></a><span class="bu">print</span>(outer_merge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="geospatial-data-and-geopandas" class="slide level2">
-<h2>Geospatial data and GeoPandas</h2>
-
-<img data-src="https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png" class="quarto-figure quarto-figure-center r-stretch"><ul>
-<li>Geospatial data are data with location information</li>
-<li>The geometry variable indicates where the <em>data</em> is located</li>
-</ul>
-</section>
-<section class="slide level2">
-
-<ul>
-<li>New Zealand population using code</li>
-</ul>
-
-<img data-src="https://newzealandmap360.com/img/1200/new%20zealand-population-density-map.jpg" class="quarto-figure quarto-figure-center r-stretch" style="width:120.0%"></section>
-<section id="how-we-record-the-real-world" class="slide level2">
-<h2>How we record the real world</h2>
-<div class="columns">
-<div class="column" style="width:60%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="Figs/howwemap.png" class="quarto-figure quarto-figure-center" style="width:120.0%"></p>
-</figure>
-</div>
-</div><div class="column" style="width:40%;">
-<div style="font-size: 80%;">
-<ul>
-<li>Point (2, 10)</li>
-<li>LineString ([(1,2), (1,5)…])</li>
-<li>Polygons ([(13,2), (15,4)…])</li>
-<li>Pixels</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
-<section id="vector-attribute-data" class="slide level2">
-<h2>Vector attribute data</h2>
-<ul>
-<li>Vector features have attributes that look like a table</li>
-<li>Watch out for the projections</li>
-</ul>
-
-<img data-src="Figs/attribute.png" class="quarto-figure quarto-figure-center r-stretch" style="width:70.0%"></section>
-<section id="projections" class="slide level2">
-<h2>Projections</h2>
-<ul>
-<li>Coordinate reference systems (CRS): a consistent way to represent locations in space (<a href="https://www.linz.govt.nz/guidance/geodetic-system/coordinate-systems-used-new-zealand">Land Information NZ</a>)</li>
-<li>Geographic coordinate systems (Global): Longitude/Latitude, UTM</li>
-<li>Projected coordinate systems (Local): 2D maps.</li>
-<li>Each projection provides a unique code starting with EPSG
-<ul>
-<li>Long/Lat decimal points (EPSG: 4326)</li>
-<li>NZ transverse mercator (EPSG: 2193)</li>
-</ul></li>
-</ul>
-</section>
-<section id="lets-get-our-hands-dirty-with-geopandas" class="slide level2">
-<h2><br> Let’s get our hands dirty with <code>geopandas</code>!</h2>
+<div class="sourceCode" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href=""></a>outer_merge <span class="op">=</span> pd.merge(df1, df2, on<span class="op">=</span><span class="st">'ID'</span>, how<span class="op">=</span><span class="st">'outer'</span>)</span>
+<span id="cb56-2"><a href=""></a><span class="bu">print</span>(outer_merge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
