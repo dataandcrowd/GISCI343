@@ -1,7 +1,7 @@
 ---
-title: "Programming Part 2"
-subtitle: ": GIS with Pandas & Geopandas"
-date: 07/30/2024
+title: "Programming Bootcamp: Part 2"
+subtitle: ": Pandas"
+date: 03/18/2025
 date-format: long
 author:
   - name: Hyesop Shin
@@ -45,19 +45,18 @@ include-in-header:
     - `{ }` as curly brackets
     - `< >` as angle(d) brackets 
 
-## What will we cover today?
+## What will we cover this week?
 - How can we better understand the code structure to query complicated datasets?
-- How can we utilse Python Packages in GIS Tasks
+- How can we utilse Python Packages
 - How does programming open up new methods for spatial analysis that are not possible through manual processes
 
 
 
-## What will we "really" cover today?
+## What will we "really" cover this week?
 - How do we learn dictionaries?
 -   How to import spreadsheet data with `pandas`
 -   How to clean and explore data
--   Data Visualisation
--   How to play with GIS data with `geopandas`
+-   Data Visualisation (tutorial class)
 
 ::: notes
 :::
@@ -194,6 +193,7 @@ print(mydict["people"])
 
 
 ## Getting started with Pandas
+* Packages
 * Reading in files
 * Filtering columns and rows
 * `Group by` and `Aggregation`
@@ -201,27 +201,40 @@ print(mydict["people"])
 * Visulisation
 
 
+## Packages
 
-## What is a dataframe
+* In Python, you can do all sorts of thing beyond the basic python command
+* You can do so using **packages**
+* Do you recognise any of them?
 
-![](https://media.geeksforgeeks.org/wp-content/uploads/finallpandas.png){fig-align=center}
+![](data/ranks.png){fig-align=center}
 
-::: {style="font-size: 50%;"}
-source: geeksforgeeks.org
-:::
+## Installation
 
-* Tabular array 
-* Might be a stack of lists (recap of last lecture) 
-* A combined data series
+* Using **conda**: <br> in your terminal, `conda install pandas`
+* Using **pip** or **pip3**: <br> in your terminal, `pip3 install pandas`
 
+<br>
 
-## DataFrame vs Data series?
+* However colab requires an exclamation mark in front of pip
+* `!pip install pandas`
 
-* A Series is a 1-dimensional data structure used to represent a single column or row of data within a DataFrame or as a standalone data structure.
-* A DataFrame is a 2-dimensional data structure designed for handling tabular data with multiple columns
+## Once installed you `import` libraries (or modules) {.smaller}
 
-![](https://av-eks-blogoptimized.s3.amazonaws.com/series-and-dataframe.png){fig-align=center}
+* In Python, you must specify which library a function comes from, even after importing it.
+* To simplify this, assign a nickname (alias) when importing a library.
+* Commonly used nicknames:
+    - pandas → pd
+    - numPy → np
+    - matplotlib.pyplot → plt
+    - seaborn → sns
+* Using nicknames makes code more readable and efficient.
 
+```python
+import pandas as pd
+import numpy as np
+import matplotlib as plt
+```
 
 ## Reading in Files
 
@@ -244,10 +257,53 @@ df.to_excel("output.xlsx")
 * `.json`
 * ...
 
+---
+
+### However in Colab
+
+* After you upload your files you can run these codes (refer to the Google Colab link)
+
+```
+# method 1
+with open('/content/drive/My Drive/example.txt', 'r') as f:
+    text = f.read()
+print(text)
+
+# method 2
+import pandas as pd
+data = pd.read_csv('/content/drive/My Drive/my_data/data.csv')
+print(data.head())
+```
+* Fore detailed info: [https://saturncloud.io/blog/google-colab-how-to-read-data-from-my-google-drive/](https://saturncloud.io/blog/google-colab-how-to-read-data-from-my-google-drive/)
+
+
+
+
+## What is a dataframe
+
+![](https://media.geeksforgeeks.org/wp-content/uploads/finallpandas.png){fig-align=center}
+
+::: {style="font-size: 50%;"}
+source: geeksforgeeks.org
+:::
+
+* Tabular array 
+* Might be a stack of lists (recap of last lecture) 
+* A combined data series
+
+___
+
+### A toy DataFrame
+
+```python
+pandas_df = pd.DataFrame({'a': [1,2,3,4], 
+                          'b': [5,6,7,8]})
+pandas_df
+```
 
 ---
 
-### Example
+### Your turn
 
 ```python
 import pandas as pd
@@ -261,32 +317,25 @@ df = pd.DataFrame(data)
 
 # Print the output.
 print(df)
-```
 
-```
-    Name  Age
-0    Tom   20
-1   Nick   21
-2  Krish   19
-3   Jack   18
-```
-
-::: {style="font-size: 70%;"}
-* Pandas has assigned a key for each person as the numerical values 0 through 3
-* If you would like to have different index values, say, the person's initial, you can do that easily as well.
-:::
-
-
----
-
-### Import dataset
+## Always check using these functions
 
 ```python
-census = pd.read_csv('data/Age.csv')
-print(census)
+pandas_df.columns # print the pandas column names
+pandas_df.shape # Dimension
+pandas_df.type()
+pandas_df.describe()
 ```
 
-----
+
+## DataFrame vs Data series?
+
+* A Series is a 1-dimensional data structure used to represent a single column or row of data within a DataFrame or as a standalone data structure.
+* A DataFrame is a 2-dimensional data structure designed for handling tabular data with multiple columns
+
+![](https://av-eks-blogoptimized.s3.amazonaws.com/series-and-dataframe.png){fig-align=center}
+
+
 
 
 ### Understanding the data structure
@@ -294,8 +343,8 @@ print(census)
 
 
 ```python
-census.info() ## technical summary (e.g. dataframe, rows/columnns and their names)
-census.dtypes ## generic summary
+df.info() ## technical summary (e.g. dataframe, rows/columnns and their names)
+df.dtypes ## generic summary
 ```
 
 <br>
@@ -304,39 +353,211 @@ census.dtypes ## generic summary
 
 
 ```python
-census.head()
-census.tail()
+df.head()
+df.tail()
 ```
+
+
+## Dot Syntax and Methods in Python
+
+- The **dot (`.`) syntax** is used for both:  
+  - Extracting attributes → `object.attribute`  
+  - Applying object-specific functions → `object.method()`  
+
+- **Methods** are functions specific to an object's type.  
+
+- Example with a **pandas DataFrame (`pandas_df`)**:  
+  - Compute the mean of each column:  
+    ```python
+    pandas_df.mean()
+    ```  
+  - Compute the sum of each column:  
+    ```python
+    pandas_df.sum()
+    ```  
+
+- Methods are called using **`object.method()`** format.
+
+---
+
+### libraries can be confusing
+
+* Does this work?
+
+```python
+py_list = [1, 3, 4]
+py_list.mean()
+```
+* If not, why doesn't it work?
+* Can you come up with a solution?
+
 
 ## Indexing DataFrames
 
-::: {style="font-size: 80%;"}
-* When selecting subsets of data, `[]` are used.
-* Inside `[]`, you can use a single column/row label, a list of column/row labels, a slice of labels, a conditional expression or a colon.
-* `loc` when selecting the row and column names e.g. census["age"]
-* `iloc` when specifying the positions in the table e.g. census[2:5]
-* You can assign new values to a selection based on `loc`/`iloc.`
-:::
+### Extracting columns
+While you can create a pandas DataFrame using a dictionary containing list entries (as we did earlier), the columns of a DataFrame themselves, when extracted, are a “Series” type object (rather than a list).
 
-
----
-
-### Subsetting the data frame: Columns
-
-![](https://pandas.pydata.org/docs/_images/03_subset_columns.svg)
-
-* Selecting a single column
-* Selecting multiple columns
 
 ```python
-census["Name"]
-census[["Name", "pop23_ov65"]]
-census.iloc[:, 3]
+pandas_df['a'] # the column 'a' can be extracted using []
+
+pandas_df.a # df.col dot syntax
 ```
+* The output above is the same as from the pandas_df['a'] syntax: both outputs are a pandas Series object.
+
 
 ---
 
-### Subsetting the data frame: Rows
+<!-- ### Subsetting the data frame: Columns -->
+
+<!-- ![](https://pandas.pydata.org/docs/_images/03_subset_columns.svg) -->
+
+<!-- * Selecting a single column -->
+<!-- * Selecting multiple columns -->
+
+<!-- ::: {style="font-size: 80%;"} -->
+<!-- * When selecting subsets of data, `[]` are used. -->
+<!-- * Inside `[]`, you can use a single column/row label, a list of column/row labels, a slice of labels, a conditional expression or a colon. -->
+<!-- * `loc` when selecting the row and column names e.g. census["age"] -->
+<!-- * `iloc` when specifying the positions in the table e.g. census[2:5] -->
+<!-- * You can assign new values to a selection based on `loc`/`iloc.` -->
+<!-- ::: -->
+
+
+<!-- ```python -->
+<!-- census["Name"] -->
+<!-- census[["Name", "pop23_ov65"]] -->
+<!-- census.iloc[:, 3] -->
+<!-- ``` -->
+
+
+### Adding columns to a DataFrame
+
+* You can define a new DataFrame using an existing data frame and then modify it, e.g., by adding a new column:
+
+```python
+# define a new data frame using the original one
+pandas_df_new = pandas_df
+# add a new column to the new data frame
+pandas_df_new['d'] = [13,14,15,16]
+# print out the new data frame
+pandas_df_new
+```
+
+Notice that the original DataFrame will also change:
+
+```python
+pandas_df
+```
+
+```
+   a  b   c   d
+0  1  5   9  13
+1  2  6  10  14
+2  3  7  11  15
+3  4  8  12  16
+```
+
+## Don’t forget to `.copy()`
+
+1. **Assignment in Python Creates a Reference, Not a Copy**  
+   When you assign one variable to another, like this:
+   
+   ```python
+   pandas_df_new = pandas_df
+   ```
+   
+   - You are **not** creating a new DataFrame.  
+   - Instead, `pandas_df_new` becomes another **name (or pointer)** for the same underlying object (`pandas_df`).  
+   - Any changes made to `pandas_df_new` will also **modify** `pandas_df` because they both reference the same data in memory.
+
+---
+
+### 2. Example of the Problem  {.smaller}
+
+   ```python
+   import pandas as pd
+   
+   pandas_df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+   pandas_df_new = pandas_df
+   pandas_df_new['A'] = [10, 20, 30]
+   print(pandas_df)  # The original DataFrame is also modified!
+   ```
+
+**Output:**
+
+   ```
+       A  B
+   0  10  4
+   1  20  5
+   2  30  6
+   ```
+
+   - Notice that `pandas_df` changed even though we only modified `pandas_df_new`.  
+   - This happens because `pandas_df_new` is just another reference to the same object.
+
+---
+
+### 3. Solution: Use `.copy()` to Create a True Copy
+
+```python
+pandas_df_new = pandas_df.copy()
+```
+
+   - Now, `pandas_df_new` is a completely **separate** DataFrame.  
+   - Changes made to `pandas_df_new` **won’t** affect `pandas_df`.
+
+
+## 4. Example with `.copy()` {.smaller}
+
+   ```python
+   import pandas as pd
+
+   # Create a DataFrame
+   pandas_df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+
+   # Create a true copy
+   pandas_df_new = pandas_df.copy()
+
+   # Modify the new DataFrame
+   pandas_df_new['A'] = [10, 20, 30]
+
+   print("Original DataFrame:\n", pandas_df)
+   print("\nNew DataFrame:\n", pandas_df_new)
+   ```
+
+   **Output:**
+   
+   ```
+   Original DataFrame:
+       A  B
+   0  1  4
+   1  2  5
+   2  3  6
+
+   New DataFrame:
+       A  B
+   0  10  4
+   1  20  5
+   2  30  6
+   ```
+   
+   - Now, `pandas_df` remains **unchanged**, because `pandas_df_new` is an independent copy.
+
+## Your turn
+
+* recreate a dataframe using the code below
+* copy the dataframe and assign the new dataframe as `pandas_df_new`
+* add a new column called 'c', with a list of [9,10,11,12]
+* print the result for both `pandas_df` and `pandas_df_new` 
+
+```python
+pandas_df = pd.DataFrame({'a': [1,2,3,4], 
+                          'b': [5,6,7,8]})
+pandas_df
+```
+
+## Filtering (subsetting rows)
 
 ![](https://pandas.pydata.org/docs/_images/03_subset_rows.svg)
 
