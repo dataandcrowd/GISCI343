@@ -56,7 +56,7 @@ include-in-header:
 - How do we learn dictionaries?
 -   How to import spreadsheet data with `pandas`
 -   How to clean and explore data
--   Data Visualisation (tutorial class)
+-   Data Visualisation
 
 ::: notes
 :::
@@ -74,7 +74,7 @@ include-in-header:
 ### Example
 
 ```python
-census = {
+GISCI_dictionary = {
                         "apple":"a delicious round fruit",
                         "bench":"a place to sit next to the footpath",
                         "candy":"something thats tastey but causes cavities",
@@ -319,8 +319,6 @@ df = pd.DataFrame(data)
 print(df)
 
 ## Always check using these functions
-
-```python
 pandas_df.columns # print the pandas column names
 pandas_df.shape # Dimension
 pandas_df.type()
@@ -336,7 +334,7 @@ pandas_df.describe()
 ![](https://av-eks-blogoptimized.s3.amazonaws.com/series-and-dataframe.png){fig-align=center}
 
 
-
+---
 
 ### Understanding the data structure
 * The info methods and the dtypes attribute are convenient for a first check.
@@ -391,6 +389,16 @@ py_list.mean()
 * If not, why doesn't it work?
 * Can you come up with a solution?
 
+::: {.notes}
+Your code will result in an AttributeError because Python's built-in list type does not have a .mean() method.
+
+```python
+import numpy as np
+py_list = [1, 3, 4]
+mean_value = np.mean(py_list)
+print(mean_value)  # Output: 2.6666666666666665
+```
+:::
 
 ## Indexing DataFrames
 
@@ -666,7 +674,7 @@ nz_cities = {
 2. Convert this to a dataframe
 
 ```python
-`nzpop = pd.DataFrame(nz_cities.items(), columns=['city', 'population'])`
+nzpop = pd.DataFrame(nz_cities.items(), columns=['city', 'population'])
 ```
 
 3. Use three methods to extract the Auckland population. Hint: use `loc`, `iloc`, and `query`
@@ -825,6 +833,16 @@ gdp_by_continent.plot.bar()
 
 ![](https://rebeccabarter.com/blog/2023-09-11-from_r_to_python_files/figure-html/unnamed-chunk-61-3.png){fig-align=center}
 
+Again, the row index of the Series object is used as the x-axis labels by default.
+
+## Scatter Plot
+We could similarly create a scatterplot of the `gdpPercap` and `lifeExp` columns from gapminder using the `plot.scatter()` method:
+
+```python
+gapminder.plot.scatter(x='gdpPercap', y='lifeExp')
+```
+![](https://rebeccabarter.com/blog/2023-09-11-from_r_to_python_files/figure-html/unnamed-chunk-62-5.png)
+
 
 ## Merge df's
 * Concatenate DataFrames along row and column.
@@ -894,10 +912,9 @@ print(outer_merge)
 
 ## Summary
 * To navigate complex datasets effectively, it's crucial to structure your code in a way that enhances readability and maintainability
-* Python offers a rich ecosystem of libraries specifically designed for GIS and spatial analysis. We explored some key packages such as GeoPandas for spatial data frames
+* Python offers a rich ecosystem of libraries specifically designed for GIS and spatial analysis. 
 * The actual programming:
-    - Pandas: Indexing, Filtering, Grouping, Join between dataframes
-    - Geopandas: Hands-on experience in GIS using codes
+    - Pandas: Indexing, Filtering, Grouping, Data Vis, and Joining between dataframes
 
 
 
