@@ -133,6 +133,49 @@ Raster = continuous & consistent
 | **Applications**   | Accurate mapping, cadastre, infrastructure            | Background layers, remote sensing, environmental models  |
 
 
+## Which data to use
+
+* Vector datasets and methods dominate the social sciences because human settlements and processes (e.g., transport infrastructure) tend to have discrete borders
+* Raster datasets and methods dominate many environmental sciences because of the reliance on remote sensing data
+
+## Python Tools for Vector and Raster Data
+
+### 🟢 Vector Data
+
+| Package      | Level     | Description                                                                 |
+|--------------|-----------|-----------------------------------------------------------------------------|
+| `shapely`    | Low-level | Handles individual geometry objects (points, lines, polygons)               |
+| `geopandas`  | High-level| Works with GeoSeries & GeoDataFrames (vector layers); built on shapely      |
+
+<!-- ➡️ **GeoPandas** is the core of the vector data ecosystem in Python. -->
+
+---
+
+### 🟡 Raster Data
+
+| Package       | Focus      | Description                                                                 |
+|---------------|------------|-----------------------------------------------------------------------------|
+| `rasterio`    | Simple rasters | Uses `numpy` arrays + metadata dictionary (CRS, transform, etc.)            |
+| `xarray`      | Complex rasters | Uses `xarray.Dataset` and `DataArray`; ideal for NetCDF & multi-band rasters |
+
+<!-- ➡️ This course focuses on **rasterio** for raster processing. -->
+
+
+## Geospatial data in Python 
+
+* A couple of terminology notes
+    _ A feature refers to both the geometry and attributes of specific piece of vector data
+    - A feature collection is a list, or collection, of features
+    
+* Common formats for vector datasets
+    - A shapefile
+    * Mandatory files:
+    * shp: the file containing the geometries
+    * .shx: the file that indexes the geometry
+    * .dbf: tabular data format storing the attributes for each geometry
+    * And many optional files for documentation, projection information, etc.
+
+* geopackage (gpkg), gdb, tif, img, parquet
 
 
 ## Geospatial data and GeoPandas

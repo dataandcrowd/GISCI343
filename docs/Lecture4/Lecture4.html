@@ -549,6 +549,94 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </tbody>
 </table>
 </section>
+<section id="which-data-to-use" class="slide level2">
+<h2>Which data to use</h2>
+<ul>
+<li>Vector datasets and methods dominate the social sciences because human settlements and processes (e.g., transport infrastructure) tend to have discrete borders</li>
+<li>Raster datasets and methods dominate many environmental sciences because of the reliance on remote sensing data</li>
+</ul>
+</section>
+<section id="python-tools-for-vector-and-raster-data" class="slide level2">
+<h2>Python Tools for Vector and Raster Data</h2>
+<h3 id="vector-data">🟢 Vector Data</h3>
+<table>
+<colgroup>
+<col style="width: 13%">
+<col style="width: 10%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Level</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>shapely</code></td>
+<td>Low-level</td>
+<td>Handles individual geometry objects (points, lines, polygons)</td>
+</tr>
+<tr class="even">
+<td><code>geopandas</code></td>
+<td>High-level</td>
+<td>Works with GeoSeries &amp; GeoDataFrames (vector layers); built on shapely</td>
+</tr>
+</tbody>
+</table>
+<!-- ➡️ **GeoPandas** is the core of the vector data ecosystem in Python. -->
+</section>
+<section class="slide level2">
+
+<h3 id="raster-data">🟡 Raster Data</h3>
+<table>
+<colgroup>
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Focus</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>rasterio</code></td>
+<td>Simple rasters</td>
+<td>Uses <code>numpy</code> arrays + metadata dictionary (CRS, transform, etc.)</td>
+</tr>
+<tr class="even">
+<td><code>xarray</code></td>
+<td>Complex rasters</td>
+<td>Uses <code>xarray.Dataset</code> and <code>DataArray</code>; ideal for NetCDF &amp; multi-band rasters</td>
+</tr>
+</tbody>
+</table>
+<!-- ➡️ This course focuses on **rasterio** for raster processing. -->
+</section>
+<section id="geospatial-data-in-python" class="slide level2">
+<h2>Geospatial data in Python</h2>
+<ul>
+<li>A couple of terminology notes _ A feature refers to both the geometry and attributes of specific piece of vector data
+<ul>
+<li>A feature collection is a list, or collection, of features</li>
+</ul></li>
+<li>Common formats for vector datasets
+<ul>
+<li>A shapefile</li>
+<li>Mandatory files:</li>
+<li>shp: the file containing the geometries</li>
+<li>.shx: the file that indexes the geometry</li>
+<li>.dbf: tabular data format storing the attributes for each geometry</li>
+<li>And many optional files for documentation, projection information, etc.</li>
+</ul></li>
+<li>geopackage (gpkg), gdb, tif, img, parquet</li>
+</ul>
+</section>
 <section id="geospatial-data-and-geopandas" class="slide level2">
 <h2>Geospatial data and GeoPandas</h2>
 
