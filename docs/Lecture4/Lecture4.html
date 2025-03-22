@@ -797,6 +797,9 @@ Datum: World Geodetic System 1984 ensemble
 <section id="part-2-spatial-relationships-and-joins" class="slide level2">
 <h2>Part 2: Spatial Relationships and Joins</h2>
 <p>Let’s explore joins and merges between GeoDataFrames based on geospatial relationships</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a>cities_url <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/dataandcrowd/GISCI343/main/docs/Lecture4/data/ne_110m_populated_places.gpkg"</span></span>
+<span id="cb27-2"><a href=""></a>cities <span class="op">=</span> gpd.read_file(cities_url)</span>
+<span id="cb27-3"><a href=""></a>cities.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>

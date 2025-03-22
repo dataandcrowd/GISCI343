@@ -406,7 +406,11 @@ gdf = gpd.GeoDataFrame(
 
 Let’s explore joins and merges between GeoDataFrames based on geospatial relationships
 
-
+```python
+cities_url = "https://raw.githubusercontent.com/dataandcrowd/GISCI343/main/docs/Lecture4/data/ne_110m_populated_places.gpkg"
+cities = gpd.read_file(cities_url)
+cities.head()
+```
 
 
 
