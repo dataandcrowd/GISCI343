@@ -12,7 +12,7 @@
 
   <meta name="author" content="Hyesop Shin">
   <meta name="dcterms.date" content="2025-03-21">
-  <title>An Introduction to Geospatial Analysis with Python - GeoPandas 1</title>
+  <title>Python Data Bootcamp - Geopandas 1</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -398,7 +398,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">An Introduction to Geospatial Analysis with Python - GeoPandas 1</h1>
+  <h1 class="title">Python Data Bootcamp - Geopandas 1</h1>
+  <p class="subtitle">: An Introduction to Geospatial Analysis with Python</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -422,66 +423,134 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>Descriptive Statistics</li>
 <li>Aggregation using <code>groupby</code></li>
 <li>Merging dataframes</li>
+<li>Data Vis</li>
 </ul>
 </section>
-<section id="todays-lecture-1hr" class="slide level2">
-<h2>Today’s Lecture (1hr)</h2>
+<section id="todays-lecture" class="slide level2">
+<h2>Today’s Lecture</h2>
 <ul>
+<li>Little bit of <code>pandas</code></li>
 <li>Lots of GIS functions exist</li>
 <li>We are not going to cover everything such as:
 <ul>
 <li>Intersect</li>
 <li>Buffer</li>
 <li>Clip</li>
-<li>Interpolation</li>
-<li>…. <!-- * Instead, we want to choose a topic and explore functions from there --></li>
 </ul></li>
 </ul>
 </section>
-<section class="slide level2">
+<section id="melt-and-cast" class="slide level2 smaller">
+<h2>Melt and Cast</h2>
 
-<h3 id="buffer">Buffer</h3>
-
-<img data-src="https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/5c7eb6fc4bcbfc5117d778f0aabfded6.jpg" class="r-stretch"></section>
-<section class="slide level2">
-
-<h3 id="geoprocessing">Geoprocessing</h3>
-
-<img data-src="https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/8a76c2bc3a77bf08103a204b1fdeab45.jpg" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section class="slide level2">
-
-<h3 id="multiple-layer-analysis">Multiple Layer Analysis</h3>
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><img data-src="https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/ca6ce94cdd2e09a1da8aa6ec22336835.jpg" style="width:70.0%"></p>
-</div><div class="column" style="width:60%;">
-<p><img data-src="https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/a33268f6ff028c24152080d0aa3f2aad.jpg" style="width:80.0%"></p>
-</div>
-</div>
+<img data-src="https://hausetutorials.netlify.app/posts/2020-05-14-reshaping-data-in-python-pandas/pic5.png" class="quarto-figure quarto-figure-center r-stretch"><ul>
+<li>Pandas <code>melt()</code> function is used to change the DataFrame format from wide to long.</li>
+<li>It’s used to create a specific format of the DataFrame object where one or more columns work as identifiers.</li>
+<li>All the remaining columns are treated as values and unpivoted to the row axis and only two columns – variable and value.</li>
+<li>We can use <code>pivot()</code> function to unmelt the output DataFrame back to the original data frame.</li>
+</ul>
 </section>
-<section class="slide level2">
-
-<h3 id="raster-vector">Raster &amp; Vector</h3>
+<section id="melt-and-cast-1" class="slide level2">
+<h2>Melt and Cast</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb1-2"><a href=""></a>    <span class="st">'City'</span>: [<span class="st">'Auckland'</span>, <span class="st">'Wellington'</span>, <span class="st">'Christchurch'</span>],</span>
+<span id="cb1-3"><a href=""></a>    <span class="st">'Jan_Temp'</span>: [<span class="dv">25</span>, <span class="dv">22</span>, <span class="dv">20</span>],</span>
+<span id="cb1-4"><a href=""></a>    <span class="st">'Feb_Temp'</span>: [<span class="dv">24</span>, <span class="dv">21</span>, <span class="dv">19</span>],</span>
+<span id="cb1-5"><a href=""></a>    <span class="st">'Mar_Temp'</span>: [<span class="dv">23</span>, <span class="dv">20</span>, <span class="dv">18</span>]</span>
+<span id="cb1-6"><a href=""></a>})</span>
+<span id="cb1-7"><a href=""></a></span>
+<span id="cb1-8"><a href=""></a><span class="bu">print</span>(<span class="st">"Original DataFrame:"</span>)</span>
+<span id="cb1-9"><a href=""></a><span class="bu">print</span>(df)</span>
+<span id="cb1-10"><a href=""></a></span>
+<span id="cb1-11"><a href=""></a><span class="co"># Using melt to reshape the DataFrame</span></span>
+<span id="cb1-12"><a href=""></a>df_melted <span class="op">=</span> pd.melt(df, id_vars<span class="op">=</span>[<span class="st">'City'</span>], var_name<span class="op">=</span><span class="st">'Month'</span>, value_name<span class="op">=</span><span class="st">'Temperature'</span>)</span>
+<span id="cb1-13"><a href=""></a></span>
+<span id="cb1-14"><a href=""></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Melted DataFrame:"</span>)</span>
+<span id="cb1-15"><a href=""></a><span class="bu">print</span>(df_melted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="data-vis" class="slide level2">
+<h2>Data Vis</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-2"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href=""></a></span>
+<span id="cb2-4"><a href=""></a><span class="co"># Set a clean style</span></span>
+<span id="cb2-5"><a href=""></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb2-6"><a href=""></a></span>
+<span id="cb2-7"><a href=""></a><span class="co"># Plot</span></span>
+<span id="cb2-8"><a href=""></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb2-9"><a href=""></a>sns.lineplot(data<span class="op">=</span>df_melted, x<span class="op">=</span><span class="st">'Month'</span>, y<span class="op">=</span><span class="st">'Temperature'</span>, hue<span class="op">=</span><span class="st">'City'</span>, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb2-10"><a href=""></a></span>
+<span id="cb2-11"><a href=""></a><span class="co"># Add titles and labels</span></span>
+<span id="cb2-12"><a href=""></a>plt.title(<span class="st">'Monthly Temperatures Across Cities'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb2-13"><a href=""></a>plt.xlabel(<span class="st">'Month'</span>)</span>
+<span id="cb2-14"><a href=""></a>plt.ylabel(<span class="st">'Temperature (°C)'</span>)</span>
+<span id="cb2-15"><a href=""></a>plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb2-16"><a href=""></a>plt.legend(title<span class="op">=</span><span class="st">'City'</span>)</span>
+<span id="cb2-17"><a href=""></a>plt.tight_layout()</span>
+<span id="cb2-18"><a href=""></a></span>
+<span id="cb2-19"><a href=""></a><span class="co"># Show plot</span></span>
+<span id="cb2-20"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="two-fundamental-geographic-data-models" class="slide level2">
+<h2>Two fundamental geographic data models</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><img data-src="https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_12/2a68ec6d5c214c2518a936e4abf14619.jpg"></p>
+<p><img data-src="Figs/howwemap.png"></p>
 </div><div class="column" style="width:50%;">
-<p><img data-src="https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_12/095c6533afae0ad16c99688a3d0d489e.jpg" style="width:80.0%"></p>
+<p>Vector = precise &amp; structured. Raster = continuous &amp; consistent</p>
 </div>
 </div>
 </section>
-<section class="slide level2">
-
-<h3 id="spatial-autocorrelation">Spatial Autocorrelation</h3>
-
-<img data-src="https://www.e-education.psu.edu/geog586/sites/www.e-education.psu.edu.geog586/files/Lesson_04/Images/L4LISA.PNG" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section class="slide level2">
-
-<h3 id="spatial-interpolation">Spatial Interpolation</h3>
-
-<img data-src="Figs/interpolation.png" style="width:30.0%" class="r-stretch"></section>
-<section id="geospatial-data-and-geopandas-a-recap" class="slide level2">
-<h2>Geospatial data and GeoPandas: A Recap</h2>
+<section id="vector-vs-raster-data-models" class="slide level2 smaller">
+<h2>Vector vs Raster Data Models</h2>
+<table>
+<colgroup>
+<col style="width: 14%">
+<col style="width: 41%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Aspect</strong></th>
+<th><strong>Vector Model</strong></th>
+<th><strong>Raster Model</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Data Type</strong></td>
+<td>Points, Lines, Polygons</td>
+<td>Grid of uniform cells (pixels)</td>
+</tr>
+<tr class="even">
+<td><strong>Boundaries</strong></td>
+<td>Discrete, well-defined</td>
+<td>Aggregated, based on resolution</td>
+</tr>
+<tr class="odd">
+<td><strong>Precision</strong></td>
+<td>High precision (exact shapes &amp; locations)</td>
+<td>Lower precision, depends on cell size</td>
+</tr>
+<tr class="even">
+<td><strong>Scalability</strong></td>
+<td>Scales with complexity</td>
+<td>Consistent and scalable over space</td>
+</tr>
+<tr class="odd">
+<td><strong>Common Uses</strong></td>
+<td>Parcels, roads, boundaries</td>
+<td>Satellite imagery, aerial photos, land cover</td>
+</tr>
+<tr class="even">
+<td><strong>Applications</strong></td>
+<td>Accurate mapping, cadastre, infrastructure</td>
+<td>Background layers, remote sensing, environmental models</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="geospatial-data-and-geopandas" class="slide level2">
+<h2>Geospatial data and GeoPandas</h2>
 
 <img data-src="https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png" class="quarto-figure quarto-figure-center r-stretch"><ul>
 <li>Geospatial data are data with location information</li>
@@ -494,14 +563,14 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <ul>
 <li>Use <code>gpd.read_file()</code> to read various spatial data formats (e.g., Shapefiles, GeoJSON)</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>  <span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb1-2"><a href=""></a>  nzpop <span class="op">=</span> gpd.read_file(<span class="st">'path_to_file.shp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>  <span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb3-2"><a href=""></a>  nzpop <span class="op">=</span> gpd.read_file(<span class="st">'path_to_file.shp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
 <h3 id="writing-data">Writing Data</h3>
 <p>Use <code>gpd.to_file()</code> to write GeoDataFrames to different formats</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>nzpop.to_file(<span class="st">'path_to_save_file.shp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>nzpop.to_file(<span class="st">'path_to_save_file.shp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
@@ -517,9 +586,9 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <section id="mapping-and-plotting-tools" class="slide level2">
 <h2>Mapping and plotting tools</h2>
 <p>GeoPandas provides a high-level interface to the <code>matplotlib</code> library for making maps. Mapping shapes is as easy as using the <code>plot()</code> method on a <code>GeoSeries</code> or <code>GeoDataFrame.</code></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>nzpop.plot()</span>
-<span id="cb3-2"><a href=""></a></span>
-<span id="cb3-3"><a href=""></a>nzpop.boundary.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>nzpop.plot()</span>
+<span id="cb5-2"><a href=""></a></span>
+<span id="cb5-3"><a href=""></a>nzpop.boundary.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 <img data-src="Figs/boundary.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section class="slide level2">
@@ -537,18 +606,18 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <section class="slide level2">
 
 <h3 id="with-our-own-data">With our own data</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 <img data-src="Figs/choroplethmap_colour.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section class="slide level2">
 
 <h3 id="with-our-own-data-2">With our own data 2</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_23'</span>, legend<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb5-2"><a href=""></a>           legend_kwds<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">"Population in 2023"</span>,</span>
-<span id="cb5-3"><a href=""></a>                        <span class="st">'orientation'</span>: <span class="st">"vertical"</span>},</span>
-<span id="cb5-4"><a href=""></a>           cmap<span class="op">=</span><span class="st">'OrRd'</span>)</span>
-<span id="cb5-5"><a href=""></a>plt.title(<span class="st">'Choropleth Map of Population in 2023'</span>)</span>
-<span id="cb5-6"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_23'</span>, legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb7-2"><a href=""></a>           legend_kwds<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">"Population in 2023"</span>,</span>
+<span id="cb7-3"><a href=""></a>                        <span class="st">'orientation'</span>: <span class="st">"vertical"</span>},</span>
+<span id="cb7-4"><a href=""></a>           cmap<span class="op">=</span><span class="st">'OrRd'</span>)</span>
+<span id="cb7-5"><a href=""></a>plt.title(<span class="st">'Choropleth Map of Population in 2023'</span>)</span>
+<span id="cb7-6"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
@@ -560,21 +629,21 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>https://pysal.org/mapclassify/</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a><span class="im">import</span> mapclassify <span class="im">as</span> mc</span>
-<span id="cb6-2"><a href=""></a></span>
-<span id="cb6-3"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>, scheme<span class="op">=</span><span class="st">'quantiles'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a><span class="im">import</span> mapclassify <span class="im">as</span> mc</span>
+<span id="cb8-2"><a href=""></a></span>
+<span id="cb8-3"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>, scheme<span class="op">=</span><span class="st">'quantiles'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
 <h3 id="with-our-own-data-4">With our own data 4</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a>classifier <span class="op">=</span> mc.NaturalBreaks(y<span class="op">=</span>nzpop[<span class="st">"VAR_1_23"</span>], k<span class="op">=</span><span class="dv">5</span>)  <span class="co"># k is the number of classes</span></span>
-<span id="cb7-2"><a href=""></a></span>
-<span id="cb7-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb7-4"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>, linewidth<span class="op">=</span><span class="fl">0.8</span>, ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">'0.8'</span>, </span>
-<span id="cb7-5"><a href=""></a>           scheme<span class="op">=</span><span class="st">'NaturalBreaks'</span>, classification_kwds<span class="op">=</span>{<span class="st">'k'</span>: <span class="dv">5</span>}, legend<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-6"><a href=""></a></span>
-<span id="cb7-7"><a href=""></a>plt.title(<span class="st">'Choropleth Map of Population with Natural Breaks'</span>)</span>
-<span id="cb7-8"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>classifier <span class="op">=</span> mc.NaturalBreaks(y<span class="op">=</span>nzpop[<span class="st">"VAR_1_23"</span>], k<span class="op">=</span><span class="dv">5</span>)  <span class="co"># k is the number of classes</span></span>
+<span id="cb9-2"><a href=""></a></span>
+<span id="cb9-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb9-4"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>, linewidth<span class="op">=</span><span class="fl">0.8</span>, ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">'0.8'</span>, </span>
+<span id="cb9-5"><a href=""></a>           scheme<span class="op">=</span><span class="st">'NaturalBreaks'</span>, classification_kwds<span class="op">=</span>{<span class="st">'k'</span>: <span class="dv">5</span>}, legend<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-6"><a href=""></a></span>
+<span id="cb9-7"><a href=""></a>plt.title(<span class="st">'Choropleth Map of Population with Natural Breaks'</span>)</span>
+<span id="cb9-8"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="pandas-plots" class="slide level2">
 <h2>Pandas plots</h2>
@@ -597,9 +666,9 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <section class="slide level2">
 
 <h3 id="scatter-plot-and-histogram">Scatter plot and Histogram</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>nzpop.plot(kind<span class="op">=</span><span class="st">"scatter"</span>, x<span class="op">=</span><span class="st">"VAR_1_15"</span>, y<span class="op">=</span><span class="st">"VAR_1_23"</span>)</span>
-<span id="cb8-2"><a href=""></a></span>
-<span id="cb8-3"><a href=""></a>nzpop.plot[[<span class="st">"VAR_1_15"</span>, <span class="st">"VAR_1_23"</span>, <span class="st">"geometry"</span>]].plot.hist(alpha<span class="op">=</span><span class="fl">.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>nzpop.plot(kind<span class="op">=</span><span class="st">"scatter"</span>, x<span class="op">=</span><span class="st">"VAR_1_15"</span>, y<span class="op">=</span><span class="st">"VAR_1_23"</span>)</span>
+<span id="cb10-2"><a href=""></a></span>
+<span id="cb10-3"><a href=""></a>nzpop.plot[[<span class="st">"VAR_1_15"</span>, <span class="st">"VAR_1_23"</span>, <span class="st">"geometry"</span>]].plot.hist(alpha<span class="op">=</span><span class="fl">.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
 <div style="font-size: 70%;">
 <ul>
@@ -610,24 +679,24 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <section id="population-distribution-and-demographics-census-nz-2023-vs-2018" class="slide level2">
 <h2>Population Distribution and Demographics: Census NZ 2023 vs 2018</h2>
 <div style="font-size: 70%;">
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb9-2"><a href=""></a></span>
-<span id="cb9-3"><a href=""></a><span class="co"># First variable</span></span>
-<span id="cb9-4"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_15'</span>, ax<span class="op">=</span>ax1, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>)</span>
-<span id="cb9-5"><a href=""></a>ax1.set_title(<span class="st">'Population 2018'</span>)</span>
-<span id="cb9-6"><a href=""></a>cbar1 <span class="op">=</span> ax1.get_figure().get_axes()[<span class="dv">2</span>]  <span class="co"># Get the first colorbar axis</span></span>
-<span id="cb9-7"><a href=""></a>cbar1.ticklabel_format(style<span class="op">=</span><span class="st">'plain'</span>) <span class="co"># Access the colorbars (legends) and apply ticklabel_format</span></span>
-<span id="cb9-8"><a href=""></a></span>
-<span id="cb9-9"><a href=""></a><span class="co"># Second variable</span></span>
-<span id="cb9-10"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_23'</span>, ax<span class="op">=</span>ax2, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'YlGn'</span>)</span>
-<span id="cb9-11"><a href=""></a>ax2.set_title(<span class="st">'Population 2023'</span>)</span>
-<span id="cb9-12"><a href=""></a>cbar2 <span class="op">=</span> ax2.get_figure().get_axes()[<span class="dv">3</span>]  <span class="co"># Get the second colorbar axis</span></span>
-<span id="cb9-13"><a href=""></a>cbar2.ticklabel_format(style<span class="op">=</span><span class="st">'plain'</span>)</span>
-<span id="cb9-14"><a href=""></a></span>
-<span id="cb9-15"><a href=""></a><span class="co"># Adjust layout to prevent overlap</span></span>
-<span id="cb9-16"><a href=""></a>plt.tight_layout()</span>
-<span id="cb9-17"><a href=""></a><span class="co"># Show the plot</span></span>
-<span id="cb9-18"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb11-2"><a href=""></a></span>
+<span id="cb11-3"><a href=""></a><span class="co"># First variable</span></span>
+<span id="cb11-4"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_15'</span>, ax<span class="op">=</span>ax1, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>)</span>
+<span id="cb11-5"><a href=""></a>ax1.set_title(<span class="st">'Population 2018'</span>)</span>
+<span id="cb11-6"><a href=""></a>cbar1 <span class="op">=</span> ax1.get_figure().get_axes()[<span class="dv">2</span>]  <span class="co"># Get the first colorbar axis</span></span>
+<span id="cb11-7"><a href=""></a>cbar1.ticklabel_format(style<span class="op">=</span><span class="st">'plain'</span>) <span class="co"># Access the colorbars (legends) and apply ticklabel_format</span></span>
+<span id="cb11-8"><a href=""></a></span>
+<span id="cb11-9"><a href=""></a><span class="co"># Second variable</span></span>
+<span id="cb11-10"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_23'</span>, ax<span class="op">=</span>ax2, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'YlGn'</span>)</span>
+<span id="cb11-11"><a href=""></a>ax2.set_title(<span class="st">'Population 2023'</span>)</span>
+<span id="cb11-12"><a href=""></a>cbar2 <span class="op">=</span> ax2.get_figure().get_axes()[<span class="dv">3</span>]  <span class="co"># Get the second colorbar axis</span></span>
+<span id="cb11-13"><a href=""></a>cbar2.ticklabel_format(style<span class="op">=</span><span class="st">'plain'</span>)</span>
+<span id="cb11-14"><a href=""></a></span>
+<span id="cb11-15"><a href=""></a><span class="co"># Adjust layout to prevent overlap</span></span>
+<span id="cb11-16"><a href=""></a>plt.tight_layout()</span>
+<span id="cb11-17"><a href=""></a><span class="co"># Show the plot</span></span>
+<span id="cb11-18"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section class="slide level2">
@@ -641,8 +710,8 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <section id="merging-data" class="slide level2">
 <h2>Merging data</h2>
 <p>There are two ways to combine datasets in GeoPandas – <span style="color:blue;">attribute joins</span> and <span style="color:red;">spatial joins</span>.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="co">#pip install geodatasets</span></span>
-<span id="cb10-2"><a href=""></a><span class="im">import</span> geodatasets</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="co">#pip install geodatasets</span></span>
+<span id="cb12-2"><a href=""></a><span class="im">import</span> geodatasets</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
@@ -651,10 +720,10 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>Attribute joins are accomplished using the <code>merge()</code> method. In general, it is recommended to use the <code>merge()</code> method called from the spatial dataset.</li>
 <li>With that said, the stand-alone <code>pandas.merge()</code> function will work if the GeoDataFrame is in the <code>left</code> argument</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>chicago_shapes.head()</span>
-<span id="cb11-2"><a href=""></a>chicago_names.head()</span>
-<span id="cb11-3"><a href=""></a></span>
-<span id="cb11-4"><a href=""></a>chicago_shapes <span class="op">=</span> chicago_shapes.merge(chicago_names, on<span class="op">=</span><span class="st">'NID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a>chicago_shapes.head()</span>
+<span id="cb13-2"><a href=""></a>chicago_names.head()</span>
+<span id="cb13-3"><a href=""></a></span>
+<span id="cb13-4"><a href=""></a>chicago_shapes <span class="op">=</span> chicago_shapes.merge(chicago_names, on<span class="op">=</span><span class="st">'NID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section class="slide level2">
 
@@ -664,10 +733,10 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>GeoDataFrame.sjoin(): joins based on binary predicates (intersects, contains, etc.)</li>
 <li>GeoDataFrame.sjoin_nearest(): joins based on proximity, with the ability to set a maximum search radius.</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>chicago.head()</span>
-<span id="cb12-2"><a href=""></a>groceries.head()</span>
-<span id="cb12-3"><a href=""></a></span>
-<span id="cb12-4"><a href=""></a>groceries_with_community <span class="op">=</span> groceries.sjoin(chicago, how<span class="op">=</span><span class="st">"inner"</span>, predicate<span class="op">=</span><span class="st">'intersects'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a>chicago.head()</span>
+<span id="cb14-2"><a href=""></a>groceries.head()</span>
+<span id="cb14-3"><a href=""></a></span>
+<span id="cb14-4"><a href=""></a>groceries_with_community <span class="op">=</span> groceries.sjoin(chicago, how<span class="op">=</span><span class="st">"inner"</span>, predicate<span class="op">=</span><span class="st">'intersects'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="thoughts" class="slide level2">
 <h2>Thoughts</h2>

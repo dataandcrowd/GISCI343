@@ -1,6 +1,6 @@
 ---
-title: "An Introduction to Geospatial Analysis with Python - GeoPandas 1"
-#subtitle: ": Examples with Census NZ"
+title: "Python Data Bootcamp - Geopandas 1"
+subtitle: ": An Introduction to Geospatial Analysis with Python"
 date: 03/21/2025
 date-format: long
 author:
@@ -34,66 +34,117 @@ include-in-header:
 - Descriptive Statistics
 - Aggregation using `groupby`
 - Merging dataframes
+- Data Vis
 
 
-## Today's Lecture (1hr)
+## Today's Lecture
+* Little bit of `pandas`
 * Lots of GIS functions exist
 * We are not going to cover everything such as:
    - Intersect
    - Buffer
    - Clip
-   - Interpolation
-   - ....
-<!-- * Instead, we want to choose a topic and explore functions from there -->
-
----
-
-### Buffer
-
-![](https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/5c7eb6fc4bcbfc5117d778f0aabfded6.jpg)
 
 
----
+## Melt and Cast {.smaller}
 
-### Geoprocessing
+![](https://hausetutorials.netlify.app/posts/2020-05-14-reshaping-data-in-python-pandas/pic5.png){fig-align=center}
 
-![](https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/8a76c2bc3a77bf08103a204b1fdeab45.jpg){fig-align="center"}
+* Pandas `melt()` function is used to change the DataFrame format from wide to long.
+* It’s used to create a specific format of the DataFrame object where one or more columns work as identifiers.
+* All the remaining columns are treated as values and unpivoted to the row axis and only two columns – variable and value.
+* We can use `pivot()` function to unmelt the output DataFrame back to the original data frame.
 
----
 
-### Multiple Layer Analysis
+## Melt and Cast 
+
+```python
+df = pd.DataFrame({
+    'City': ['Auckland', 'Wellington', 'Christchurch'],
+    'Jan_Temp': [25, 22, 20],
+    'Feb_Temp': [24, 21, 19],
+    'Mar_Temp': [23, 20, 18]
+})
+
+print("Original DataFrame:")
+print(df)
+
+# Using melt to reshape the DataFrame
+df_melted = pd.melt(df, id_vars=['City'], var_name='Month', value_name='Temperature')
+
+print("\nMelted DataFrame:")
+print(df_melted)
+```
+
+## Data Vis
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Set a clean style
+sns.set(style="whitegrid")
+
+# Plot
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=df_melted, x='Month', y='Temperature', hue='City', marker='o')
+
+# Add titles and labels
+plt.title('Monthly Temperatures Across Cities', fontsize=16)
+plt.xlabel('Month')
+plt.ylabel('Temperature (°C)')
+plt.xticks(rotation=45)
+plt.legend(title='City')
+plt.tight_layout()
+
+# Show plot
+plt.show()
+```
+
+## Two fundamental geographic data models
+
+
 
 :::: {.columns}
-::: {.column width="40%"}
-![](https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/ca6ce94cdd2e09a1da8aa6ec22336835.jpg){width=70%}
-:::
-
-::: {.column width="60%"}
-![](https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_11/a33268f6ff028c24152080d0aa3f2aad.jpg){width=80%}
-:::
-::::
-
----
-
-### Raster & Vector
-
-:::: {.columns}
-::: {.column width="50%"}
-![](https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_12/2a68ec6d5c214c2518a936e4abf14619.jpg)
-:::
 
 ::: {.column width="50%"}
-![](https://saylordotorg.github.io/text_essentials-of-geographic-information-systems/section_12/095c6533afae0ad16c99688a3d0d489e.jpg){width=80%}
+
+![](Figs/howwemap.png)
+
 :::
+
+
+::: {.column width="50%"}
+Vector = precise & structured.
+Raster = continuous & consistent
+:::
+
 ::::
 
+## Vector vs Raster Data Models {.smaller}
 
-## Geospatial data and GeoPandas: A Recap
+| **Aspect**         | **Vector Model**                                      | **Raster Model**                                         |
+|--------------------|--------------------------------------------------------|-----------------------------------------------------------|
+| **Data Type**      | Points, Lines, Polygons                               | Grid of uniform cells (pixels)                           |
+| **Boundaries**     | Discrete, well-defined                                | Aggregated, based on resolution                          |
+| **Precision**      | High precision (exact shapes & locations)             | Lower precision, depends on cell size                    |
+| **Scalability**    | Scales with complexity                                | Consistent and scalable over space                       |
+| **Common Uses**    | Parcels, roads, boundaries                            | Satellite imagery, aerial photos, land cover             |
+| **Applications**   | Accurate mapping, cadastre, infrastructure            | Background layers, remote sensing, environmental models  |
+
+
+
+
+## Geospatial data and GeoPandas
 
 ![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
 
 * Geospatial data are data with location information
 * The geometry variable indicates where the *data* is located
+
+
+
+
 
 
 ## Reading and Writing Spatial Data
