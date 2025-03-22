@@ -634,15 +634,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>.dbf: tabular data format storing the attributes for each geometry</li>
 <li>And many optional files for documentation, projection information, etc.</li>
 </ul></li>
-<li>geopackage (gpkg), gdb, tif, img, parquet</li>
-</ul>
-</section>
-<section id="geospatial-data-and-geopandas" class="slide level2">
-<h2>Geospatial data and GeoPandas</h2>
-
-<img data-src="https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png" class="quarto-figure quarto-figure-center r-stretch"><ul>
-<li>Geospatial data are data with location information</li>
-<li>The geometry variable indicates where the <em>data</em> is located</li>
+<li>geopackage (gpkg), geojson, gdb, tif, img, parquet…</li>
 </ul>
 </section>
 <section id="reading-and-writing-spatial-data" class="slide level2">
@@ -660,180 +652,152 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <p>Use <code>gpd.to_file()</code> to write GeoDataFrames to different formats</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>nzpop.to_file(<span class="st">'path_to_save_file.shp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section class="slide level2">
+<section id="analysing-vector-data-with-geopandas" class="slide level2">
+<h2>Analysing vector data with GeoPandas</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb5-2"><a href=""></a>countries <span class="op">=</span> gpd.read_file(<span class="st">"./data/ne_110m_admin_0_countries"</span>)</span>
+<span id="cb5-3"><a href=""></a>countries.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>iso_a3  name                  continent     pop_est   gdp_md_est      geometry
+AFG     Afghanistan        Asia         34124811    64080           POLYGON ((61.21082 ...
+AGO     Angola             Africa         29310273  189000          MULTIPOLYGON (((23.9...
+ALB     Albania            Europe         3047987     33900         POLYGON ((21.02004 ...
+ARE     UAE                Asia         6072475   667200            POLYGON ((51.57952 ...
+ARG     Argentina          S. America     44293293  879400          MULTIPOLYGON (((-66...
+...</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a><span class="bu">type</span>(countries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>geopandas.geodataframe.GeoDataFrame</code></pre>
+</section>
+<section id="what-is-a-geodataframe" class="slide level2">
+<h2>What is a geodataframe</h2>
 
-<h3 id="coordinate-reference-systems-crs">Coordinate Reference Systems (CRS)</h3>
+<img data-src="https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png" class="quarto-figure quarto-figure-center r-stretch"><ul>
+<li>Just like a DataFrame but with a new, special geometry column:</li>
+</ul>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>countries[<span class="st">"geometry"</span>].head(n<span class="op">=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>0    POLYGON ((61.21082 35.65007, 62.23065 35.27066...
+1    MULTIPOLYGON (((23.90415 -11.72228, 24.07991 -...
+2    POLYGON ((21.02004 40.84273, 20.99999 40.58000...
+Name: geometry, dtype: geometry</code></pre>
+<p>Take a look at the first geometry polygon by using the .iloc[] selector:</p>
+<pre><code>countries['geometry'].iloc[0]</code></pre>
+</section>
+<section id="we-can-still-leverage-the-power-of-pandas" class="slide level2">
+<h2>We can still leverage the power of pandas</h2>
+<p>Calculate the total world population:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>countries[<span class="st">"pop"</span>].<span class="bu">sum</span>() <span class="op">/</span> <span class="fl">1e9</span>  <span class="co"># In billions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>7.150238276</code></pre>
+<p>Calculate the total population on each continent:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a>grouped <span class="op">=</span> countries.groupby(<span class="st">"continent"</span>)</span>
+<span id="cb14-2"><a href=""></a>grouped</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Access the “pop” column from the groupby variable (“grouped”) and then call the .sum() function to calculate our desired statistic:</p>
+<p><em>The groupby() function does not return a DataFrame — you need to call sum(), mean() etc, or apply() a function to get your desired result!</em></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>pop_by_continent <span class="op">=</span> grouped[<span class="st">"pop"</span>].<span class="bu">sum</span>()</span>
+<span id="cb15-2"><a href=""></a></span>
+<span id="cb15-3"><a href=""></a>pop_by_continent</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="filter-dataframe" class="slide level2">
+<h2>Filter dataframe</h2>
+<p>Filter the data frame based on a boolean selection:</p>
+<pre><code># Is the country name NZ?
+is_NZ = countries["name"] == "New Zealand"
+
+is_NZ</code></pre>
+<pre><code># Get the row with USA
+NZ = countries.loc[is_NZ]
+
+NZ</code></pre>
+</section>
+<section id="squeeze" class="slide level2">
+<h2><code>Squeeze</code></h2>
+<p>The squeeze() function does just one it sounds like: if you have a DataFrame with only one row, it will “squeeze” the row dimension by removing it, returning just a Series object:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>NZ.squeeze().geometry</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a><span class="co"># Squeeze</span></span>
+<span id="cb19-2"><a href=""></a>NZsqueezed <span class="op">=</span> NZ.squeeze()</span>
+<span id="cb19-3"><a href=""></a></span>
+<span id="cb19-4"><a href=""></a><span class="co"># Print out the types</span></span>
+<span id="cb19-5"><a href=""></a><span class="bu">print</span>(<span class="st">"The type of NZ is: "</span>, <span class="bu">type</span>(NZsqueezed))</span>
+<span id="cb19-6"><a href=""></a></span>
+<span id="cb19-7"><a href=""></a><span class="co"># Output</span></span>
+<span id="cb19-8"><a href=""></a>NZsqueezed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="coordinate-reference-systems-crs" class="slide level2">
+<h2>Coordinate Reference Systems (CRS)</h2>
 <ul>
 <li>Importance of CRS in spatial data</li>
 <li>Using <code>.crs</code> to check CRS</li>
 <li>Setting CRS during data read/write operations</li>
-<li><code>print(nzpop.crs)</code></li>
-<li>Transform to a different CRS: <code>gdf = gdf.to_crs(3857)</code></li>
+<li><code>print(countries.crs)</code></li>
 </ul>
+<pre><code>&lt;Geographic 2D CRS: EPSG:4326&gt;
+Name: WGS 84
+Axis Info [ellipsoidal]:
+- Lat[north]: Geodetic latitude (degree)
+- Lon[east]: Geodetic longitude (degree)
+Area of Use:
+- name: World.
+- bounds: (-180.0, -90.0, 180.0, 90.0)
+Datum: World Geodetic System 1984 ensemble
+- Ellipsoid: WGS 84
+- Prime Meridian: Greenwich</code></pre>
 </section>
-<section id="mapping-and-plotting-tools" class="slide level2">
-<h2>Mapping and plotting tools</h2>
-<p>GeoPandas provides a high-level interface to the <code>matplotlib</code> library for making maps. Mapping shapes is as easy as using the <code>plot()</code> method on a <code>GeoSeries</code> or <code>GeoDataFrame.</code></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>nzpop.plot()</span>
-<span id="cb5-2"><a href=""></a></span>
-<span id="cb5-3"><a href=""></a>nzpop.boundary.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
-<img data-src="Figs/boundary.png" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section class="slide level2">
-
-<h3 id="choropleth-maps">Choropleth maps</h3>
-<div style="font-size: 80%;">
+<section id="the-epsg4326-crs" class="slide level2 smaller">
+<h2>The EPSG=4326 CRS</h2>
 <ul>
-<li>Choropleth maps use the Counts and amounts (Colour) smart mapping symbol type to show data as shaded points, lines, or areas. (source: ArcGIS)</li>
-<li>Choropleth maps help answer questions about data, such as: How do rates or percentages compare by geographic feature?</li>
-<li>Unemployment and Crime</li>
+<li>EPSG 4326 is known as WGS 84 where x and y are longitude and latitude.</li>
+<li>It is is the default coordinate system for GPS systems.</li>
+<li>It’s also known as Plate Carrée or equirectangular</li>
 </ul>
-</div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a><span class="co"># Create a figure and axes</span></span>
+<span id="cb21-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb21-3"><a href=""></a><span class="co"># Plot the countries on our axes</span></span>
+<span id="cb21-4"><a href=""></a>ax <span class="op">=</span> countries.plot(ax<span class="op">=</span>ax, facecolor<span class="op">=</span><span class="st">"none"</span>, edgecolor<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb21-5"><a href=""></a><span class="co"># Add a title</span></span>
+<span id="cb21-6"><a href=""></a>ax.set_title(<span class="st">"Equirectangular Projection"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-<img data-src="Figs/unemployment.png" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section class="slide level2">
-
-<h3 id="with-our-own-data">With our own data</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
-<img data-src="Figs/choroplethmap_colour.png" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section class="slide level2">
-
-<h3 id="with-our-own-data-2">With our own data 2</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_23'</span>, legend<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb7-2"><a href=""></a>           legend_kwds<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">"Population in 2023"</span>,</span>
-<span id="cb7-3"><a href=""></a>                        <span class="st">'orientation'</span>: <span class="st">"vertical"</span>},</span>
-<span id="cb7-4"><a href=""></a>           cmap<span class="op">=</span><span class="st">'OrRd'</span>)</span>
-<span id="cb7-5"><a href=""></a>plt.title(<span class="st">'Choropleth Map of Population in 2023'</span>)</span>
-<span id="cb7-6"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section class="slide level2">
-
-<h3 id="with-our-own-data-3-classification">With our own data 3: Classification</h3>
-<div style="font-size: 70%;">
+<img data-src="https://musa-550-fall-2023.github.io/content/week-3/imgs/equirectangular.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="can-we-convert-to-other-coordinate-systems" class="slide level2 smaller">
+<h2>Can we convert to other coordinate systems?</h2>
 <ul>
-<li>The scheme option can be set to any scheme provided by mapclassify</li>
-<li>e.g.&nbsp;<code>box_plot</code>, <code>equal_interval</code>, <code>fisher_jenks</code>, <code>fisher_jenks_sampled</code>, <code>headtail_breaks</code>, <code>jenks_caspall</code>, <code>jenks_caspall_forced</code>, <code>jenks_caspall_sampled</code>, <code>max_p_classifier</code>, <code>maximum_breaks</code>, <code>natural_breaks</code>, <code>quantiles</code>, <code>percentiles</code>, <code>std_mean</code> or <code>user_defined</code></li>
-<li>https://pysal.org/mapclassify/</li>
+<li>Use the <code>df.to_crs()</code> function! The most well-known projections can be specified by their EPSG code.</li>
+<li>Geopandas documentation on re-projecting: <a href="https://geopandas.org/en/stable/docs/user_guide/projections.html">Managing Projections</a></li>
+<li>Let’s convert to the Mercator projection</li>
 </ul>
-</div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a><span class="im">import</span> mapclassify <span class="im">as</span> mc</span>
-<span id="cb8-2"><a href=""></a></span>
-<span id="cb8-3"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>, scheme<span class="op">=</span><span class="st">'quantiles'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section class="slide level2">
+<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>no_antarctica <span class="op">=</span> countries.loc[(countries[<span class="st">"name_long"</span>] <span class="op">!=</span> <span class="st">"Antarctica"</span>)]</span>
+<span id="cb22-2"><a href=""></a><span class="co"># Two ways to specify the EPSG code</span></span>
+<span id="cb22-3"><a href=""></a>countries_mercator <span class="op">=</span> no_antarctica.to_crs(epsg<span class="op">=</span><span class="dv">3395</span>)</span>
+<span id="cb22-4"><a href=""></a><span class="co"># Alternatively:</span></span>
+<span id="cb22-5"><a href=""></a><span class="co"># countries_mercator = no_antartica.to_crs("EPSG:3395")</span></span>
+<span id="cb22-6"><a href=""></a>countries_mercator.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-<h3 id="with-our-own-data-4">With our own data 4</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>classifier <span class="op">=</span> mc.NaturalBreaks(y<span class="op">=</span>nzpop[<span class="st">"VAR_1_23"</span>], k<span class="op">=</span><span class="dv">5</span>)  <span class="co"># k is the number of classes</span></span>
-<span id="cb9-2"><a href=""></a></span>
-<span id="cb9-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb9-4"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">"VAR_1_23"</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>, linewidth<span class="op">=</span><span class="fl">0.8</span>, ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">'0.8'</span>, </span>
-<span id="cb9-5"><a href=""></a>           scheme<span class="op">=</span><span class="st">'NaturalBreaks'</span>, classification_kwds<span class="op">=</span>{<span class="st">'k'</span>: <span class="dv">5</span>}, legend<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb9-6"><a href=""></a></span>
-<span id="cb9-7"><a href=""></a>plt.title(<span class="st">'Choropleth Map of Population with Natural Breaks'</span>)</span>
-<span id="cb9-8"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="pandas-plots" class="slide level2">
-<h2>Pandas plots</h2>
-<div style="font-size: 70%;">
-<p>Plotting methods also allow for different plot styles from pandas along with the default <code>geo</code> plot. These methods can be accessed using the <code>kind</code> keyword argument in <code>plot()</code>, and include:</p>
+<img data-src="https://musa-550-fall-2023.github.io/content/week-3/imgs/mercator.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="lets-try-another-dataset" class="slide level2">
+<h2>Let’s try another dataset</h2>
 <ul>
-<li><code>geo</code> for mapping</li>
-<li><code>line</code> for line plots</li>
-<li><code>bar</code> or <code>barh</code> for bar plots</li>
-<li><code>hist</code> for histogram</li>
-<li><code>box</code> for boxplot</li>
-<li><code>kde</code> or <code>density</code> for density plots</li>
-<li><code>area</code> for area plots</li>
-<li><code>scatter</code> for scatter plots</li>
-<li><code>hexbin</code> for hexagonal bin plots</li>
-<li><code>pie</code> for pie plots</li>
+<li>This time we can try some points</li>
 </ul>
-</div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href=""></a>data <span class="op">=</span> {</span>
+<span id="cb23-2"><a href=""></a>    <span class="st">"Name"</span>: [<span class="st">"New York City"</span>, <span class="st">"São Paulo"</span>, <span class="st">"Tokyo"</span>, <span class="st">"Lagos"</span>, <span class="st">"Sydney"</span>],</span>
+<span id="cb23-3"><a href=""></a>    <span class="st">"Population"</span>: [<span class="dv">8419600</span>, <span class="dv">12325232</span>, <span class="dv">13929286</span>, <span class="dv">15000000</span>, <span class="dv">5312163</span>],  <span class="co"># Approximate populations</span></span>
+<span id="cb23-4"><a href=""></a>    <span class="st">"Latitude"</span>: [<span class="fl">40.7128</span>, <span class="op">-</span><span class="fl">23.5505</span>, <span class="fl">35.6895</span>, <span class="fl">6.5244</span>, <span class="op">-</span><span class="fl">33.8688</span>],</span>
+<span id="cb23-5"><a href=""></a>    <span class="st">"Longitude"</span>: [<span class="op">-</span><span class="fl">74.0060</span>, <span class="op">-</span><span class="fl">46.6333</span>, <span class="fl">139.6917</span>, <span class="fl">3.3792</span>, <span class="fl">151.2093</span>]</span>
+<span id="cb23-6"><a href=""></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>type(data)</code></pre>
+<pre><code>dict</code></pre>
 </section>
-<section class="slide level2">
-
-<h3 id="scatter-plot-and-histogram">Scatter plot and Histogram</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>nzpop.plot(kind<span class="op">=</span><span class="st">"scatter"</span>, x<span class="op">=</span><span class="st">"VAR_1_15"</span>, y<span class="op">=</span><span class="st">"VAR_1_23"</span>)</span>
-<span id="cb10-2"><a href=""></a></span>
-<span id="cb10-3"><a href=""></a>nzpop.plot[[<span class="st">"VAR_1_15"</span>, <span class="st">"VAR_1_23"</span>, <span class="st">"geometry"</span>]].plot.hist(alpha<span class="op">=</span><span class="fl">.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><br></p>
-<div style="font-size: 70%;">
-<ul>
-<li>If you want to change the name of the variable, <code>nzpop.rename(columns={'VAR_1_15': 'NewName_15', 'VAR_1_23': 'NewName_23'}, inplace=True)</code></li>
-</ul>
-</div>
+<section id="converting-dataframe-to-geodataframe" class="slide level2">
+<h2>Converting dataframe to geodataframe</h2>
+<div class="sourceCode" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a>gdf <span class="op">=</span> gpd.GeoDataFrame(</span>
+<span id="cb26-2"><a href=""></a>    cities_df, </span>
+<span id="cb26-3"><a href=""></a>    geometry<span class="op">=</span>gpd.points_from_xy(</span>
+<span id="cb26-4"><a href=""></a>        cities_df[<span class="st">'Longitude'</span>],</span>
+<span id="cb26-5"><a href=""></a>          cities_df[<span class="st">'Latitude'</span>]</span>
+<span id="cb26-6"><a href=""></a>          )</span>
+<span id="cb26-7"><a href=""></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="population-distribution-and-demographics-census-nz-2023-vs-2018" class="slide level2">
-<h2>Population Distribution and Demographics: Census NZ 2023 vs 2018</h2>
-<div style="font-size: 70%;">
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb11-2"><a href=""></a></span>
-<span id="cb11-3"><a href=""></a><span class="co"># First variable</span></span>
-<span id="cb11-4"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_15'</span>, ax<span class="op">=</span>ax1, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'OrRd'</span>)</span>
-<span id="cb11-5"><a href=""></a>ax1.set_title(<span class="st">'Population 2018'</span>)</span>
-<span id="cb11-6"><a href=""></a>cbar1 <span class="op">=</span> ax1.get_figure().get_axes()[<span class="dv">2</span>]  <span class="co"># Get the first colorbar axis</span></span>
-<span id="cb11-7"><a href=""></a>cbar1.ticklabel_format(style<span class="op">=</span><span class="st">'plain'</span>) <span class="co"># Access the colorbars (legends) and apply ticklabel_format</span></span>
-<span id="cb11-8"><a href=""></a></span>
-<span id="cb11-9"><a href=""></a><span class="co"># Second variable</span></span>
-<span id="cb11-10"><a href=""></a>nzpop.plot(column<span class="op">=</span><span class="st">'VAR_1_23'</span>, ax<span class="op">=</span>ax2, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'YlGn'</span>)</span>
-<span id="cb11-11"><a href=""></a>ax2.set_title(<span class="st">'Population 2023'</span>)</span>
-<span id="cb11-12"><a href=""></a>cbar2 <span class="op">=</span> ax2.get_figure().get_axes()[<span class="dv">3</span>]  <span class="co"># Get the second colorbar axis</span></span>
-<span id="cb11-13"><a href=""></a>cbar2.ticklabel_format(style<span class="op">=</span><span class="st">'plain'</span>)</span>
-<span id="cb11-14"><a href=""></a></span>
-<span id="cb11-15"><a href=""></a><span class="co"># Adjust layout to prevent overlap</span></span>
-<span id="cb11-16"><a href=""></a>plt.tight_layout()</span>
-<span id="cb11-17"><a href=""></a><span class="co"># Show the plot</span></span>
-<span id="cb11-18"><a href=""></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="part-2-spatial-relationships-and-joins" class="slide level2">
+<h2>Part 2: Spatial Relationships and Joins</h2>
+<p>Let’s explore joins and merges between GeoDataFrames based on geospatial relationships</p>
 </section>
-<section class="slide level2">
-
-<h3 id="output">Output</h3>
-
-<img data-src="Figs/pop1823.png" class="r-stretch"><ul>
-<li>Can you now add the total population of 2013 next to these plots?</li>
-</ul>
-</section>
-<section id="merging-data" class="slide level2">
-<h2>Merging data</h2>
-<p>There are two ways to combine datasets in GeoPandas – <span style="color:blue;">attribute joins</span> and <span style="color:red;">spatial joins</span>.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="co">#pip install geodatasets</span></span>
-<span id="cb12-2"><a href=""></a><span class="im">import</span> geodatasets</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section class="slide level2">
-
-<h3 id="attribute-joins">Attribute joins</h3>
-<ul>
-<li>Attribute joins are accomplished using the <code>merge()</code> method. In general, it is recommended to use the <code>merge()</code> method called from the spatial dataset.</li>
-<li>With that said, the stand-alone <code>pandas.merge()</code> function will work if the GeoDataFrame is in the <code>left</code> argument</li>
-</ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a>chicago_shapes.head()</span>
-<span id="cb13-2"><a href=""></a>chicago_names.head()</span>
-<span id="cb13-3"><a href=""></a></span>
-<span id="cb13-4"><a href=""></a>chicago_shapes <span class="op">=</span> chicago_shapes.merge(chicago_names, on<span class="op">=</span><span class="st">'NID'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section class="slide level2">
-
-<h3 id="spatial-joins">Spatial joins</h3>
-<p>In a spatial join, two geometry objects are merged based on their spatial relationship to one another. GeoPandas provides two spatial-join functions:</p>
-<ul>
-<li>GeoDataFrame.sjoin(): joins based on binary predicates (intersects, contains, etc.)</li>
-<li>GeoDataFrame.sjoin_nearest(): joins based on proximity, with the ability to set a maximum search radius.</li>
-</ul>
-<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a>chicago.head()</span>
-<span id="cb14-2"><a href=""></a>groceries.head()</span>
-<span id="cb14-3"><a href=""></a></span>
-<span id="cb14-4"><a href=""></a>groceries_with_community <span class="op">=</span> groceries.sjoin(chicago, how<span class="op">=</span><span class="st">"inner"</span>, predicate<span class="op">=</span><span class="st">'intersects'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="thoughts" class="slide level2">
-<h2>Thoughts</h2>
-<ul>
-<li>What are the age distribution patterns across different regions in New Zealand?</li>
-<li>How has the ethnic diversity in New Zealand evolved over the past three censuses, and what are the notable trends in Auckland?</li>
-</ul>
-
-<img data-src="Figs/further.jpg" class="r-stretch"></section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
 <ul>

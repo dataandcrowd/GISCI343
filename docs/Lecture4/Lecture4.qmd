@@ -175,19 +175,7 @@ Raster = continuous & consistent
     * .dbf: tabular data format storing the attributes for each geometry
     * And many optional files for documentation, projection information, etc.
 
-* geopackage (gpkg), gdb, tif, img, parquet
-
-
-## Geospatial data and GeoPandas
-
-![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
-
-* Geospatial data are data with location information
-* The geometry variable indicates where the *data* is located
-
-
-
-
+* geopackage (gpkg), geojson, gdb, tif, img, parquet...
 
 
 ## Reading and Writing Spatial Data
@@ -210,220 +198,217 @@ Use `gpd.to_file()` to write GeoDataFrames to different formats
 nzpop.to_file('path_to_save_file.shp')
 ```
 
----
+## Analysing vector data with GeoPandas
 
-### Coordinate Reference Systems (CRS)
+```python
+import geopandas as gpd
+countries = gpd.read_file("./data/ne_110m_admin_0_countries")
+countries.head()
+```
+
+
+```
+iso_a3	name	              continent	    pop_est	  gdp_md_est	  geometry
+AFG	    Afghanistan        Asia	        34124811	64080	        POLYGON ((61.21082 ...
+AGO	    Angola             Africa	      29310273	189000	        MULTIPOLYGON (((23.9...
+ALB	    Albania            Europe	      3047987	  33900	        POLYGON ((21.02004 ...
+ARE	    UAE                Asia	        6072475	  667200	        POLYGON ((51.57952 ...
+ARG	    Argentina          S. America	  44293293	879400	        MULTIPOLYGON (((-66...
+...
+```
+
+```python
+type(countries)
+```
+
+```
+geopandas.geodataframe.GeoDataFrame
+```
+
+
+## What is a geodataframe
+
+![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
+
+* Just like a DataFrame but with a new, special geometry column:
+
+```python
+countries["geometry"].head(n=3)
+```
+
+```
+0    POLYGON ((61.21082 35.65007, 62.23065 35.27066...
+1    MULTIPOLYGON (((23.90415 -11.72228, 24.07991 -...
+2    POLYGON ((21.02004 40.84273, 20.99999 40.58000...
+Name: geometry, dtype: geometry
+```
+
+Take a look at the first geometry polygon by using the .iloc[] selector:
+```
+countries['geometry'].iloc[0]
+```
+
+## We can still leverage the power of pandas
+Calculate the total world population:
+
+```python
+countries["pop"].sum() / 1e9  # In billions
+```
+
+```
+7.150238276
+```
+
+Calculate the total population on each continent:
+```python
+grouped = countries.groupby("continent")
+grouped
+```
+
+Access the “pop” column from the groupby variable (“grouped”) and then call the .sum() function to calculate our desired statistic:
+
+*The groupby() function does not return a DataFrame — you need to call sum(), mean() etc, or apply() a function to get your desired result!*
+
+```python
+pop_by_continent = grouped["pop"].sum()
+
+pop_by_continent
+```
+
+
+## Filter dataframe
+
+Filter the data frame based on a boolean selection:
+
+```
+# Is the country name NZ?
+is_NZ = countries["name"] == "New Zealand"
+
+is_NZ
+```
+
+
+
+```
+# Get the row with USA
+NZ = countries.loc[is_NZ]
+
+NZ
+```
+
+## `Squeeze`
+
+The squeeze() function does just one it sounds like: if you have a DataFrame with only one row, it will “squeeze” the row dimension by removing it, returning just a Series object:
+
+```python
+NZ.squeeze().geometry
+```
+
+```python
+# Squeeze
+NZsqueezed = NZ.squeeze()
+
+# Print out the types
+print("The type of NZ is: ", type(NZsqueezed))
+
+# Output
+NZsqueezed
+```
+
+
+## Coordinate Reference Systems (CRS)
 - Importance of CRS in spatial data
 - Using `.crs` to check CRS
 - Setting CRS during data read/write operations
-- `print(nzpop.crs)`
-- Transform to a different CRS: `gdf = gdf.to_crs(3857)`
-
-
-## Mapping and plotting tools
-
-GeoPandas provides a high-level interface to the `matplotlib` library for making maps. Mapping shapes is as easy as using the `plot()` method on a `GeoSeries` or `GeoDataFrame.`
-
-```python
-nzpop.plot()
-
-nzpop.boundary.plot()
+- `print(countries.crs)`
 
 ```
-
-![](Figs/boundary.png){fig-align="center"}
-
-
-
----
-
-### Choropleth maps
-::: {style="font-size: 80%;"}
-- Choropleth maps use the Counts and amounts (Colour) smart mapping symbol type to show data as shaded points, lines, or areas. (source: ArcGIS)
-- Choropleth maps help answer questions about data, such as: How do rates or percentages compare by geographic feature?
-- Unemployment and Crime
-:::
-
-![](Figs/unemployment.png){fig-align="center"}
-
----
-
-### With our own data
-
-```python
-nzpop.plot(column="VAR_1_23")
+<Geographic 2D CRS: EPSG:4326>
+Name: WGS 84
+Axis Info [ellipsoidal]:
+- Lat[north]: Geodetic latitude (degree)
+- Lon[east]: Geodetic longitude (degree)
+Area of Use:
+- name: World.
+- bounds: (-180.0, -90.0, 180.0, 90.0)
+Datum: World Geodetic System 1984 ensemble
+- Ellipsoid: WGS 84
+- Prime Meridian: Greenwich
 ```
 
-![](Figs/choroplethmap_colour.png){fig-align="center"}
-
-
----
-
-### With our own data 2
+## The EPSG=4326 CRS {.smaller}
+* EPSG 4326 is known as WGS 84 where x and y are longitude and latitude.
+* It is is the default coordinate system for GPS systems.
+* It’s also known as Plate Carrée or equirectangular
 
 ```python
-nzpop.plot(column='VAR_1_23', legend=True,
-           legend_kwds={'label': "Population in 2023",
-                        'orientation': "vertical"},
-           cmap='OrRd')
-plt.title('Choropleth Map of Population in 2023')
-plt.show()
+# Create a figure and axes
+fig, ax = plt.subplots(figsize=(10, 6))
+# Plot the countries on our axes
+ax = countries.plot(ax=ax, facecolor="none", edgecolor="black")
+# Add a title
+ax.set_title("Equirectangular Projection");
+```
+![](https://musa-550-fall-2023.github.io/content/week-3/imgs/equirectangular.png){fig-align=center}
+
+
+## Can we convert to other coordinate systems? {.smaller}
+* Use the `df.to_crs()` function! The most well-known projections can be specified by their EPSG code.
+* Geopandas documentation on re-projecting: [Managing Projections](https://geopandas.org/en/stable/docs/user_guide/projections.html)
+* Let’s convert to the Mercator projection
+
+```python
+no_antarctica = countries.loc[(countries["name_long"] != "Antarctica")]
+# Two ways to specify the EPSG code
+countries_mercator = no_antarctica.to_crs(epsg=3395)
+# Alternatively:
+# countries_mercator = no_antartica.to_crs("EPSG:3395")
+countries_mercator.head()
 ```
 
----
+![](https://musa-550-fall-2023.github.io/content/week-3/imgs/mercator.png){fig-align=center}
 
-### With our own data 3: Classification
 
-::: {style="font-size: 70%;"}
-- The scheme option can be set to any scheme provided by mapclassify 
-- e.g. `box_plot`, `equal_interval`, `fisher_jenks`, `fisher_jenks_sampled`, `headtail_breaks`, `jenks_caspall`, `jenks_caspall_forced`, `jenks_caspall_sampled`, `max_p_classifier`, `maximum_breaks`, `natural_breaks`, `quantiles`, `percentiles`, `std_mean` or `user_defined`
-- https://pysal.org/mapclassify/
-
-:::
-
+## Let's try another dataset
+* This time we can try some points
 
 ```python
-import mapclassify as mc
-
-nzpop.plot(column="VAR_1_23", cmap='OrRd', scheme='quantiles')
-
+data = {
+    "Name": ["New York City", "São Paulo", "Tokyo", "Lagos", "Sydney"],
+    "Population": [8419600, 12325232, 13929286, 15000000, 5312163],  # Approximate populations
+    "Latitude": [40.7128, -23.5505, 35.6895, 6.5244, -33.8688],
+    "Longitude": [-74.0060, -46.6333, 139.6917, 3.3792, 151.2093]
+}
 ```
 
----
+```
+type(data)
+```
 
-### With our own data 4
+```
+dict
+```
+
+## Converting dataframe to geodataframe
 
 ```python
-classifier = mc.NaturalBreaks(y=nzpop["VAR_1_23"], k=5)  # k is the number of classes
-
-fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-nzpop.plot(column="VAR_1_23", cmap='OrRd', linewidth=0.8, ax=ax, edgecolor='0.8', 
-           scheme='NaturalBreaks', classification_kwds={'k': 5}, legend=True)
-
-plt.title('Choropleth Map of Population with Natural Breaks')
-plt.show()
+gdf = gpd.GeoDataFrame(
+    cities_df, 
+    geometry=gpd.points_from_xy(
+        cities_df['Longitude'],
+          cities_df['Latitude']
+          )
+        )
 ```
 
 
-## Pandas plots
-::: {style="font-size: 70%;"}
+## Part 2: Spatial Relationships and Joins
 
-Plotting methods also allow for different plot styles from pandas along with the default `geo` plot. These methods can be accessed using the `kind` keyword argument in `plot()`, and include:
-
-- `geo` for mapping
-- `line` for line plots
-- `bar` or `barh` for bar plots
-- `hist` for histogram
-- `box` for boxplot
-- `kde` or `density` for density plots
-- `area` for area plots
-- `scatter` for scatter plots
-- `hexbin` for hexagonal bin plots
-- `pie` for pie plots
-:::
+Let’s explore joins and merges between GeoDataFrames based on geospatial relationships
 
 
 
---- 
 
-### Scatter plot and Histogram
-
-```python
-nzpop.plot(kind="scatter", x="VAR_1_15", y="VAR_1_23")
-
-nzpop.plot[["VAR_1_15", "VAR_1_23", "geometry"]].plot.hist(alpha=.4)
-```
-
-<br>
-
-::: {style="font-size: 70%;"}
-
-- If you want to change the name of the variable, `nzpop.rename(columns={'VAR_1_15': 'NewName_15', 'VAR_1_23': 'NewName_23'}, inplace=True)`
-
-:::
-
-
-## Population Distribution and Demographics: Census NZ 2023 vs 2018
-
-::: {style="font-size: 70%;"}
-
-```python
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-
-# First variable
-nzpop.plot(column='VAR_1_15', ax=ax1, legend=True, cmap='OrRd')
-ax1.set_title('Population 2018')
-cbar1 = ax1.get_figure().get_axes()[2]  # Get the first colorbar axis
-cbar1.ticklabel_format(style='plain') # Access the colorbars (legends) and apply ticklabel_format
-
-# Second variable
-nzpop.plot(column='VAR_1_23', ax=ax2, legend=True, cmap='YlGn')
-ax2.set_title('Population 2023')
-cbar2 = ax2.get_figure().get_axes()[3]  # Get the second colorbar axis
-cbar2.ticklabel_format(style='plain')
-
-# Adjust layout to prevent overlap
-plt.tight_layout()
-# Show the plot
-plt.show()
-```
-:::
-
----
-
-### Output
-
-![](Figs/pop1823.png)
-
-- Can you now add the total population of 2013 next to these plots?
-
-
-## Merging data
-
-There are two ways to combine datasets in GeoPandas – <span style="color:blue;">attribute joins</span> and <span style="color:red;">spatial joins</span>.
-
-```python
-#pip install geodatasets
-import geodatasets
-```
-
----
-
-### Attribute joins
-- Attribute joins are accomplished using the `merge()` method. In general, it is recommended to use the `merge()` method called from the spatial dataset.
-- With that said, the stand-alone `pandas.merge()` function will work if the GeoDataFrame is in the `left` argument
-
-```python
-chicago_shapes.head()
-chicago_names.head()
-
-chicago_shapes = chicago_shapes.merge(chicago_names, on='NID')
-```
-
----
-
-### Spatial joins
-
-In a spatial join, two geometry objects are merged based on their spatial relationship to one another.
-GeoPandas provides two spatial-join functions:
-
-- GeoDataFrame.sjoin(): joins based on binary predicates (intersects, contains, etc.)
-- GeoDataFrame.sjoin_nearest(): joins based on proximity, with the ability to set a maximum search radius.
-
-
-```python
-chicago.head()
-groceries.head()
-
-groceries_with_community = groceries.sjoin(chicago, how="inner", predicate='intersects')
-```
-
-## Thoughts
-
-* What are the age distribution patterns across different regions in New Zealand?
-* How has the ethnic diversity in New Zealand evolved over the past three censuses, and what are the notable trends in Auckland?
-
-![](Figs/further.jpg)
 
 
 ## Summary
