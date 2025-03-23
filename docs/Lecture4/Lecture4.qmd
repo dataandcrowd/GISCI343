@@ -160,47 +160,116 @@ Here are just some of the questions that GIS allows us to explore with <span sty
 
 :::
 
+## Rail Maps
+
+![](https://i.redd.it/4exvxwozdz381.jpg)
+
+---
+
+### How do we class Rail maps?
+
+* Reference maps because…
+They show the location of different tube stations, and the location of each tube line 
+
+<br>
+
+* Thematic maps because...
+They can be used to predict life expectancy, poverty and median house prices
+
+---
+
+### Other cases
+
+* Scenario 1: The visualisation of road networks to improve road safety measures are a type of ?
+* Scenario 2: The visualisation of the earth's surface, showing its elevation, is a type of
+* Scenario 3: Navigation tools such as Google maps or City-Mapper can be classed as
+
+:::{.notes}
+
+"The visualisation of road networks to improve road safety measures"
+This is typically a Thematic Map — specifically a transportation or road safety map. These maps focus on a specific theme or purpose (in this case, road safety), and visualize relevant features like crash hotspots, speed limits, traffic volumes, or intersections.
+
+"The visualisation of the earth’s surface, showing its elevation"
+This describes a Topographic Map, which represents elevation through contour lines, shading, or colour gradients to depict terrain and landforms.
+
+"Navigation tools such as Google Maps or CityMapper"
+These fall under Reference Maps or Navigational Maps, designed for general location-finding, route planning, and wayfinding. While they use various thematic layers (e.g., traffic, transit), their primary function is spatial orientation.
+:::
+
+## What is Geospatial Data?
+
+* Geospatial data (or spatial data in particular areas in the world) is a data frame that contains information about a specific location, which can be analysed to better understand that location.
+GIS enables this spatial data to be processed and analysed.
+* Two types: Vector and Raster
 
 
 
-## Two fundamental geographic data models
-
-
+## Vector and Raster
 
 :::: {.columns}
 
 ::: {.column width="50%"}
 
-![](Figs/howwemap.png)
+* **Vector**: points, lines and polygons
+
+![](Figs/vector.png)
 
 :::
 
 
 ::: {.column width="50%"}
-Vector = precise & structured.
-Raster = continuous & consistent
+
+* **Raster**: Imagery or satellite data that are formed from a grid of pixels.
+
+![](Figs/raster.png){width="50%" fig-align=center}
+
 :::
 
 ::::
 
-## Vector vs Raster Data Models {.smaller}
 
-| **Aspect**         | **Vector Model**                                      | **Raster Model**                                         |
-|--------------------|--------------------------------------------------------|-----------------------------------------------------------|
-| **Data Type**      | Points, Lines, Polygons                               | Grid of uniform cells (pixels)                           |
-| **Boundaries**     | Discrete, well-defined                                | Aggregated, based on resolution                          |
-| **Precision**      | High precision (exact shapes & locations)             | Lower precision, depends on cell size                    |
-| **Scalability**    | Scales with complexity                                | Consistent and scalable over space                       |
-| **Common Uses**    | Parcels, roads, boundaries                            | Satellite imagery, aerial photos, land cover             |
-| **Applications**   | Accurate mapping, cadastre, infrastructure            | Background layers, remote sensing, environmental models  |
+
+
+
+<!-- ## Vector vs Raster Data Models {.smaller} -->
+
+<!-- | **Aspect**         | **Vector Model**                                      | **Raster Model**                                         | -->
+<!-- |--------------------|--------------------------------------------------------|-----------------------------------------------------------| -->
+<!-- | **Data Type**      | Points, Lines, Polygons                               | Grid of uniform cells (pixels)                           | -->
+<!-- | **Boundaries**     | Discrete, well-defined                                | Aggregated, based on resolution                          | -->
+<!-- | **Precision**      | High precision (exact shapes & locations)             | Lower precision, depends on cell size                    | -->
+<!-- | **Scalability**    | Scales with complexity                                | Consistent and scalable over space                       | -->
+<!-- | **Common Uses**    | Parcels, roads, boundaries                            | Satellite imagery, aerial photos, land cover             | -->
+<!-- | **Applications**   | Accurate mapping, cadastre, infrastructure            | Background layers, remote sensing, environmental models  | -->
+
+## GIS Data Management
+
+* GeoTiff files are commonly used for raster data
+* Shapefile files are commonly used for vector data. Here’s a file extension… 
+
+![](Figs/shapfile.png){fig-align=center}
 
 
 ## Which data to use
 
-* Vector datasets and methods dominate the social sciences because human settlements and processes (e.g., transport infrastructure) tend to have discrete borders
-* Raster datasets and methods dominate many environmental sciences because of the reliance on remote sensing data
+* <span style="color:blue">Vector datasets</span> and methods dominate the social sciences because human settlements and processes  tend to have discrete borders (e.g., transport)
+* <span style="color:green">Raster</span> datasets and methods dominate many environmental sciences because of the reliance on *remote sensing data*
 
-## Python Tools for Vector and Raster Data
+## Don't forget about me! {.smaller}
+
+* GeoJSON (.geojson / .json) – Web-friendly, lightweight format for encoding geographic data structures.
+* KML/KMZ – Used primarily in Google Earth; KMZ is a zipped KML.
+* GPKG (GeoPackage) – A modern SQLite-based format supporting both vector and raster data.
+* File Geodatabase (GDB) – ESRI's proprietary format allowing complex datasets and relationships.
+* CSV + coordinates – Plain text tabular data that can be georeferenced using lat/lon columns.
+* DXF/DWG – CAD files that can be converted to GIS-compatible formats.
+* GPX (GPS Exchange Format) – Typically used for GPS data (routes, tracks, waypoints).
+* MapInfo TAB / MIF – Formats used in MapInfo software
+
+
+
+
+## Python tools for geospatial data
 
 ### 🟢 Vector Data
 
@@ -223,21 +292,170 @@ Raster = continuous & consistent
 <!-- ➡️ This course focuses on **rasterio** for raster processing. -->
 
 
-## Geospatial data in Python 
+<!-- ## Geospatial data in Python  -->
 
-* A couple of terminology notes
-    _ A feature refers to both the geometry and attributes of specific piece of vector data
-    - A feature collection is a list, or collection, of features
-    
-* Common formats for vector datasets
-    - A shapefile
-    * Mandatory files:
-    * shp: the file containing the geometries
-    * .shx: the file that indexes the geometry
-    * .dbf: tabular data format storing the attributes for each geometry
-    * And many optional files for documentation, projection information, etc.
+<!-- * A couple of terminology notes -->
+<!--     _ A feature refers to both the geometry and attributes of specific piece of vector data -->
+<!--     - A feature collection is a list, or collection, of features -->
 
-* geopackage (gpkg), geojson, gdb, tif, img, parquet...
+<!-- * Common formats for vector datasets -->
+<!--     - A shapefile -->
+<!--     * Mandatory files: -->
+<!--     * shp: the file containing the geometries -->
+<!--     * .shx: the file that indexes the geometry -->
+<!--     * .dbf: tabular data format storing the attributes for each geometry -->
+<!--     * And many optional files for documentation, projection information, etc. -->
+
+<!-- * geopackage (gpkg), geojson, gdb, tif, img, parquet... -->
+
+## Projection Methods
+
+* Moving from the 3D to the 2D
+
+![](Figs/3d2d.jpg)
+
+## Football example
+
+![](Figs/football.png){fig-align=center}
+
+## Distortion 
+
+The misrepresentation of… 
+
+* Area
+* Shape 
+* Distance 
+* Direction of points
+
+## Distortion
+
+:::: {.columns}
+
+::: {.column width="30%"}
+* Cylindrical
+* Conical
+* Planar
+:::
+
+
+::: {.column width="70%"}
+![](https://www.jouav.com/wp-content/uploads/2024/04/map-projections-1024x703.jpg){width=80%}
+:::
+
+::::
+
+
+
+## Web Mercator vs Gall-Peter Projection 
+
+![](https://miro.medium.com/v2/resize:fit:878/1*AmpqWkF6QbdEj3KVjHEixg.png)
+
+
+## So how do we project maps?
+
+![](Figs/globe-projected.jpg){width="50%"}
+
+## Coordinate Reference Systems (CRS) {.smaller}
+
+* The move from the 3D to the 2D is done with the help of CRS  
+* Every place on earth is specified by three numbers (i.e.  Latitude, longitude and Altitude)
+* Geographic Coordinate System vs Projected Coordinate Systems 
+
+![](https://www.esri.com/arcgis-blog/wp-content/uploads/2022/02/grid2.png){fig-align=center}
+
+## CRS example
+
+![](https://www.esri.com/arcgis-blog/wp-content/uploads/2020/02/2.png){fig-align=center}
+
+
+## Spatial Relations in GIS
+
+:::: {.columns}
+
+::: {.column width="50%"}
+- <span style="color:blue">Spatial relations</span> refer to the ways in which different locations, areas, or objects are situated in relation to each other on the Earth's surface.
+:::
+
+::: {.column width="20%"}
+
+:::
+
+::: {.column width="30%"}
+![](https://www.e-education.psu.edu/maps/sites/www.e-education.psu.edu.maps/files/Images/L2_Figure6a.jpg){width=80%}
+:::
+
+::::
+
+
+## Spatial analysis in GIS
+
+- <span style="color:red">Spatial analysis</span> refers to studying entities by examining, assessing, evaluating, and modelling spatial data features
+
+---
+
+### Choropleth & point pattern maps
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiE3yPjtyAyLNKDuwHTspS0NLR-SK0xHNvXz87LlW-VfzZbIUNmyGaGap35atJ6jspLa9g38hugfGaJmzT7zv66qnOFbVgBmS33kE8RcXrAw1qOUg9DdEruqPMuRcVOiNmpnQ_dRZ7sYls/s1600/deprivation.png)
+:::
+
+::: {.column width="20%"}
+
+:::
+
+::: {.column width="40%"}
+![](https://inzight.nz/img/user_guides/advanced/aboutmaps/03_nzquakes.png)
+:::
+
+::::
+
+
+---
+
+### Spatial Autocorrelation
+
+![](https://maczokni.github.io/crime_mapping_textbook/img/philly_rob.png){fig-align=center}
+
+---
+
+### Spatial Interpolation
+
+![](https://spatial.nzta.govt.nz/portal/help/en/11.3/analyze/GUID-86BF3874-03C1-441D-B559-6CF239DB0278-web.png)
+
+---
+
+### Hotspot maps
+
+![](https://images.newscientist.com/wp-content/uploads/2004/10/dn6515-1_996.jpg?crop=1:1,smart&width=1200&height=1200&upscale=true)
+
+
+
+
+## Modifiable Arial Unit Problem (MAUP) 
+
+::: {.center .quote}
+> *MAUP* refers to the cartographic representation of data whose attributes are significantly influenced by the spatial scale used
+:::
+
+:::{style="font-size: 80%;"}
+
+Two key Aspects:
+
+* Scale Effect: Changing the size of the spatial units (e.g., from neighbourhoods to districts) can alter statistical results, such as means or totals.
+* Zoning Effect: Altering the shape or configuration of spatial units, even if the scale remains constant, can also impact results.
+
+:::
+
+## Scale Effect
+
+![](https://gisgeography.com/wp-content/uploads/2020/11/MAUP-Scale-Effect-1536x768.png)
+
+## Zonal Effect
+
+![](https://gisgeography.com/wp-content/uploads/2020/11/MAUP-Zone-Effect-1536x768.png)
+
 
 
 ## Reading and Writing Spatial Data
@@ -260,7 +478,7 @@ Use `gpd.to_file()` to write GeoDataFrames to different formats
 nzpop.to_file('path_to_save_file.shp')
 ```
 
-## Analysing vector data with GeoPandas
+## Analysing vector data with GeoPandas {.smaller}
 
 ```python
 import geopandas as gpd
@@ -287,8 +505,7 @@ type(countries)
 geopandas.geodataframe.GeoDataFrame
 ```
 
-
-## What is a geodataframe
+## What is a geodataframe {.smaller}
 
 ![](https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png){fig-align=center}
 
@@ -342,16 +559,16 @@ pop_by_continent
 
 Filter the data frame based on a boolean selection:
 
-```
+```python
 # Is the country name NZ?
 is_NZ = countries["name"] == "New Zealand"
 
 is_NZ
 ```
 
+<br>
 
-
-```
+```python
 # Get the row with USA
 NZ = countries.loc[is_NZ]
 
@@ -365,6 +582,8 @@ The squeeze() function does just one it sounds like: if you have a DataFrame wit
 ```python
 NZ.squeeze().geometry
 ```
+
+<br>
 
 ```python
 # Squeeze
@@ -511,8 +730,12 @@ new_york.within(USA)
 ## Your turn
 * Use the same code to find Auckland
 
-## Spatial relationships: Functions
+## Spatial relationships: Functions {.smaller}
 
+
+:::: {.columns}
+
+::: {.column width="40%"}
 * `equals`
 * `contains`
 * `crosses`
@@ -522,6 +745,19 @@ new_york.within(USA)
 * `touches`
 * `within`
 * `covers`
+:::
+
+::: {.column width="20%"}
+
+:::
+
+::: {.column width="40%"}
+![](https://www.e-education.psu.edu/maps/sites/www.e-education.psu.edu.maps/files/Images/L2_Figure6a.jpg){width=70%}
+:::
+
+::::
+
+
 
 
 ## Spatial Join `sjoin`
@@ -710,12 +946,41 @@ ax.set_aspect("equal")
 ![](https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-61-output-2.png){fig-align=center}
 
 
-## Summary
-* To navigate complex datasets effectively, it's crucial to structure your code in a way that enhances readability and maintainability
-* Python offers a rich ecosystem of libraries specifically designed for GIS and spatial analysis. We explored some key packages such as GeoPandas for spatial data frames
-* The actual programming:
-    - Pandas: Indexing, Filtering, Grouping, Join between dataframes
-    - Geopandas: Hands-on experience in GIS using codes
+## Summary: 🌐 Core GIS Concepts {.smaller}
+
+- **GIS = Attribute + Location** — everything is *georeferenced*
+- **Vector vs Raster**:  
+  - *Vector*: points, lines, polygons  
+  - *Raster*: grids of pixels (e.g., satellite images)
+- **Reference vs Thematic Maps**:  
+  - Reference = location/navigation  
+  - Thematic = patterns/relationships
+- **Projections & CRS**:  
+  - Map distortion comes from projecting 3D → 2D  
+  - Use `EPSG` codes (e.g., 4326 for WGS84)
+- **MAUP**:  
+  - *Scale Effect*: unit size changes results  
+  - *Zoning Effect*: how units are drawn matters
+- **Spatial relationships**:  
+  - `within`, `intersects`, `contains`, `touches`, etc.
+
+## 💻 Python Practicals with GeoPandas {.smaller}
+- **Data Wrangling** with `pandas`:  
+  - `melt()`, `groupby()`, and data visualisation using `seaborn`
+- **Load Spatial Data**:  
+  - `gpd.read_file()` for Shapefiles, GeoJSON, GPKG
+- **Understand Geometry**:  
+  - Access `.geometry`, filter with `.loc[]`, `squeeze()` single-row GeoDataFrames
+- **Work with CRS**:  
+  - Check with `.crs`  
+  - Reproject using `.to_crs(epsg=...)`
+- **Spatial Joins**:  
+  - `gpd.sjoin()` to combine points with polygons based on spatial logic
+- **Buffering & Overlay**:  
+  - Use `.buffer()` for zones (e.g., 250km)  
+  - `gpd.overlay()` for geometric operations like `difference`, `intersection`
+- **Map Visualisation**:  
+  - Plot with `.plot()` and customize using `matplotlib`
 
 
 

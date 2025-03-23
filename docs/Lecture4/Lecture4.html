@@ -559,74 +559,111 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </div>
 </div>
 </section>
-<section id="two-fundamental-geographic-data-models" class="slide level2">
-<h2>Two fundamental geographic data models</h2>
+<section id="rail-maps" class="slide level2">
+<h2>Rail Maps</h2>
+
+<img data-src="https://i.redd.it/4exvxwozdz381.jpg" class="r-stretch"></section>
+<section class="slide level2">
+
+<h3 id="how-do-we-class-rail-maps">How do we class Rail maps?</h3>
+<ul>
+<li>Reference maps because… They show the location of different tube stations, and the location of each tube line</li>
+</ul>
+<p><br></p>
+<ul>
+<li>Thematic maps because… They can be used to predict life expectancy, poverty and median house prices</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="other-cases">Other cases</h3>
+<ul>
+<li>Scenario 1: The visualisation of road networks to improve road safety measures are a type of ?</li>
+<li>Scenario 2: The visualisation of the earth’s surface, showing its elevation, is a type of</li>
+<li>Scenario 3: Navigation tools such as Google maps or City-Mapper can be classed as</li>
+</ul>
+<aside class="notes">
+<p>“The visualisation of road networks to improve road safety measures” This is typically a Thematic Map — specifically a transportation or road safety map. These maps focus on a specific theme or purpose (in this case, road safety), and visualize relevant features like crash hotspots, speed limits, traffic volumes, or intersections.</p>
+<p>“The visualisation of the earth’s surface, showing its elevation” This describes a Topographic Map, which represents elevation through contour lines, shading, or colour gradients to depict terrain and landforms.</p>
+<p>“Navigation tools such as Google Maps or CityMapper” These fall under Reference Maps or Navigational Maps, designed for general location-finding, route planning, and wayfinding. While they use various thematic layers (e.g., traffic, transit), their primary function is spatial orientation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-is-geospatial-data" class="slide level2">
+<h2>What is Geospatial Data?</h2>
+<ul>
+<li>Geospatial data (or spatial data in particular areas in the world) is a data frame that contains information about a specific location, which can be analysed to better understand that location. GIS enables this spatial data to be processed and analysed.</li>
+<li>Two types: Vector and Raster</li>
+</ul>
+</section>
+<section id="vector-and-raster" class="slide level2">
+<h2>Vector and Raster</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><img data-src="Figs/howwemap.png"></p>
+<ul>
+<li><strong>Vector</strong>: points, lines and polygons</li>
+</ul>
+<p><img data-src="Figs/vector.png"></p>
 </div><div class="column" style="width:50%;">
-<p>Vector = precise &amp; structured. Raster = continuous &amp; consistent</p>
+<ul>
+<li><strong>Raster</strong>: Imagery or satellite data that are formed from a grid of pixels.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="Figs/raster.png" class="quarto-figure quarto-figure-center" style="width:50.0%"></p>
+</figure>
 </div>
 </div>
+</div>
+<!-- ## Vector vs Raster Data Models {.smaller} -->
+<!-- | **Aspect**         | **Vector Model**                                      | **Raster Model**                                         | -->
+<!-- |--------------------|--------------------------------------------------------|-----------------------------------------------------------| -->
+<!-- | **Data Type**      | Points, Lines, Polygons                               | Grid of uniform cells (pixels)                           | -->
+<!-- | **Boundaries**     | Discrete, well-defined                                | Aggregated, based on resolution                          | -->
+<!-- | **Precision**      | High precision (exact shapes & locations)             | Lower precision, depends on cell size                    | -->
+<!-- | **Scalability**    | Scales with complexity                                | Consistent and scalable over space                       | -->
+<!-- | **Common Uses**    | Parcels, roads, boundaries                            | Satellite imagery, aerial photos, land cover             | -->
+<!-- | **Applications**   | Accurate mapping, cadastre, infrastructure            | Background layers, remote sensing, environmental models  | -->
 </section>
-<section id="vector-vs-raster-data-models" class="slide level2 smaller">
-<h2>Vector vs Raster Data Models</h2>
-<table>
-<colgroup>
-<col style="width: 14%">
-<col style="width: 41%">
-<col style="width: 43%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><strong>Aspect</strong></th>
-<th><strong>Vector Model</strong></th>
-<th><strong>Raster Model</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Data Type</strong></td>
-<td>Points, Lines, Polygons</td>
-<td>Grid of uniform cells (pixels)</td>
-</tr>
-<tr class="even">
-<td><strong>Boundaries</strong></td>
-<td>Discrete, well-defined</td>
-<td>Aggregated, based on resolution</td>
-</tr>
-<tr class="odd">
-<td><strong>Precision</strong></td>
-<td>High precision (exact shapes &amp; locations)</td>
-<td>Lower precision, depends on cell size</td>
-</tr>
-<tr class="even">
-<td><strong>Scalability</strong></td>
-<td>Scales with complexity</td>
-<td>Consistent and scalable over space</td>
-</tr>
-<tr class="odd">
-<td><strong>Common Uses</strong></td>
-<td>Parcels, roads, boundaries</td>
-<td>Satellite imagery, aerial photos, land cover</td>
-</tr>
-<tr class="even">
-<td><strong>Applications</strong></td>
-<td>Accurate mapping, cadastre, infrastructure</td>
-<td>Background layers, remote sensing, environmental models</td>
-</tr>
-</tbody>
-</table>
-</section>
+<section id="gis-data-management" class="slide level2">
+<h2>GIS Data Management</h2>
+<ul>
+<li>GeoTiff files are commonly used for raster data</li>
+<li>Shapefile files are commonly used for vector data. Here’s a file extension…</li>
+</ul>
+
+<img data-src="Figs/shapfile.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="which-data-to-use" class="slide level2">
 <h2>Which data to use</h2>
 <ul>
-<li>Vector datasets and methods dominate the social sciences because human settlements and processes (e.g., transport infrastructure) tend to have discrete borders</li>
-<li>Raster datasets and methods dominate many environmental sciences because of the reliance on remote sensing data</li>
+<li><span style="color:blue">Vector datasets</span> and methods dominate the social sciences because human settlements and processes tend to have discrete borders (e.g., transport)</li>
+<li><span style="color:green">Raster</span> datasets and methods dominate many environmental sciences because of the reliance on <em>remote sensing data</em></li>
 </ul>
 </section>
-<section id="python-tools-for-vector-and-raster-data" class="slide level2">
-<h2>Python Tools for Vector and Raster Data</h2>
+<section id="dont-forget-about-me" class="slide level2 smaller">
+<h2>Don’t forget about me!</h2>
+<ul>
+<li>GeoJSON (.geojson / .json) – Web-friendly, lightweight format for encoding geographic data structures.</li>
+<li>KML/KMZ – Used primarily in Google Earth; KMZ is a zipped KML.</li>
+<li>GPKG (GeoPackage) – A modern SQLite-based format supporting both vector and raster data.</li>
+<li>File Geodatabase (GDB) – ESRI’s proprietary format allowing complex datasets and relationships.</li>
+<li>CSV + coordinates – Plain text tabular data that can be georeferenced using lat/lon columns.</li>
+<li>DXF/DWG – CAD files that can be converted to GIS-compatible formats.</li>
+<li>GPX (GPS Exchange Format) – Typically used for GPS data (routes, tracks, waypoints).</li>
+<li>MapInfo TAB / MIF – Formats used in MapInfo software</li>
+</ul>
+</section>
+<section id="python-tools-for-geospatial-data" class="slide level2">
+<h2>Python tools for geospatial data</h2>
 <h3 id="vector-data">🟢 Vector Data</h3>
 <table>
 <colgroup>
@@ -686,26 +723,147 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </tbody>
 </table>
 <!-- ➡️ This course focuses on **rasterio** for raster processing. -->
+<!-- ## Geospatial data in Python  -->
+<!-- * A couple of terminology notes -->
+<!--     _ A feature refers to both the geometry and attributes of specific piece of vector data -->
+<!--     - A feature collection is a list, or collection, of features -->
+<!-- * Common formats for vector datasets -->
+<!--     - A shapefile -->
+<!--     * Mandatory files: -->
+<!--     * shp: the file containing the geometries -->
+<!--     * .shx: the file that indexes the geometry -->
+<!--     * .dbf: tabular data format storing the attributes for each geometry -->
+<!--     * And many optional files for documentation, projection information, etc. -->
+<!-- * geopackage (gpkg), geojson, gdb, tif, img, parquet... -->
 </section>
-<section id="geospatial-data-in-python" class="slide level2">
-<h2>Geospatial data in Python</h2>
+<section id="projection-methods" class="slide level2">
+<h2>Projection Methods</h2>
 <ul>
-<li>A couple of terminology notes _ A feature refers to both the geometry and attributes of specific piece of vector data
+<li>Moving from the 3D to the 2D</li>
+</ul>
+
+<img data-src="Figs/3d2d.jpg" class="r-stretch"></section>
+<section id="football-example" class="slide level2">
+<h2>Football example</h2>
+
+<img data-src="Figs/football.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="distortion" class="slide level2">
+<h2>Distortion</h2>
+<p>The misrepresentation of…</p>
 <ul>
-<li>A feature collection is a list, or collection, of features</li>
-</ul></li>
-<li>Common formats for vector datasets
-<ul>
-<li>A shapefile</li>
-<li>Mandatory files:</li>
-<li>shp: the file containing the geometries</li>
-<li>.shx: the file that indexes the geometry</li>
-<li>.dbf: tabular data format storing the attributes for each geometry</li>
-<li>And many optional files for documentation, projection information, etc.</li>
-</ul></li>
-<li>geopackage (gpkg), geojson, gdb, tif, img, parquet…</li>
+<li>Area</li>
+<li>Shape</li>
+<li>Distance</li>
+<li>Direction of points</li>
 </ul>
 </section>
+<section id="distortion-1" class="slide level2">
+<h2>Distortion</h2>
+<div class="columns">
+<div class="column" style="width:30%;">
+<ul>
+<li>Cylindrical</li>
+<li>Conical</li>
+<li>Planar</li>
+</ul>
+</div><div class="column" style="width:70%;">
+<p><img data-src="https://www.jouav.com/wp-content/uploads/2024/04/map-projections-1024x703.jpg" style="width:80.0%"></p>
+</div>
+</div>
+</section>
+<section id="web-mercator-vs-gall-peter-projection" class="slide level2">
+<h2>Web Mercator vs Gall-Peter Projection</h2>
+
+<img data-src="https://miro.medium.com/v2/resize:fit:878/1*AmpqWkF6QbdEj3KVjHEixg.png" class="r-stretch"></section>
+<section id="so-how-do-we-project-maps" class="slide level2">
+<h2>So how do we project maps?</h2>
+
+<img data-src="Figs/globe-projected.jpg" style="width:50.0%" class="r-stretch"></section>
+<section id="coordinate-reference-systems-crs" class="slide level2 smaller">
+<h2>Coordinate Reference Systems (CRS)</h2>
+<ul>
+<li>The move from the 3D to the 2D is done with the help of CRS<br>
+</li>
+<li>Every place on earth is specified by three numbers (i.e.&nbsp;Latitude, longitude and Altitude)</li>
+<li>Geographic Coordinate System vs Projected Coordinate Systems</li>
+</ul>
+
+<img data-src="https://www.esri.com/arcgis-blog/wp-content/uploads/2022/02/grid2.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="crs-example" class="slide level2">
+<h2>CRS example</h2>
+
+<img data-src="https://www.esri.com/arcgis-blog/wp-content/uploads/2020/02/2.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="spatial-relations-in-gis" class="slide level2">
+<h2>Spatial Relations in GIS</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><span style="color:blue">Spatial relations</span> refer to the ways in which different locations, areas, or objects are situated in relation to each other on the Earth’s surface.</li>
+</ul>
+</div><div class="column" style="width:20%;">
+
+</div><div class="column" style="width:30%;">
+<p><img data-src="https://www.e-education.psu.edu/maps/sites/www.e-education.psu.edu.maps/files/Images/L2_Figure6a.jpg" style="width:80.0%"></p>
+</div>
+</div>
+</section>
+<section id="spatial-analysis-in-gis" class="slide level2">
+<h2>Spatial analysis in GIS</h2>
+<ul>
+<li><span style="color:red">Spatial analysis</span> refers to studying entities by examining, assessing, evaluating, and modelling spatial data features</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="choropleth-point-pattern-maps">Choropleth &amp; point pattern maps</h3>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiE3yPjtyAyLNKDuwHTspS0NLR-SK0xHNvXz87LlW-VfzZbIUNmyGaGap35atJ6jspLa9g38hugfGaJmzT7zv66qnOFbVgBmS33kE8RcXrAw1qOUg9DdEruqPMuRcVOiNmpnQ_dRZ7sYls/s1600/deprivation.png"></p>
+</div><div class="column" style="width:20%;">
+
+</div><div class="column" style="width:40%;">
+<p><img data-src="https://inzight.nz/img/user_guides/advanced/aboutmaps/03_nzquakes.png"></p>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="spatial-autocorrelation">Spatial Autocorrelation</h3>
+
+<img data-src="https://maczokni.github.io/crime_mapping_textbook/img/philly_rob.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section class="slide level2">
+
+<h3 id="spatial-interpolation">Spatial Interpolation</h3>
+
+<img data-src="https://spatial.nzta.govt.nz/portal/help/en/11.3/analyze/GUID-86BF3874-03C1-441D-B559-6CF239DB0278-web.png" class="r-stretch"></section>
+<section class="slide level2">
+
+<h3 id="hotspot-maps">Hotspot maps</h3>
+
+<img data-src="https://images.newscientist.com/wp-content/uploads/2004/10/dn6515-1_996.jpg?crop=1:1,smart&amp;width=1200&amp;height=1200&amp;upscale=true" class="r-stretch"></section>
+<section id="modifiable-arial-unit-problem-maup" class="slide level2">
+<h2>Modifiable Arial Unit Problem (MAUP)</h2>
+<div class="center quote">
+<blockquote>
+<p><em>MAUP</em> refers to the cartographic representation of data whose attributes are significantly influenced by the spatial scale used</p>
+</blockquote>
+</div>
+<div style="font-size: 80%;">
+<p>Two key Aspects:</p>
+<ul>
+<li>Scale Effect: Changing the size of the spatial units (e.g., from neighbourhoods to districts) can alter statistical results, such as means or totals.</li>
+<li>Zoning Effect: Altering the shape or configuration of spatial units, even if the scale remains constant, can also impact results.</li>
+</ul>
+</div>
+</section>
+<section id="scale-effect" class="slide level2">
+<h2>Scale Effect</h2>
+
+<img data-src="https://gisgeography.com/wp-content/uploads/2020/11/MAUP-Scale-Effect-1536x768.png" class="r-stretch"></section>
+<section id="zonal-effect" class="slide level2">
+<h2>Zonal Effect</h2>
+
+<img data-src="https://gisgeography.com/wp-content/uploads/2020/11/MAUP-Zone-Effect-1536x768.png" class="r-stretch"></section>
 <section id="reading-and-writing-spatial-data" class="slide level2">
 <h2>Reading and Writing Spatial Data</h2>
 <h3 id="reading-data">Reading Data</h3>
@@ -721,7 +879,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <p>Use <code>gpd.to_file()</code> to write GeoDataFrames to different formats</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>nzpop.to_file(<span class="st">'path_to_save_file.shp'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="analysing-vector-data-with-geopandas" class="slide level2">
+<section id="analysing-vector-data-with-geopandas" class="slide level2 smaller">
 <h2>Analysing vector data with GeoPandas</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
 <span id="cb5-2"><a href=""></a>countries <span class="op">=</span> gpd.read_file(<span class="st">"./data/ne_110m_admin_0_countries"</span>)</span>
@@ -736,7 +894,7 @@ ARG     Argentina          S. America     44293293  879400          MULTIPOLYGON
 <div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a><span class="bu">type</span>(countries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre><code>geopandas.geodataframe.GeoDataFrame</code></pre>
 </section>
-<section id="what-is-a-geodataframe" class="slide level2">
+<section id="what-is-a-geodataframe" class="slide level2 smaller">
 <h2>What is a geodataframe</h2>
 
 <img data-src="https://miro.medium.com/v2/resize:fit:1238/1*x9gF-ZVR4JMAv3cTH6LtfA.png" class="quarto-figure quarto-figure-center r-stretch"><ul>
@@ -767,19 +925,21 @@ Name: geometry, dtype: geometry</code></pre>
 <section id="filter-dataframe" class="slide level2">
 <h2>Filter dataframe</h2>
 <p>Filter the data frame based on a boolean selection:</p>
-<pre><code># Is the country name NZ?
-is_NZ = countries["name"] == "New Zealand"
-
-is_NZ</code></pre>
-<pre><code># Get the row with USA
-NZ = countries.loc[is_NZ]
-
-NZ</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a><span class="co"># Is the country name NZ?</span></span>
+<span id="cb16-2"><a href=""></a>is_NZ <span class="op">=</span> countries[<span class="st">"name"</span>] <span class="op">==</span> <span class="st">"New Zealand"</span></span>
+<span id="cb16-3"><a href=""></a></span>
+<span id="cb16-4"><a href=""></a>is_NZ</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a><span class="co"># Get the row with USA</span></span>
+<span id="cb17-2"><a href=""></a>NZ <span class="op">=</span> countries.loc[is_NZ]</span>
+<span id="cb17-3"><a href=""></a></span>
+<span id="cb17-4"><a href=""></a>NZ</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="squeeze" class="slide level2">
 <h2><code>Squeeze</code></h2>
 <p>The squeeze() function does just one it sounds like: if you have a DataFrame with only one row, it will “squeeze” the row dimension by removing it, returning just a Series object:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>NZ.squeeze().geometry</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a><span class="co"># Squeeze</span></span>
 <span id="cb19-2"><a href=""></a>NZsqueezed <span class="op">=</span> NZ.squeeze()</span>
 <span id="cb19-3"><a href=""></a></span>
@@ -789,7 +949,7 @@ NZ</code></pre>
 <span id="cb19-7"><a href=""></a><span class="co"># Output</span></span>
 <span id="cb19-8"><a href=""></a>NZsqueezed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="coordinate-reference-systems-crs" class="slide level2">
+<section id="coordinate-reference-systems-crs-1" class="slide level2">
 <h2>Coordinate Reference Systems (CRS)</h2>
 <ul>
 <li>Importance of CRS in spatial data</li>
@@ -893,8 +1053,10 @@ Datum: World Geodetic System 1984 ensemble
 <li>Use the same code to find Auckland</li>
 </ul>
 </section>
-<section id="spatial-relationships-functions" class="slide level2">
+<section id="spatial-relationships-functions" class="slide level2 smaller">
 <h2>Spatial relationships: Functions</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
 <ul>
 <li><code>equals</code></li>
 <li><code>contains</code></li>
@@ -906,6 +1068,12 @@ Datum: World Geodetic System 1984 ensemble
 <li><code>within</code></li>
 <li><code>covers</code></li>
 </ul>
+</div><div class="column" style="width:20%;">
+
+</div><div class="column" style="width:40%;">
+<p><img data-src="https://www.e-education.psu.edu/maps/sites/www.e-education.psu.edu.maps/files/Images/L2_Figure6a.jpg" style="width:70.0%"></p>
+</div>
+</div>
 </section>
 <section id="spatial-join-sjoin" class="slide level2">
 <h2>Spatial Join <code>sjoin</code></h2>
@@ -1050,15 +1218,74 @@ Datum: World Geodetic System 1984 ensemble
 <span id="cb47-13"><a href=""></a>ax.set_aspect(<span class="st">"equal"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 <img data-src="https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-61-output-2.png" class="quarto-figure quarto-figure-center r-stretch"></section>
-<section id="summary" class="slide level2">
-<h2>Summary</h2>
+<section id="summary-core-gis-concepts" class="slide level2 smaller">
+<h2>Summary: 🌐 Core GIS Concepts</h2>
 <ul>
-<li>To navigate complex datasets effectively, it’s crucial to structure your code in a way that enhances readability and maintainability</li>
-<li>Python offers a rich ecosystem of libraries specifically designed for GIS and spatial analysis. We explored some key packages such as GeoPandas for spatial data frames</li>
-<li>The actual programming:
+<li><strong>GIS = Attribute + Location</strong> — everything is <em>georeferenced</em></li>
+<li><strong>Vector vs Raster</strong>:
 <ul>
-<li>Pandas: Indexing, Filtering, Grouping, Join between dataframes</li>
-<li>Geopandas: Hands-on experience in GIS using codes</li>
+<li><em>Vector</em>: points, lines, polygons<br>
+</li>
+<li><em>Raster</em>: grids of pixels (e.g., satellite images)</li>
+</ul></li>
+<li><strong>Reference vs Thematic Maps</strong>:
+<ul>
+<li>Reference = location/navigation<br>
+</li>
+<li>Thematic = patterns/relationships</li>
+</ul></li>
+<li><strong>Projections &amp; CRS</strong>:
+<ul>
+<li>Map distortion comes from projecting 3D → 2D<br>
+</li>
+<li>Use <code>EPSG</code> codes (e.g., 4326 for WGS84)</li>
+</ul></li>
+<li><strong>MAUP</strong>:
+<ul>
+<li><em>Scale Effect</em>: unit size changes results<br>
+</li>
+<li><em>Zoning Effect</em>: how units are drawn matters</li>
+</ul></li>
+<li><strong>Spatial relationships</strong>:
+<ul>
+<li><code>within</code>, <code>intersects</code>, <code>contains</code>, <code>touches</code>, etc.</li>
+</ul></li>
+</ul>
+</section>
+<section id="python-practicals-with-geopandas" class="slide level2 smaller">
+<h2>💻 Python Practicals with GeoPandas</h2>
+<ul>
+<li><strong>Data Wrangling</strong> with <code>pandas</code>:
+<ul>
+<li><code>melt()</code>, <code>groupby()</code>, and data visualisation using <code>seaborn</code></li>
+</ul></li>
+<li><strong>Load Spatial Data</strong>:
+<ul>
+<li><code>gpd.read_file()</code> for Shapefiles, GeoJSON, GPKG</li>
+</ul></li>
+<li><strong>Understand Geometry</strong>:
+<ul>
+<li>Access <code>.geometry</code>, filter with <code>.loc[]</code>, <code>squeeze()</code> single-row GeoDataFrames</li>
+</ul></li>
+<li><strong>Work with CRS</strong>:
+<ul>
+<li>Check with <code>.crs</code><br>
+</li>
+<li>Reproject using <code>.to_crs(epsg=...)</code></li>
+</ul></li>
+<li><strong>Spatial Joins</strong>:
+<ul>
+<li><code>gpd.sjoin()</code> to combine points with polygons based on spatial logic</li>
+</ul></li>
+<li><strong>Buffering &amp; Overlay</strong>:
+<ul>
+<li>Use <code>.buffer()</code> for zones (e.g., 250km)<br>
+</li>
+<li><code>gpd.overlay()</code> for geometric operations like <code>difference</code>, <code>intersection</code></li>
+</ul></li>
+<li><strong>Map Visualisation</strong>:
+<ul>
+<li>Plot with <code>.plot()</code> and customize using <code>matplotlib</code></li>
 </ul></li>
 </ul>
 </section>
