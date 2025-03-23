@@ -412,6 +412,56 @@ cities = gpd.read_file(cities_url)
 cities.head()
 ```
 
+## A quick example
+What country is New York in?
+
+```python
+# Select the Point representing New York City
+new_york = cities.loc[cities["name"] == "New York"].geometry.squeeze()
+
+new_york
+```
+
+```python
+type(new_york)
+```
+
+```
+shapely.geometry.point.Point
+```
+
+```python
+countries.contains(new_york)
+```
+
+```python
+# Find the country that contains New York
+countries.loc[countries.contains(new_york)]
+```
+
+```python
+USA = countries.loc[countries.contains(new_york)].squeeze().geometry
+USA
+
+new_york.within(USA)
+```
+
+## Your turn
+* Use the same code to find Auckland
+
+## Spatial relationships: Functions
+
+* `equals`
+* `contains`
+* `crosses`
+* `disjoint`
+* `intersects`
+* `overlaps`
+* `touches`
+* `within`
+* `covers`
+
+
 
 
 

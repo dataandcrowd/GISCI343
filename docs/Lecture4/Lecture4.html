@@ -801,6 +801,43 @@ Datum: World Geodetic System 1984 ensemble
 <span id="cb27-2"><a href=""></a>cities <span class="op">=</span> gpd.read_file(cities_url)</span>
 <span id="cb27-3"><a href=""></a>cities.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
+<section id="a-quick-example" class="slide level2">
+<h2>A quick example</h2>
+<p>What country is New York in?</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="co"># Select the Point representing New York City</span></span>
+<span id="cb28-2"><a href=""></a>new_york <span class="op">=</span> cities.loc[cities[<span class="st">"name"</span>] <span class="op">==</span> <span class="st">"New York"</span>].geometry.squeeze()</span>
+<span id="cb28-3"><a href=""></a></span>
+<span id="cb28-4"><a href=""></a>new_york</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="bu">type</span>(new_york)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>shapely.geometry.point.Point</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>countries.contains(new_york)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href=""></a><span class="co"># Find the country that contains New York</span></span>
+<span id="cb32-2"><a href=""></a>countries.loc[countries.contains(new_york)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>USA <span class="op">=</span> countries.loc[countries.contains(new_york)].squeeze().geometry</span>
+<span id="cb33-2"><a href=""></a>USA</span>
+<span id="cb33-3"><a href=""></a></span>
+<span id="cb33-4"><a href=""></a>new_york.within(USA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="your-turn" class="slide level2">
+<h2>Your turn</h2>
+<ul>
+<li>Use the same code to find Auckland</li>
+</ul>
+</section>
+<section id="spatial-relationships-functions" class="slide level2">
+<h2>Spatial relationships: Functions</h2>
+<ul>
+<li><code>equals</code></li>
+<li><code>contains</code></li>
+<li><code>crosses</code></li>
+<li><code>disjoint</code></li>
+<li><code>intersects</code></li>
+<li><code>overlaps</code></li>
+<li><code>touches</code></li>
+<li><code>within</code></li>
+<li><code>covers</code></li>
+</ul>
+</section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
 <ul>
