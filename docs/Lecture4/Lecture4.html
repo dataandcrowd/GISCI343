@@ -838,6 +838,149 @@ Datum: World Geodetic System 1984 ensemble
 <li><code>covers</code></li>
 </ul>
 </section>
+<section id="spatial-join-sjoin" class="slide level2">
+<h2>Spatial Join <code>sjoin</code></h2>
+<ul>
+<li><p>merging attributes from two geometry layers based on their spatial relationship</p></li>
+<li><p>Different parts of this operations:</p>
+<ul>
+<li>The GeoDataFrame to which we want add information</li>
+<li>The GeoDataFrame that contains the information we want to add</li>
+<li>The spatial relationship we want to use to match both datasets (intersects, contains, within)</li>
+<li>The type of join: left or inner join</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="cities-and-countries">Cities and countries</h3>
+<p>In this case, we want to join the cities dataframe, containing Point geometries, with the information of the countries dataframe, containing Polygon geometries.</p>
+<p>To match cities with countries, we’ll use the within spatial relationship.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a>joined <span class="op">=</span> gpd.sjoin(</span>
+<span id="cb34-2"><a href=""></a>    cities,</span>
+<span id="cb34-3"><a href=""></a>    countries,</span>
+<span id="cb34-4"><a href=""></a>    predicate<span class="op">=</span><span class="st">"within"</span>,</span>
+<span id="cb34-5"><a href=""></a>    how<span class="op">=</span><span class="st">"left"</span>,</span>
+<span id="cb34-6"><a href=""></a>    lsuffix<span class="op">=</span><span class="st">"city"</span>,</span>
+<span id="cb34-7"><a href=""></a>    rsuffix<span class="op">=</span><span class="st">"country"</span>,</span>
+<span id="cb34-8"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href=""></a>joined.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>    name_city   geometry    index_country   iso_a3  name_country    continent   pop_est gdp_md_est
+0   Vatican City    POINT (12.45339 41.90328)   79.0    ITA Italy   Europe  62137802.0  2221000.0
+1   San Marino  POINT (12.44177 43.93610)   79.0    ITA Italy   Europe  62137802.0  2221000.0
+2   Vaduz   POINT (9.51667 47.13372)    9.0 AUT Austria Europe  8754413.0   416600.0
+3   Lobamba POINT (31.20000 -26.46667)  152.0   SWZ Swaziland   Africa  1467152.0   11060.0
+4   Luxembourg  POINT (6.13000 49.61166)    97.0    LUX Luxembourg  Europe  594130.0    58740.0</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="italy">Italy</h3>
+<p>As we can see above, the attributes of the cities (left) and countries (right) have been merged based on whether the city is inside the country.</p>
+<p>Let’s select cities in Italy only:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a>cities_in_italy <span class="op">=</span> joined.loc[joined[<span class="st">"name_country"</span>] <span class="op">==</span> <span class="st">"Italy"</span>]</span>
+<span id="cb37-2"><a href=""></a>cities_in_italy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>    name_city   geometry    index_country   iso_a3  name_country    continent   pop_est gdp_md_est
+0   Vatican City    POINT (12.45339 41.90328)   79.0    ITA Italy   Europe  62137802.0  2221000.0
+1   San Marino  POINT (12.44177 43.93610)   79.0    ITA Italy   Europe  62137802.0  2221000.0
+226 Rome    POINT (12.48131 41.89790)   79.0    ITA Italy   Europe  62137802.0  2221000.0</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="plot">Plot</h3>
+<div class="sourceCode" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href=""></a><span class="co"># Extract Italy</span></span>
+<span id="cb39-2"><a href=""></a>italy <span class="op">=</span> countries.loc[countries[<span class="st">"name"</span>] <span class="op">==</span> <span class="st">"Italy"</span>]</span>
+<span id="cb39-3"><a href=""></a></span>
+<span id="cb39-4"><a href=""></a><span class="co"># Plot</span></span>
+<span id="cb39-5"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb39-6"><a href=""></a>italy.plot(ax<span class="op">=</span>ax, facecolor<span class="op">=</span><span class="st">"none"</span>, edgecolor<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb39-7"><a href=""></a>ax.set_axis_off()</span>
+<span id="cb39-8"><a href=""></a>ax.set_aspect(<span class="st">"equal"</span>)</span>
+<span id="cb39-9"><a href=""></a></span>
+<span id="cb39-10"><a href=""></a><span class="co"># Plot the first city in the joined data frame (Vatican City)</span></span>
+<span id="cb39-11"><a href=""></a><span class="co"># Use the same axes by passing in the ax=ax keyword</span></span>
+<span id="cb39-12"><a href=""></a>ax <span class="op">=</span> cities_in_italy.plot(ax<span class="op">=</span>ax, color<span class="op">=</span><span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-53-output-1.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="overlay" class="slide level2 smaller">
+<h2><code>overlay()</code></h2>
+<ul>
+<li>We can also perform the “join” operation on the geometries rather than just combining attributes.</li>
+<li>The overlay() function combines geometries, e.g.&nbsp;by taking the intersection of the geometries.</li>
+<li>Select all countries in Africa:</li>
+</ul>
+<div class="sourceCode" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href=""></a>africa <span class="op">=</span> countries.loc[countries[<span class="st">"continent"</span>] <span class="op">==</span> <span class="st">"Africa"</span>]</span>
+<span id="cb40-2"><a href=""></a>africa.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>    iso_a3  name    continent   pop_est gdp_md_est  geometry
+1   AGO Angola  Africa  29310273.0  189000.0    MULTIPOLYGON (((23.90415 -11.72228, 24.07991 -...
+11  BDI Burundi Africa  11466756.0  7892.0  POLYGON ((29.34000 -4.49998, 29.27638 -3.29391...
+13  BEN Benin   Africa  11038805.0  24310.0 POLYGON ((2.69170 6.25882, 1.86524 6.14216, 1....
+14  BFA Burkina Faso    Africa  20107509.0  32990.0 POLYGON ((2.15447 11.94015, 1.93599 11.64115, ...
+25  BWA Botswana    Africa  2214858.0   35900.0 POLYGON ((29.43219 -22.09131, 28.01724 -22.827...</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="crs">crs</h3>
+<ul>
+<li>What is the CRS?</li>
+</ul>
+<div class="sourceCode" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href=""></a>africa.crs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>&lt;Geographic 2D CRS: EPSG:4326&gt;
+Name: WGS 84
+Axis Info [ellipsoidal]:
+- Lat[north]: Geodetic latitude (degree)
+- Lon[east]: Geodetic longitude (degree)
+Area of Use:
+- name: World.
+- bounds: (-180.0, -90.0, 180.0, 90.0)
+Datum: World Geodetic System 1984 ensemble
+- Ellipsoid: WGS 84
+- Prime Meridian: Greenwich</code></pre>
+<ul>
+<li>Let’s transform to a CRS that uses metres instead of degrees (EPSG=3857)</li>
+</ul>
+<div class="sourceCode" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href=""></a>africa <span class="op">=</span> africa.to_crs(epsg<span class="op">=</span><span class="dv">3857</span>)</span>
+<span id="cb44-2"><a href=""></a>africa.crs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section class="slide level2">
+
+<h3 id="plot-1">Plot</h3>
+<div class="sourceCode" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb45-2"><a href=""></a></span>
+<span id="cb45-3"><a href=""></a>africa.plot(ax<span class="op">=</span>ax, facecolor<span class="op">=</span><span class="st">"#b9f2b1"</span>)</span>
+<span id="cb45-4"><a href=""></a></span>
+<span id="cb45-5"><a href=""></a>ax.set_axis_off()</span>
+<span id="cb45-6"><a href=""></a>ax.set_aspect(<span class="st">"equal"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-58-output-1.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section class="slide level2">
+
+<h3 id="crs-and-buffer">crs and buffer</h3>
+<div class="sourceCode" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href=""></a>cities_3857 <span class="op">=</span> cities.to_crs(epsg<span class="op">=</span><span class="dv">3857</span>)</span>
+<span id="cb46-2"><a href=""></a></span>
+<span id="cb46-3"><a href=""></a><span class="co"># Create a copy of the GeoDataFrame</span></span>
+<span id="cb46-4"><a href=""></a>buffered_cities <span class="op">=</span> cities_3857.copy()</span>
+<span id="cb46-5"><a href=""></a></span>
+<span id="cb46-6"><a href=""></a><span class="co"># Add a buffer region of 250 km around all cities</span></span>
+<span id="cb46-7"><a href=""></a>buffered_cities[<span class="st">"geometry"</span>] <span class="op">=</span> buffered_cities.<span class="bu">buffer</span>(<span class="fl">250e3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section class="slide level2">
+
+<h3 id="plot-the-difference-of-the-two-geometries">Plot the difference of the two geometries</h3>
+<div class="sourceCode" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb47-2"><a href=""></a></span>
+<span id="cb47-3"><a href=""></a><span class="co"># Calculate the difference of the geometry sets</span></span>
+<span id="cb47-4"><a href=""></a>diff <span class="op">=</span> gpd.overlay(</span>
+<span id="cb47-5"><a href=""></a>    africa,</span>
+<span id="cb47-6"><a href=""></a>    buffered_cities,</span>
+<span id="cb47-7"><a href=""></a>    how<span class="op">=</span><span class="st">"difference"</span>,</span>
+<span id="cb47-8"><a href=""></a>)</span>
+<span id="cb47-9"><a href=""></a></span>
+<span id="cb47-10"><a href=""></a><span class="co"># Plot</span></span>
+<span id="cb47-11"><a href=""></a>diff.plot(facecolor<span class="op">=</span><span class="st">"#b9f2b1"</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb47-12"><a href=""></a>ax.set_axis_off()</span>
+<span id="cb47-13"><a href=""></a>ax.set_aspect(<span class="st">"equal"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-61-output-2.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
 <ul>

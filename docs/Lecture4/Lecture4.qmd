@@ -462,7 +462,190 @@ new_york.within(USA)
 * `covers`
 
 
+## Spatial Join `sjoin`
 
+* merging attributes from two geometry layers based on their spatial relationship
+
+* Different parts of this operations:
+  * The GeoDataFrame to which we want add information
+  * The GeoDataFrame that contains the information we want to add
+  * The spatial relationship we want to use to match both datasets (intersects, contains, within)
+  * The type of join: left or inner join
+
+---
+
+### Cities and countries
+
+In this case, we want to join the cities dataframe, containing Point geometries, with the information of the countries dataframe, containing Polygon geometries.
+
+To match cities with countries, we’ll use the within spatial relationship.
+
+```python
+joined = gpd.sjoin(
+    cities,
+    countries,
+    predicate="within",
+    how="left",
+    lsuffix="city",
+    rsuffix="country",
+)
+```
+
+```python
+joined.head()
+```
+
+```
+	name_city	geometry	index_country	iso_a3	name_country	continent	pop_est	gdp_md_est
+0	Vatican City	POINT (12.45339 41.90328)	79.0	ITA	Italy	Europe	62137802.0	2221000.0
+1	San Marino	POINT (12.44177 43.93610)	79.0	ITA	Italy	Europe	62137802.0	2221000.0
+2	Vaduz	POINT (9.51667 47.13372)	9.0	AUT	Austria	Europe	8754413.0	416600.0
+3	Lobamba	POINT (31.20000 -26.46667)	152.0	SWZ	Swaziland	Africa	1467152.0	11060.0
+4	Luxembourg	POINT (6.13000 49.61166)	97.0	LUX	Luxembourg	Europe	594130.0	58740.0
+```
+
+---
+
+### Italy
+
+As we can see above, the attributes of the cities (left) and countries (right) have been merged based on whether the city is inside the country.
+
+Let’s select cities in Italy only:
+
+```python
+cities_in_italy = joined.loc[joined["name_country"] == "Italy"]
+cities_in_italy
+```
+
+```
+	name_city	geometry	index_country	iso_a3	name_country	continent	pop_est	gdp_md_est
+0	Vatican City	POINT (12.45339 41.90328)	79.0	ITA	Italy	Europe	62137802.0	2221000.0
+1	San Marino	POINT (12.44177 43.93610)	79.0	ITA	Italy	Europe	62137802.0	2221000.0
+226	Rome	POINT (12.48131 41.89790)	79.0	ITA	Italy	Europe	62137802.0	2221000.0
+```
+
+---
+
+### Plot
+
+```python
+# Extract Italy
+italy = countries.loc[countries["name"] == "Italy"]
+
+# Plot
+fig, ax = plt.subplots(figsize=(8, 8))
+italy.plot(ax=ax, facecolor="none", edgecolor="black")
+ax.set_axis_off()
+ax.set_aspect("equal")
+
+# Plot the first city in the joined data frame (Vatican City)
+# Use the same axes by passing in the ax=ax keyword
+ax = cities_in_italy.plot(ax=ax, color="red")
+```
+
+![](https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-53-output-1.png){fig-align=center}
+
+## `overlay()` {.smaller}
+
+* We can also perform the “join” operation on the geometries rather than just combining attributes.
+* The overlay() function combines geometries, e.g. by taking the intersection of the geometries.
+* Select all countries in Africa:
+
+```python
+africa = countries.loc[countries["continent"] == "Africa"]
+africa.head()
+```
+
+```
+	iso_a3	name	continent	pop_est	gdp_md_est	geometry
+1	AGO	Angola	Africa	29310273.0	189000.0	MULTIPOLYGON (((23.90415 -11.72228, 24.07991 -...
+11	BDI	Burundi	Africa	11466756.0	7892.0	POLYGON ((29.34000 -4.49998, 29.27638 -3.29391...
+13	BEN	Benin	Africa	11038805.0	24310.0	POLYGON ((2.69170 6.25882, 1.86524 6.14216, 1....
+14	BFA	Burkina Faso	Africa	20107509.0	32990.0	POLYGON ((2.15447 11.94015, 1.93599 11.64115, ...
+25	BWA	Botswana	Africa	2214858.0	35900.0	POLYGON ((29.43219 -22.09131, 28.01724 -22.827...
+```
+
+---
+
+### crs
+
+* What is the CRS?
+
+```python
+africa.crs
+```
+
+```
+<Geographic 2D CRS: EPSG:4326>
+Name: WGS 84
+Axis Info [ellipsoidal]:
+- Lat[north]: Geodetic latitude (degree)
+- Lon[east]: Geodetic longitude (degree)
+Area of Use:
+- name: World.
+- bounds: (-180.0, -90.0, 180.0, 90.0)
+Datum: World Geodetic System 1984 ensemble
+- Ellipsoid: WGS 84
+- Prime Meridian: Greenwich
+```
+
+* Let's transform to a CRS that uses metres instead of degrees (EPSG=3857)
+
+```python
+africa = africa.to_crs(epsg=3857)
+africa.crs
+```
+
+---
+
+### Plot
+
+```python
+fig, ax = plt.subplots(figsize=(8, 8))
+
+africa.plot(ax=ax, facecolor="#b9f2b1")
+
+ax.set_axis_off()
+ax.set_aspect("equal")
+```
+
+![](https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-58-output-1.png){fig-align=center}
+
+---
+
+### crs and buffer
+
+```python
+cities_3857 = cities.to_crs(epsg=3857)
+
+# Create a copy of the GeoDataFrame
+buffered_cities = cities_3857.copy()
+
+# Add a buffer region of 250 km around all cities
+buffered_cities["geometry"] = buffered_cities.buffer(250e3)
+```
+
+---
+
+### Plot the difference of the two geometries
+
+```python
+fig, ax = plt.subplots(figsize=(8, 8))
+
+# Calculate the difference of the geometry sets
+diff = gpd.overlay(
+    africa,
+    buffered_cities,
+    how="difference",
+)
+
+# Plot
+diff.plot(facecolor="#b9f2b1", ax=ax)
+ax.set_axis_off()
+ax.set_aspect("equal")
+```
+
+![](https://musa-550-fall-2023.github.io/content/week-3/lecture-3B_files/figure-html/cell-61-output-2.png){fig-align=center}
 
 
 ## Summary
