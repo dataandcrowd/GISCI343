@@ -101,6 +101,68 @@ plt.tight_layout()
 plt.show()
 ```
 
+## What is GIS
+
+![](Figs/roger.jpg){.absolute top=350 right=50 width=450 height=250}
+
+* Graphical Information Systems: 
+* *Computer system for capturing, storing, checking, and displaying data related to positions on Earth’s surface*
+
+## What is GIS 
+
+* All data in GIS are ‘georeferenced’ meaning it has both;
+   * Attribute (what it is)
+   * Location (where it is, a known location)
+
+![](https://www.jpsservices.org.uk/uploads/1/2/4/6/12463370/attribute-table-multi-selection_orig.png){fig-align=center}
+
+
+## GIS examples questions
+
+Here are just some of the questions that GIS allows us to explore with <span style="color:blue">**crime data**.</span>
+
+<br>
+
+* Where are the most vulnerable communities located?
+* Why do crimes occur in one area and not the other
+* How do offenders travel to the crime location? 
+* Where are there more or less stop and search than we would expect in relation to the distribution of crime? 
+
+
+## Reference vs Thematic Maps
+
+* <span style="color:blue">**Reference Maps**</span>: used to communicate location on more static data points
+    * To ‘pin point’ data on a map 
+    * Descriptive 
+
+
+* <span style="color:#E49B0F">**Thematic Maps**</span>: used to highlight a spatial relationship
+    * To ‘study a theme’ within a map
+    * Explanatory 
+
+## Reference vs Thematic Maps
+
+:::{.columns}
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="30%"}
+![Map of New Zealand](https://www.backpack-newzealand.com/maps/newzealand-map.gif)
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="50%"}
+![Cartogram of the Africa](https://www.data-to-viz.com/graph/IMG/cartogram2.png)
+:::
+
+:::
+
+
+
+
 ## Two fundamental geographic data models
 
 
