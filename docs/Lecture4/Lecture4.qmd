@@ -101,12 +101,20 @@ plt.tight_layout()
 plt.show()
 ```
 
+## Your turn
+
+* Load the measles data followed by the url. assign it as `measles_data_raw`
+* melt it by using the columns "YEAR" and "WEEK" as `id_vars`, and  var_name='incidence', value_name='state'.
+* Assign it as `measles_data`
+
+
 ## What is GIS
 
 ![](Figs/roger.jpg){.absolute top=350 right=50 width=450 height=250}
 
 * Graphical Information Systems: 
 * *Computer system for capturing, storing, checking, and displaying data related to positions on Earth’s surface*
+* Tomlinson coined the term GIS
 
 ## What is GIS 
 
@@ -169,7 +177,7 @@ Here are just some of the questions that GIS allows us to explore with <span sty
 ### How do we class Rail maps?
 
 * Reference maps because…
-They show the location of different tube stations, and the location of each tube line 
+They show the location of different stations, and the location of each line 
 
 <br>
 
@@ -180,9 +188,9 @@ They can be used to predict life expectancy, poverty and median house prices
 
 ### Other cases
 
-* Scenario 1: The visualisation of road networks to improve road safety measures are a type of ?
-* Scenario 2: The visualisation of the earth's surface, showing its elevation, is a type of
-* Scenario 3: Navigation tools such as Google maps or City-Mapper can be classed as
+* The visualisation of road networks to improve road safety measures are a type of 
+* The visualisation of the earth's surface, showing its elevation, is a type of
+* Navigation tools such as Google maps can be classed as
 
 :::{.notes}
 
@@ -448,13 +456,22 @@ Two key Aspects:
 
 :::
 
-## Scale Effect
+## Scale Effect & Zoning Effect
 
-![](https://gisgeography.com/wp-content/uploads/2020/11/MAUP-Scale-Effect-1536x768.png)
+![](https://gdsl-ul.github.io/san/figs/ch1/maup.png)
 
-## Zonal Effect
 
-![](https://gisgeography.com/wp-content/uploads/2020/11/MAUP-Zone-Effect-1536x768.png)
+---
+
+### Scale effect example
+
+![](https://metrans.org/assets/upload/news/Screen%20Shot%202017-02-03%20at%2016.13.21.png)
+
+---
+
+### Zonal effect example
+
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHsT31amnRPDmUMpKHktd3UFwemjrzUIu-3Q&s)
 
 
 
@@ -478,11 +495,11 @@ Use `gpd.to_file()` to write GeoDataFrames to different formats
 nzpop.to_file('path_to_save_file.shp')
 ```
 
-## Analysing vector data with GeoPandas {.smaller}
+## Analysing vector data with `geopandas` {.smaller}
 
 ```python
 import geopandas as gpd
-countries = gpd.read_file("./data/ne_110m_admin_0_countries")
+countries = gpd.read_file("world.gpkg")
 countries.head()
 ```
 
@@ -527,7 +544,19 @@ Take a look at the first geometry polygon by using the .iloc[] selector:
 countries['geometry'].iloc[0]
 ```
 
-## We can still leverage the power of pandas
+## We can do some fun mapping
+
+* static maps
+* interactive maps
+
+```python
+countries.plot()
+countries.explore()
+```
+
+
+
+## We can still leverage the power of pandas {.smaller}
 Calculate the total world population:
 
 ```python
@@ -683,7 +712,11 @@ gdf = gpd.GeoDataFrame(
 ```
 
 
-## Part 2: Spatial Relationships and Joins
+
+
+
+
+## Spatial Relationships and Joins
 
 Let’s explore joins and merges between GeoDataFrames based on geospatial relationships
 
