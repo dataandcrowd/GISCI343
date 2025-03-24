@@ -770,9 +770,8 @@ new_york.within(USA)
   * The spatial relationship we want to use to match both datasets (intersects, contains, within)
   * The type of join: left or inner join
 
----
 
-### Cities and countries
+## Cities and countries {.smaller}
 
 In this case, we want to join the cities dataframe, containing Point geometries, with the information of the countries dataframe, containing Polygon geometries.
 
@@ -811,7 +810,7 @@ As we can see above, the attributes of the cities (left) and countries (right) h
 Let’s select cities in Italy only:
 
 ```python
-cities_in_italy = joined.loc[joined["name_country"] == "Italy"]
+cities_in_italy = joined.loc[joined["name_long"] == "Italy"]
 cities_in_italy
 ```
 

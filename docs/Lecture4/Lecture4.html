@@ -1088,9 +1088,8 @@ Datum: World Geodetic System 1984 ensemble
 </ul></li>
 </ul>
 </section>
-<section class="slide level2">
-
-<h3 id="cities-and-countries">Cities and countries</h3>
+<section id="cities-and-countries" class="slide level2 smaller">
+<h2>Cities and countries</h2>
 <p>In this case, we want to join the cities dataframe, containing Point geometries, with the information of the countries dataframe, containing Polygon geometries.</p>
 <p>To match cities with countries, we’ll use the within spatial relationship.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a>joined <span class="op">=</span> gpd.sjoin(</span>
@@ -1114,7 +1113,7 @@ Datum: World Geodetic System 1984 ensemble
 <h3 id="italy">Italy</h3>
 <p>As we can see above, the attributes of the cities (left) and countries (right) have been merged based on whether the city is inside the country.</p>
 <p>Let’s select cities in Italy only:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a>cities_in_italy <span class="op">=</span> joined.loc[joined[<span class="st">"name_country"</span>] <span class="op">==</span> <span class="st">"Italy"</span>]</span>
+<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a>cities_in_italy <span class="op">=</span> joined.loc[joined[<span class="st">"name_long"</span>] <span class="op">==</span> <span class="st">"Italy"</span>]</span>
 <span id="cb37-2"><a href=""></a>cities_in_italy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre><code>    name_city   geometry    index_country   iso_a3  name_country    continent   pop_est gdp_md_est
 0   Vatican City    POINT (12.45339 41.90328)   79.0    ITA Italy   Europe  62137802.0  2221000.0

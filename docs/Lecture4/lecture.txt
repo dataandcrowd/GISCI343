@@ -1,0 +1,22 @@
+url = "https://raw.githubusercontent.com/dataandcrowd/GISCI343/refs/heads/main/docs/Lecture4/data/measles_incidence.csv"
+measles_data_raw = pd.read_csv(url, skiprows=2, na_values="-")
+
+measles_data = ""
+
+measles_data = pd.melt(
+    measles_data_raw,
+    id_vars=["YEAR", "WEEK"],
+    var_name="incidence",
+    value_name="state"
+)
+
+
+
+# Select the Point representing Auckland
+auckland = cities.loc[cities["name"] == "Auckland"].geometry.squeeze()
+
+# Check which country contains Auckland
+countries.contains(auckland)
+
+# Return the country row that contains Auckland
+countries.loc[countries.contains(auckland)]
