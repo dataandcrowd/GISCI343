@@ -1,7 +1,7 @@
 ---
 title: "Python Data Bootcamp - Geopandas 1"
 subtitle: ": An Introduction to Geospatial Analysis with Python"
-date: 03/21/2025
+date: 03/25/2025
 date-format: long
 author:
   - name: Hyesop Shin
