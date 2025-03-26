@@ -1,0 +1,15 @@
+Step 4 spatial join
+
+schools_with_region = gpd.sjoin(schools, regions, how="inner", predicate="within")
+
+frequency_table = schools_with_region.groupby("REGC2025_1").size().reset_index(name="school_count")
+
+frequency_table.sort_values(by="school_count", ascending=False)
+
+
+
+Step 5
+
+school_counts = schools_with_region.groupby("REGC2025_1").size().reset_index(name="school_count")
+
+school_counts_sorted = school_counts.sort_values("school_count", ascending=True)
