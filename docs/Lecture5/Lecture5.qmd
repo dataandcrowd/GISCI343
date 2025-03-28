@@ -1,0 +1,150 @@
+---
+title: "Python Data Bootcamp - Geopandas 1"
+subtitle: ": An Introduction to Geospatial Analysis with Python"
+date: 04/01/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Recap of Previous Lecture
+
+- melt and cast
+- Brief ideation of GIS and maps
+- Introduction to `geopandas`
+
+
+
+## Today's Lecture
+
+- Vector tools using `geopandas`
+- Distance
+- MAUP
+
+## Vector Tools {.smaller}
+  - buffer
+  - clip
+  - erase
+  - dissolve
+  - merge
+
+
+:::{.right}
+![](https://i.ytimg.com/vi/j8SYObYS9ms/maxresdefault.jpg){width=60%}
+:::
+
+::: {.notes}
+* `buffer`
+  - A buffer is a zone created around a spatial feature at a defined distance. 
+  - This zone can be used to analyse proximity relationships
+
+* `clip`
+  - The Clip tool allows you to extract a specific area from one dataset using another dataset as a boundary. 
+  - It’s useful for refining datasets, focusing on areas of interest, and reducing file sizes.
+
+* `dissolve`
+  *The Dissolve tool helps merge multiple features into one based on a common attribute. 
+  *This is useful when simplifying datasets and aggregating spatial data.
+
+* `difference (Erase)`
+  * The Difference (Erase) tool removes the areas of one layer that overlap with another layer. 
+  * Cutting out unwanted features from a dataset.
+
+
+* `intersect`
+  * The Intersect tool extracts the overlapping portions of two layers. 
+  * Commonly used in spatial analysis to find common areas between datasets.
+
+* `merge`
+  * Merging combines two or more layers into one
+
+
+* `Spatial Join`
+  * A spatial join matches rows from the Join Features values to the Target Features values based on their relative spatial locations
+
+:::
+
+
+## Vector tools in Python
+
+* Let's go to colab!
+
+```python
+import geopandas as gpd
+from shapely.geometry import Polygon, Point, LineString
+
+gpd.buffer() # buffer
+gpd.clip() # clip
+gpd.overlay(A, B, how='difference') # difference(erase)
+gpd.dissolve(by='region') # dissolve
+gpd.GeoDataFrame(pd.concat([A, B], ignore_index=True)) # merge
+
+```
+
+
+
+
+
+
+
+## Summary: 🌐 Core GIS Concepts {.smaller}
+
+- **GIS = Attribute + Location** — everything is *georeferenced*
+- **Vector vs Raster**:  
+  - *Vector*: points, lines, polygons  
+  - *Raster*: grids of pixels (e.g., satellite images)
+- **Reference vs Thematic Maps**:  
+  - Reference = location/navigation  
+  - Thematic = patterns/relationships
+- **Projections & CRS**:  
+  - Map distortion comes from projecting 3D → 2D  
+  - Use `EPSG` codes (e.g., 4326 for WGS84)
+- **MAUP**:  
+  - *Scale Effect*: unit size changes results  
+  - *Zoning Effect*: how units are drawn matters
+- **Spatial relationships**:  
+  - `within`, `intersects`, `contains`, `touches`, etc.
+
+## 💻 Python Practicals with GeoPandas {.smaller}
+- **Data Wrangling** with `pandas`:  
+  - `melt()`, `groupby()`, and data visualisation using `seaborn`
+- **Load Spatial Data**:  
+  - `gpd.read_file()` for Shapefiles, GeoJSON, GPKG
+- **Understand Geometry**:  
+  - Access `.geometry`, filter with `.loc[]`, `squeeze()` single-row GeoDataFrames
+- **Work with CRS**:  
+  - Check with `.crs`  
+  - Reproject using `.to_crs(epsg=...)`
+- **Spatial Joins**:  
+  - `gpd.sjoin()` to combine points with polygons based on spatial logic
+- **Buffering & Overlay**:  
+  - Use `.buffer()` for zones (e.g., 250km)  
+  - `gpd.overlay()` for geometric operations like `difference`, `intersection`
+- **Map Visualisation**:  
+  - Plot with `.plot()` and customize using `matplotlib`
+
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
