@@ -43,17 +43,25 @@ include-in-header:
 - Distance
 - MAUP
 
+
+## Lab 1 Assignment
+
+* Q4 was critical
+* You either can create a second dictionary
+* Or `for loop` the rows
+* or `melt` and `cast` the wide column dataframes
+
+<br>
+
+Let's go through some codes!
+
+
+
 ## Vector Tools {.smaller}
-  - buffer
-  - clip
-  - erase
-  - dissolve
-  - merge
 
 
-:::{.right}
-![](https://i.ytimg.com/vi/j8SYObYS9ms/maxresdefault.jpg){width=60%}
-:::
+![](Figs/vector_tools.jpg)
+
 
 ::: {.notes}
 * `buffer`
@@ -99,10 +107,24 @@ gpd.buffer() # buffer
 gpd.clip() # clip
 gpd.overlay(A, B, how='difference') # difference(erase)
 gpd.dissolve(by='region') # dissolve
-gpd.GeoDataFrame(pd.concat([A, B], ignore_index=True)) # merge
 
 ```
 
+## Your turn
+
+Follow the steps below to perform spatial and statistical analysis using the 2023 population data:
+
+```python
+pop23 = gpd.read_file('https://raw.githubusercontent.com/dataandcrowd/GISCI343/main/docs/Lecture5/data/pop23.gpkg')
+```
+
+<br>
+
+1. Calculate the centroid of each region
+2. Measure distances from Wellington
+3. Classify total population using Jenks natural breaks (k = 5) - Go back to tutorial
+4. Dissolve regions by North and South Islands:
+5. Calculate total population per island and percentage share: 
 
 
 

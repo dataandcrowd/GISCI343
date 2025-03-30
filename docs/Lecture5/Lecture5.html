@@ -433,19 +433,21 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>MAUP</li>
 </ul>
 </section>
+<section id="lab-1-assignment" class="slide level2">
+<h2>Lab 1 Assignment</h2>
+<ul>
+<li>Q4 was critical</li>
+<li>You either can create a second dictionary</li>
+<li>Or <code>for loop</code> the rows</li>
+<li>or <code>melt</code> and <code>cast</code> the wide column dataframes</li>
+</ul>
+<p><br></p>
+<p>Let’s go through some codes!</p>
+</section>
 <section id="vector-tools" class="slide level2 smaller">
 <h2>Vector Tools</h2>
-<ul>
-<li>buffer</li>
-<li>clip</li>
-<li>erase</li>
-<li>dissolve</li>
-<li>merge</li>
-</ul>
-<div class="right">
-<p><img data-src="https://i.ytimg.com/vi/j8SYObYS9ms/maxresdefault.jpg" style="width:60.0%"></p>
-</div>
-<aside class="notes">
+
+<img data-src="Figs/vector_tools.jpg" class="r-stretch"><aside class="notes">
 <ul>
 <li><p><code>buffer</code></p>
 <ul>
@@ -500,8 +502,20 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <span id="cb1-4"><a href=""></a>gpd.<span class="bu">buffer</span>() <span class="co"># buffer</span></span>
 <span id="cb1-5"><a href=""></a>gpd.clip() <span class="co"># clip</span></span>
 <span id="cb1-6"><a href=""></a>gpd.overlay(A, B, how<span class="op">=</span><span class="st">'difference'</span>) <span class="co"># difference(erase)</span></span>
-<span id="cb1-7"><a href=""></a>gpd.dissolve(by<span class="op">=</span><span class="st">'region'</span>) <span class="co"># dissolve</span></span>
-<span id="cb1-8"><a href=""></a>gpd.GeoDataFrame(pd.concat([A, B], ignore_index<span class="op">=</span><span class="va">True</span>)) <span class="co"># merge</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-7"><a href=""></a>gpd.dissolve(by<span class="op">=</span><span class="st">'region'</span>) <span class="co"># dissolve</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="your-turn" class="slide level2">
+<h2>Your turn</h2>
+<p>Follow the steps below to perform spatial and statistical analysis using the 2023 population data:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>pop23 <span class="op">=</span> gpd.read_file(<span class="st">'https://raw.githubusercontent.com/dataandcrowd/GISCI343/main/docs/Lecture5/data/pop23.gpkg'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<ol type="1">
+<li>Calculate the centroid of each region</li>
+<li>Measure distances from Wellington</li>
+<li>Classify total population using Jenks natural breaks (k = 5) - Go back to tutorial</li>
+<li>Dissolve regions by North and South Islands:</li>
+<li>Calculate total population per island and percentage share:</li>
+</ol>
 </section>
 <section id="summary-core-gis-concepts" class="slide level2 smaller">
 <h2>Summary: 🌐 Core GIS Concepts</h2>
