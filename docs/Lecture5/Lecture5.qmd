@@ -40,8 +40,12 @@ include-in-header:
 ## Today's Lecture
 
 - Vector tools using `geopandas`
+- Raster tools using `rasterio``
 - Distance
-- MAUP
+- Population density
+- Classified choropleth maps
+- barcharts...
+
 
 
 ## Lab 1 Assignment
@@ -124,48 +128,135 @@ pop23 = gpd.read_file('https://raw.githubusercontent.com/dataandcrowd/GISCI343/m
 2. Measure distances from Wellington
 3. Classify total population using Jenks natural breaks (k = 5) - Go back to tutorial
 4. Dissolve regions by North and South Islands:
-5. Calculate total population per island and percentage share: 
+5. Calculate total population density by region
 
 
 
+## Raster {.smaller}
+
+So far we’ve been working mainly with vector data using `geopandas`: lines, points, polygons
+
+The basemap tiles we’ve using are an example of raster data
+
+* Raster data:
+  - Gridded or pixelated
+  - Maps easily to an array — it’s the representation for digital images
 
 
+![](https://musa-550-fall-2023.github.io/content/week-5/imgs/raster-intro.png){fig-align=center}
 
-## Summary: 🌐 Core GIS Concepts {.smaller}
 
-- **GIS = Attribute + Location** — everything is *georeferenced*
-- **Vector vs Raster**:  
-  - *Vector*: points, lines, polygons  
-  - *Raster*: grids of pixels (e.g., satellite images)
-- **Reference vs Thematic Maps**:  
-  - Reference = location/navigation  
-  - Thematic = patterns/relationships
-- **Projections & CRS**:  
-  - Map distortion comes from projecting 3D → 2D  
-  - Use `EPSG` codes (e.g., 4326 for WGS84)
-- **MAUP**:  
-  - *Scale Effect*: unit size changes results  
-  - *Zoning Effect*: how units are drawn matters
-- **Spatial relationships**:  
-  - `within`, `intersects`, `contains`, `touches`, etc.
+## Examples
 
-## 💻 Python Practicals with GeoPandas {.smaller}
-- **Data Wrangling** with `pandas`:  
-  - `melt()`, `groupby()`, and data visualisation using `seaborn`
-- **Load Spatial Data**:  
-  - `gpd.read_file()` for Shapefiles, GeoJSON, GPKG
-- **Understand Geometry**:  
-  - Access `.geometry`, filter with `.loc[]`, `squeeze()` single-row GeoDataFrames
-- **Work with CRS**:  
-  - Check with `.crs`  
-  - Reproject using `.to_crs(epsg=...)`
-- **Spatial Joins**:  
-  - `gpd.sjoin()` to combine points with polygons based on spatial logic
-- **Buffering & Overlay**:  
-  - Use `.buffer()` for zones (e.g., 250km)  
-  - `gpd.overlay()` for geometric operations like `difference`, `intersection`
-- **Map Visualisation**:  
-  - Plot with `.plot()` and customize using `matplotlib`
+* Continuous rasters
+    - Multispectral satellite imagery, e.g., the Landsat satellite
+    - Digital Elevation Models (DEMs)
+    - Maps of canopy height derived from LiDAR data.
+
+* Categorical rasters
+    - Land cover or land-use maps.
+    - Tree height maps classified as short, medium, and tall trees.
+    - Snowcover masks (binary snow or no snow)
+
+## Resolution
+
+The spatial distance that a single pixel covers on the ground.
+
+![](https://musa-550-fall-2023.github.io/content/week-5/imgs/raster-resolution.png)
+
+
+## Extent
+The bounding box that covers the entire extent of the raster data.
+
+![](https://musa-550-fall-2023.github.io/content/week-5/imgs/raster-extent-2.png){fig-align=center}
+
+
+## Affine transformation: Transforming from pixel space to real space
+
+* A mapping from pixel space (rows and columns of the image) to the x and y coordinates defined by the CRS
+* Typically a six parameter matrix defining the origin, pixel resolution, and rotation of the raster image
+
+
+## Multi-band raster data
+
+Colour images are multi-band rasters!
+
+![](https://musa-550-fall-2023.github.io/content/week-5/imgs/color-images.png)
+
+
+## Multi-band raster data
+
+Each band measures the light reflected from different parts of the electromagnetic spectrum.
+
+![](https://musa-550-fall-2023.github.io/content/week-5/imgs/multi-band-raster.png)
+
+
+## The raster format: GeoTIFF
+
+* A standard .tif image format with additional spatial information embedded in the file, which includes metadata for:
+  * Geotransform, e.g., extent, resolution
+  * Coordinate Reference System (CRS)
+  * Values that represent missing data (NoDataValue)
+
+![](https://i.ytimg.com/vi/A5GphlWJLDQ/maxresdefault.jpg){fig-align=center}
+
+
+## Tools for raster data
+
+* Lots of different options: really just working with arrays
+* One of the first options: Geospatial Data Abstraction Library (GDAL)
+* Low level and not really user-friendly
+* A more recent, much more Pythonic package: `rasterio`
+* We’ll use `rasterio` for the majority of our raster analysis
+
+
+## Getting Started with `rasterio`
+
+```python
+import rasterio as rio
+
+elev = rio.open('elevation.tif')
+elev.crs
+elev.bounds # The bounds
+elev.count # The number of bands available
+elev.indexes # The band numbers that are available
+elev.shape # Number of pixels in the x and y directions
+elev.meta # # All of the meta data
+
+```
+
+## Slope
+
+* The Slope tool identifies the steepness at each cell of a raster surface. 
+* The lower the slope value, the flatter the terrain; the higher the slope value, the steeper the terrain.
+* The Slope tool uses a 3 by 3 window of cells to compute the value (but the windows can change)
+
+![](https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-analyst/GUID-43BD458B-05F2-4DC9-B133-12AE9C297797-web.png){fig-align=center}
+
+
+## Mask raster by vector boundaries
+Cuts out a portion of a raster dataset, mosaic dataset, or image service layer.
+
+![](https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/GUID-DA987A2F-5CC5-47D4-91B0-D77820AD40CA-web.gif){fig-align=center}
+
+
+## Zonal statistics
+
+* calculates statistics on cell values of a raster (a value raster) within the zones defined by another dataset.
+
+![](https://www.paulamoraga.com/book-spatial/book-spatial_files/figure-html/terracentroid-1.png){fig-align=center}
+
+
+## Summary 
+
+::: {style="font-size: 85%;"}
+
+- Use **vector tools** (e.g., `buffer`, `clip`, `dissolve`, `spatial join`) to analyse **discrete features** like roads, cities, and regions.
+- Use **raster tools** (e.g., slope, masking, zonal statistics) to explore **continuous surfaces** such as elevation, temperature, and land cover.
+- Combine both to uncover **where** things happen and **how much** — e.g., population density by region, slope-based risk zones.
+- Tools like `geopandas` and `rasterio` bring these analyses together through **code-driven, reproducible workflows**.
+
+:::
 
 
 

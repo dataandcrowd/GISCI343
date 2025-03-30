@@ -429,8 +429,11 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <h2>Today’s Lecture</h2>
 <ul>
 <li>Vector tools using <code>geopandas</code></li>
+<li>Raster tools using `rasterio``</li>
 <li>Distance</li>
-<li>MAUP</li>
+<li>Population density</li>
+<li>Classified choropleth maps</li>
+<li>barcharts…</li>
 </ul>
 </section>
 <section id="lab-1-assignment" class="slide level2">
@@ -514,79 +517,131 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>Measure distances from Wellington</li>
 <li>Classify total population using Jenks natural breaks (k = 5) - Go back to tutorial</li>
 <li>Dissolve regions by North and South Islands:</li>
-<li>Calculate total population per island and percentage share:</li>
+<li>Calculate total population density by region</li>
 </ol>
 </section>
-<section id="summary-core-gis-concepts" class="slide level2 smaller">
-<h2>Summary: 🌐 Core GIS Concepts</h2>
+<section id="raster" class="slide level2 smaller">
+<h2>Raster</h2>
+<p>So far we’ve been working mainly with vector data using <code>geopandas</code>: lines, points, polygons</p>
+<p>The basemap tiles we’ve using are an example of raster data</p>
 <ul>
-<li><strong>GIS = Attribute + Location</strong> — everything is <em>georeferenced</em></li>
-<li><strong>Vector vs Raster</strong>:
+<li>Raster data:
 <ul>
-<li><em>Vector</em>: points, lines, polygons<br>
-</li>
-<li><em>Raster</em>: grids of pixels (e.g., satellite images)</li>
+<li>Gridded or pixelated</li>
+<li>Maps easily to an array — it’s the representation for digital images</li>
 </ul></li>
-<li><strong>Reference vs Thematic Maps</strong>:
+</ul>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-5/imgs/raster-intro.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="examples" class="slide level2">
+<h2>Examples</h2>
 <ul>
-<li>Reference = location/navigation<br>
-</li>
-<li>Thematic = patterns/relationships</li>
+<li>Continuous rasters
+<ul>
+<li>Multispectral satellite imagery, e.g., the Landsat satellite</li>
+<li>Digital Elevation Models (DEMs)</li>
+<li>Maps of canopy height derived from LiDAR data.</li>
 </ul></li>
-<li><strong>Projections &amp; CRS</strong>:
+<li>Categorical rasters
 <ul>
-<li>Map distortion comes from projecting 3D → 2D<br>
-</li>
-<li>Use <code>EPSG</code> codes (e.g., 4326 for WGS84)</li>
-</ul></li>
-<li><strong>MAUP</strong>:
-<ul>
-<li><em>Scale Effect</em>: unit size changes results<br>
-</li>
-<li><em>Zoning Effect</em>: how units are drawn matters</li>
-</ul></li>
-<li><strong>Spatial relationships</strong>:
-<ul>
-<li><code>within</code>, <code>intersects</code>, <code>contains</code>, <code>touches</code>, etc.</li>
+<li>Land cover or land-use maps.</li>
+<li>Tree height maps classified as short, medium, and tall trees.</li>
+<li>Snowcover masks (binary snow or no snow)</li>
 </ul></li>
 </ul>
 </section>
-<section id="python-practicals-with-geopandas" class="slide level2 smaller">
-<h2>💻 Python Practicals with GeoPandas</h2>
+<section id="resolution" class="slide level2">
+<h2>Resolution</h2>
+<p>The spatial distance that a single pixel covers on the ground.</p>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-5/imgs/raster-resolution.png" class="r-stretch"></section>
+<section id="extent" class="slide level2">
+<h2>Extent</h2>
+<p>The bounding box that covers the entire extent of the raster data.</p>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-5/imgs/raster-extent-2.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="affine-transformation-transforming-from-pixel-space-to-real-space" class="slide level2">
+<h2>Affine transformation: Transforming from pixel space to real space</h2>
 <ul>
-<li><strong>Data Wrangling</strong> with <code>pandas</code>:
+<li>A mapping from pixel space (rows and columns of the image) to the x and y coordinates defined by the CRS</li>
+<li>Typically a six parameter matrix defining the origin, pixel resolution, and rotation of the raster image</li>
+</ul>
+</section>
+<section id="multi-band-raster-data" class="slide level2">
+<h2>Multi-band raster data</h2>
+<p>Colour images are multi-band rasters!</p>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-5/imgs/color-images.png" class="r-stretch"></section>
+<section id="multi-band-raster-data-1" class="slide level2">
+<h2>Multi-band raster data</h2>
+<p>Each band measures the light reflected from different parts of the electromagnetic spectrum.</p>
+
+<img data-src="https://musa-550-fall-2023.github.io/content/week-5/imgs/multi-band-raster.png" class="r-stretch"></section>
+<section id="the-raster-format-geotiff" class="slide level2">
+<h2>The raster format: GeoTIFF</h2>
 <ul>
-<li><code>melt()</code>, <code>groupby()</code>, and data visualisation using <code>seaborn</code></li>
-</ul></li>
-<li><strong>Load Spatial Data</strong>:
+<li>A standard .tif image format with additional spatial information embedded in the file, which includes metadata for:
 <ul>
-<li><code>gpd.read_file()</code> for Shapefiles, GeoJSON, GPKG</li>
-</ul></li>
-<li><strong>Understand Geometry</strong>:
-<ul>
-<li>Access <code>.geometry</code>, filter with <code>.loc[]</code>, <code>squeeze()</code> single-row GeoDataFrames</li>
-</ul></li>
-<li><strong>Work with CRS</strong>:
-<ul>
-<li>Check with <code>.crs</code><br>
-</li>
-<li>Reproject using <code>.to_crs(epsg=...)</code></li>
-</ul></li>
-<li><strong>Spatial Joins</strong>:
-<ul>
-<li><code>gpd.sjoin()</code> to combine points with polygons based on spatial logic</li>
-</ul></li>
-<li><strong>Buffering &amp; Overlay</strong>:
-<ul>
-<li>Use <code>.buffer()</code> for zones (e.g., 250km)<br>
-</li>
-<li><code>gpd.overlay()</code> for geometric operations like <code>difference</code>, <code>intersection</code></li>
-</ul></li>
-<li><strong>Map Visualisation</strong>:
-<ul>
-<li>Plot with <code>.plot()</code> and customize using <code>matplotlib</code></li>
+<li>Geotransform, e.g., extent, resolution</li>
+<li>Coordinate Reference System (CRS)</li>
+<li>Values that represent missing data (NoDataValue)</li>
 </ul></li>
 </ul>
+
+<img data-src="https://i.ytimg.com/vi/A5GphlWJLDQ/maxresdefault.jpg" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="tools-for-raster-data" class="slide level2">
+<h2>Tools for raster data</h2>
+<ul>
+<li>Lots of different options: really just working with arrays</li>
+<li>One of the first options: Geospatial Data Abstraction Library (GDAL)</li>
+<li>Low level and not really user-friendly</li>
+<li>A more recent, much more Pythonic package: <code>rasterio</code></li>
+<li>We’ll use <code>rasterio</code> for the majority of our raster analysis</li>
+</ul>
+</section>
+<section id="getting-started-with-rasterio" class="slide level2">
+<h2>Getting Started with <code>rasterio</code></h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="im">import</span> rasterio <span class="im">as</span> rio</span>
+<span id="cb3-2"><a href=""></a></span>
+<span id="cb3-3"><a href=""></a>elev <span class="op">=</span> rio.<span class="bu">open</span>(<span class="st">'elevation.tif'</span>)</span>
+<span id="cb3-4"><a href=""></a>elev.crs</span>
+<span id="cb3-5"><a href=""></a>elev.bounds <span class="co"># The bounds</span></span>
+<span id="cb3-6"><a href=""></a>elev.count <span class="co"># The number of bands available</span></span>
+<span id="cb3-7"><a href=""></a>elev.indexes <span class="co"># The band numbers that are available</span></span>
+<span id="cb3-8"><a href=""></a>elev.shape <span class="co"># Number of pixels in the x and y directions</span></span>
+<span id="cb3-9"><a href=""></a>elev.meta <span class="co"># # All of the meta data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="slope" class="slide level2">
+<h2>Slope</h2>
+<ul>
+<li>The Slope tool identifies the steepness at each cell of a raster surface.</li>
+<li>The lower the slope value, the flatter the terrain; the higher the slope value, the steeper the terrain.</li>
+<li>The Slope tool uses a 3 by 3 window of cells to compute the value (but the windows can change)</li>
+</ul>
+
+<img data-src="https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-analyst/GUID-43BD458B-05F2-4DC9-B133-12AE9C297797-web.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="mask-raster-by-vector-boundaries" class="slide level2">
+<h2>Mask raster by vector boundaries</h2>
+<p>Cuts out a portion of a raster dataset, mosaic dataset, or image service layer.</p>
+
+<img data-src="https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/GUID-DA987A2F-5CC5-47D4-91B0-D77820AD40CA-web.gif" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="zonal-statistics" class="slide level2">
+<h2>Zonal statistics</h2>
+<ul>
+<li>calculates statistics on cell values of a raster (a value raster) within the zones defined by another dataset.</li>
+</ul>
+
+<img data-src="https://www.paulamoraga.com/book-spatial/book-spatial_files/figure-html/terracentroid-1.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="summary" class="slide level2">
+<h2>Summary</h2>
+<div style="font-size: 85%;">
+<ul>
+<li>Use <strong>vector tools</strong> (e.g., <code>buffer</code>, <code>clip</code>, <code>dissolve</code>, <code>spatial join</code>) to analyse <strong>discrete features</strong> like roads, cities, and regions.</li>
+<li>Use <strong>raster tools</strong> (e.g., slope, masking, zonal statistics) to explore <strong>continuous surfaces</strong> such as elevation, temperature, and land cover.</li>
+<li>Combine both to uncover <strong>where</strong> things happen and <strong>how much</strong> — e.g., population density by region, slope-based risk zones.</li>
+<li>Tools like <code>geopandas</code> and <code>rasterio</code> bring these analyses together through <strong>code-driven, reproducible workflows</strong>.</li>
+</ul>
+</div>
 </section>
 <section id="thanks-q-a" class="slide level2" style="text-align: center;">
 <h2><br> Thanks! <br> Q &amp; A</h2>
