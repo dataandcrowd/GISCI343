@@ -1,6 +1,6 @@
 ---
-title: "Python Data Bootcamp - Geopandas 1"
-subtitle: ": An Introduction to Geospatial Analysis with Python"
+title: "Python Data Bootcamp - Geopandas 2"
+subtitle: ": GIS Tools and Application"
 date: 04/01/2025
 date-format: long
 author:
@@ -59,7 +59,9 @@ include-in-header:
 
 Let's go through some codes!
 
+## Why do many examples use `fig, ax = plt.subplots()`
 
+![](Figs/stackoverflow.png){fig-align=center}
 
 ## Vector Tools {.smaller}
 
