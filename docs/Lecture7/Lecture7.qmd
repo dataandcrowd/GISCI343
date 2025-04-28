@@ -1,0 +1,188 @@
+---
+title: "Spatial Autocorrelation"
+subtitle: ": Coding Moran's I"
+date: 04/29/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Recap of Previous Lecture
+
+- Vector tools using `geopandas`
+- Raster tools using `rasterio``
+- Distance
+- Population density
+- Classified choropleth maps
+
+
+
+## Today's Lecture
+
+- Spatial Autocorrelation
+    - Spatial Weights
+    - Global Moran's I
+    - Local Moran's I
+    - Getis ord (GI*)
+
+## What are we learning?
+
+* Key concepts: Correlation, spatial autocorrelation, hypotheses
+* Know what are spatial weights
+* Global Moran’s I and Local Moran’s I
+* Four types of outcomes: HH, HL, LH, LL
+* Getis Ord (Gi*): another local clustering method
+
+
+## Hypothesis
+
+:::: {.columns}
+
+::: {.column width="45%"}
+**Null Hypothesis (H0)**
+
+<br>
+
+There is [no relationship]{.underline} between the amount of green space and air pollution levels in an area
+
+
+:::
+
+::: {.column width="10%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="45%"}
+**Alternative Hypothesis (H1)**
+
+Areas with [more green spaces have lower air pollution levels]{.underline} than areas with fewer green spaces.
+
+:::
+
+::::
+
+
+## Correlation
+
+::: {style="font-size: 80%;"}
+Correlation is a statistical measure that describes the relationship between two variables. It tells us whether an increase in one variable is associated with an increase or decrease in another.
+:::
+
+
+![](https://www.simplypsychology.org/wp-content/uploads/correlation.jpg){fig-align=center}
+
+
+::: {style="font-size: 40%;"}
+* Positive: Temperature x Ice Cream Sales
+* Negative: Interest Rates x Housing prices
+:::
+
+
+## Temporal Autocorrelation
+
+![](Figs/temporal-autocorrelation.png)
+
+
+## Temporal Autocorrelation
+
+![](Figs/temporal.png)
+
+
+## Spatial Weights
+
+
+How to include [**"space"**]{style="color:red;"} in statistics?
+
+![](https://www.researchgate.net/publication/327776659/figure/fig1/AS:672948855791617@1537454918147/A-typical-spatial-weights-matrix-Note-that-A-and-E-do-not-share-a-side-thus-their.png){fig-align=center}
+
+
+## Spatial Weights
+
+* We need a mathematical representation of space
+* Geometries are spatial information but does not provide the spatial relationships
+    - Connectedness
+    - Proximity
+* But graphs do have the **close** and **far**s
+
+
+## What is a graph?
+
+In this context a graph is:
+
+* A data structure that consists of a set of objects called nodes
+* A set of connections between them called edges
+
+![](Figs/weights.png){fig-align=center}
+
+## What is a neighbour?
+
+It depends
+
+* What [neighbourhoods]{style="color:green;"} are you surrounded by?
+* How many [primary schools]{style="color:forestgreen;"} within 5km radius from [my home]{style="color:
+#E49B0F;"}?
+
+**We are building a topology that we can use to examine the data**
+
+::: {style="font-size: 40%;"}
+Topology: a mathematical structure that expresses the connectivity between observations
+:::
+
+
+## Contiguity
+
+Contiguity means that two spatial units share a common border of non-zero length
+
+![](Figs/contiguity.png)
+
+## Graph Visualisation
+
+![](Figs/rook-queen.png){fig-align=center}
+
+* Let's go to Colab for some coding exercise!
+
+## Spatial weights from real-world geographic tables
+
+Queen Contiguity
+
+
+
+
+
+
+## Summary 
+
+::: {style="font-size: 85%;"}
+
+- Use **vector tools** (e.g., `buffer`, `clip`, `dissolve`, `spatial join`) to analyse **discrete features** like roads, cities, and regions.
+- Use **raster tools** (e.g., slope, masking, zonal statistics) to explore **continuous surfaces** such as elevation, temperature, and land cover.
+- Combine both to uncover **where** things happen and **how much** — e.g., population density by region, slope-based risk zones.
+- Tools like `geopandas` and `rasterio` bring these analyses together through **code-driven, reproducible workflows**.
+
+:::
+
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
