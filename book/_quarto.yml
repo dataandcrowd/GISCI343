@@ -1,0 +1,49 @@
+project:
+  type: book
+
+book:
+  title: "Geo Data Science"
+  author: "Hyesop Shin"
+  favicon: polar-bear-airpods-no-background.png
+  description: A side-by-side comparison of the Polars and Pandas libraries.
+  keyword: polars, pandas, python, dataframe, performance, data science, data engineering
+  url: https://dataandcrowd.github.io/GISCI343
+  sidebar: 
+    background: "#F5F5F5"
+    logo: polar-bear-airpods-no-background.png
+    search: true
+  repo-url: https://github.com/dataandcrowd/GISCI343/
+  repo-subdir: book
+  repo-branch: master
+  repo-actions: [edit, issue, source]
+  sharing: [linkedin]
+  image: polar-bear-airpods-no-background.png
+  comments:
+    giscus:
+      repo: kevinheavey/modern-polars
+  open-graph:
+    image: https://github.com/kevinheavey/modern-polars/raw/master/book/resized-og-polar-bear-airpods-no-background.png
+    description: A side-by-side comparison of the Polars and Pandas libraries.
+
+  chapters:
+    - index.qmd
+    - indexing.qmd
+    # - method_chaining.qmd
+    # - performance.qmd
+    # - tidy.qmd
+    # - timeseries.qmd
+    # - scaling.qmd
+    # - summary.qmd
+
+format:
+  html:
+    theme:
+      light: cosmo
+    code-fold: false
+    css: custom.css
+    backgroundcolor: "#F5F5F5"
+
+
+
+# good themes: default, cosmo, flatly, lumen, minty, pulse, sandstone, solar, united
+# favourites: minty, cosmo

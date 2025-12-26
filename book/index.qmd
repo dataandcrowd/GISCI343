@@ -1,0 +1,79 @@
+# Preface {.unnumbered}
+
+This is an online workbook for the GISCI 343 class, Geospatial Data Science, launched in 2026.
+
+The book is organised into three main parts:
+
+Part 1. Doing geospatial analysis using Python
+Part 2. Creating geospatial dashboards
+Part 3. Publishing Python packages with a geospatial focus
+
+Throughout the course, Positron is used as the primary development environment. Unlike conventional GIS coursework that focuses on tools or isolated techniques, this book goes beyond the standard GIS and Python combination. The emphasis is on building applied, production-oriented skills that reflect how geospatial data science is practised outside the classroom, particularly through dashboards and Python packaging.
+
+## Who is this for?
+
+This book is designed for students and learners who already have foundational GIS knowledge, such as introductory GIS or remote sensing courses, but who have limited exposure to programming.
+
+If you are familiar with any dataframe-based workflow, most examples should be approachable. Familiarity with Pandas will be particularly helpful, as all Polars examples are accompanied by equivalent Pandas implementations for comparison and learning.
+
+Reading *Modern Pandas* is not required, although it is a recommended resource for those who wish to deepen their understanding.
+
+
+## Why this approach?
+
+Although artificial intelligence has transformed how we learn, analyse data, and write code, reproducibility and sound practice in data science remain essential.
+
+Simply combining GIS and Python is no longer sufficient. This course therefore addresses broader and often overlooked questions:
+
+::: {.callout-note title="Rationale behind course design"}
+
+### Why do we use Git, and how does it support reproducible research?
+
+Git provides a transparent and traceable record of how a project evolves over time. Every change to code, data processing logic, or documentation is recorded, allowing results to be reproduced, audited, and revisited. This is essential for geospatial data science, where analytical outcomes often depend on many interlinked steps, such as data cleaning, spatial joins, projections, and modelling assumptions.
+
+Using Git encourages good research habits: small, well-documented changes, clear reasoning behind decisions, and the ability to roll back or compare different analytical approaches. In collaborative settings, Git also enables multiple contributors to work on the same project without overwriting each other’s work, making it the backbone of reproducible and open geospatial research.
+
+### Why do we build dashboards, and how do they help communicate results to practitioners and decision makers?
+
+Dashboards transform analytical outputs into interactive and interpretable artefacts. Rather than presenting static maps or tables, dashboards allow users to explore spatial patterns, filter scenarios, and ask their own questions. This is particularly important in applied geospatial work, where stakeholders may not be familiar with code but need to engage with evidence.
+
+By building dashboards, students learn how to bridge the gap between analysis and communication. Dashboards force careful thinking about what results matter, how uncertainty is presented, and how spatial information can be explored intuitively. These skills are essential when working with planners, policymakers, and industry partners who rely on clear, actionable insights rather than raw analytical outputs.
+
+### Why do we develop Python packages as a final project, and how does this introduce object-oriented programming with a clear purpose and real-world relevance?
+
+Developing a Python package shifts the focus from writing one-off scripts to building reusable, maintainable software. Packaging requires students to structure code logically, define clear interfaces, and think about how others will use their work. This naturally introduces object-oriented programming concepts, such as abstraction, encapsulation, and modular design, in a context where they serve a practical purpose.
+
+In geospatial data science, packaging allows analytical workflows, spatial utilities, or modelling components to be shared, tested, and extended. The final package becomes a tangible output that can be included in a portfolio, reused in future projects, or published openly. This mirrors professional practice and helps students understand how geospatial tools are developed, maintained, and deployed in real-world environments.
+
+:::
+
+
+Each of these components is intentionally included to help students understand professional workflows and to produce outputs that can be shared beyond the university setting.
+
+The three modules in this book are designed to be complete, reusable, and ready to engage with society, forming a practical portfolio that reflects contemporary geospatial data science practice.
+
+
+## Running the code yourself
+
+
+You can install the following package versions and it should work:
+
+```         
+polars: 1.0.0
+pyarrow: 10.0.1
+pandas: 2.2.2
+geopandas: 1.1.2
+numpy: 1.26.4
+matplotlib: 3.8.0
+seaborn: 0.13.2
+statsmodels: 0.14.2
+```
+
+### Data
+
+All the data fetching code is included, but will eventually break as websites change or shut down. The smaller datasets have been checked in [here](https://github.com/dataandcrowd/GISCI343/tree/master/data) for posterity.
+
+## Contributing
+
+This book is free and open source, so please do [open an issue](https://github.com/dataandcrowd/GISCI343/issues/new) if you notice a problem!
+
