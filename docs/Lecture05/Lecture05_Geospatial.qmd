@@ -1,0 +1,631 @@
+---
+title: "Geospatial Operations with GeoPandas"
+subtitle: ": Spatial Analysis for Urban Analytics"
+date: 04/08/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+## Recap of Previous Lectures
+
+* Pandas for tabular data
+* Data visualisation with matplotlib/seaborn  
+* GeoPandas introduction
+* Vector operations basics
+
+## Today's Lecture
+
+::: {.incremental}
+* Coordinate Reference Systems (CRS)
+* Spatial operations (buffer, intersect, union)
+* Spatial joins
+* Measuring distances and areas
+* Creating reusable functions
+* Real Auckland analysis
+:::
+
+## Assignment 1 Reminder
+
+**Due**: End of this week
+
+**Requirements:**
+- Pedestrian count analysis
+- Temporal patterns
+- Visualisations
+- Blog post with Quarto
+- GitHub Pages deployment
+
+**Get help in lab if stuck!**
+
+## Why CRS Matters
+
+![](https://mgimond.github.io/Spatial/img/Map_projections2.jpg){fig-align=center}
+
+::: {.incremental}
+* Earth is 3D, maps are 2D
+* Different ways to "flatten" the Earth
+* **Geographic**: Latitude/Longitude (degrees)
+* **Projected**: X/Y coordinates (metres)
+:::
+
+## CRS in Practice
+
+**Geographic CRS** (WGS84, EPSG:4326):
+```python
+# GPS coordinates
+lat = -36.8485
+lon = 174.7633
+```
+
+::: {.incremental}
+**Projected CRS** (NZTM, EPSG:2193):
+```python
+# Metres from origin
+easting = 1751234
+northing = 5920567
+```
+:::
+
+## Why Two Different CRS Types?
+
+::: {style="font-size: 85%;"}
+**Geographic (Lat/Lon):**
+- ✅ Good for: Web maps, GPS, global coverage
+- ❌ Bad for: Distance calculations, area measurements
+
+**Projected (Metres):**
+- ✅ Good for: Measuring distances, areas, buffers
+- ❌ Bad for: Global coverage (distortion increases)
+:::
+
+::: {.callout-warning}
+## Critical Rule
+**ALWAYS use projected CRS (NZTM) for calculations in NZ!**
+:::
+
+## Checking CRS in GeoPandas
+
+```python
+import geopandas as gpd
+
+# Load Auckland SA2 boundaries
+sa2 = gpd.read_file('auckland_sa2.gpkg')
+
+# Check CRS
+print(sa2.crs)
+# Output: EPSG:2193 (NZTM - good!)
+
+# or 
+# Output: EPSG:4326 (WGS84 - need to reproject!)
+```
+
+## Reprojecting Data
+
+```python
+# Load data (might be in WGS84)
+sa2 = gpd.read_file('boundaries.gpkg')
+print(sa2.crs)  # EPSG:4326
+
+# Reproject to NZTM
+sa2_nztm = sa2.to_crs('EPSG:2193')
+print(sa2_nztm.crs)  # EPSG:2193
+
+# Now we can calculate distances/areas correctly!
+```
+
+::: {.callout-tip}
+**Always reproject BEFORE spatial operations**
+:::
+
+## Common NZ Coordinate Systems
+
+| CRS | EPSG | Units | Use Case |
+|-----|------|-------|----------|
+| **NZTM** | 2193 | metres | All NZ calculations |
+| **WGS84** | 4326 | degrees | Web maps, GPS |
+| **NZMG** | 27200 | metres | Old standard (avoid) |
+
+::: {style="font-size: 85%;"}
+**Rule of thumb**: Use NZTM (EPSG:2193) for everything in NZ!
+:::
+
+## Geometry Types Recap
+
+```python
+from shapely.geometry import Point, LineString, Polygon
+
+# Point (e.g., sensor location)
+sensor = Point(174.7633, -36.8485)
+
+# LineString (e.g., street)
+street = LineString([
+    (174.76, -36.84),
+    (174.77, -36.85)
+])
+
+# Polygon (e.g., SA2 boundary)
+zone = Polygon([
+    (174.76, -36.84),
+    (174.77, -36.84),
+    (174.77, -36.85),
+    (174.76, -36.85)
+])
+```
+
+## Spatial Operations: Buffer
+
+**Buffer**: Create area around geometry
+
+```python
+# Sensor location
+sensor = gpd.GeoDataFrame(
+    {'name': ['Queen St']},
+    geometry=[Point(1751234, 5920567)],
+    crs='EPSG:2193'
+)
+
+# 800m walking distance buffer
+buffer_800m = sensor.copy()
+buffer_800m['geometry'] = sensor.geometry.buffer(800)
+
+# Plot
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(figsize=(10, 8))
+sensor.plot(ax=ax, color='red', markersize=100)
+buffer_800m.plot(ax=ax, alpha=0.3, color='blue')
+plt.title('800m Buffer Around Sensor')
+plt.show()
+```
+
+## Your Turn: Buffer
+
+::: {style="font-size: 120%;"}
+1. Load Auckland SA2 boundaries
+2. Select one SA2 (e.g., CBD)
+3. Create a 1000m buffer around it
+4. Plot both the original and buffer
+
+**Hint**: Use `.loc[]` to select one SA2
+:::
+
+## Spatial Operations: Intersection
+
+**Intersect**: Find overlapping areas
+
+```python
+# Which SA2 zones are within 800m of sensor?
+zones_in_buffer = gpd.overlay(
+    sa2_nztm,
+    buffer_800m,
+    how='intersection'
+)
+
+print(f"Zones within 800m: {len(zones_in_buffer)}")
+
+# Plot
+fig, ax = plt.subplots()
+sa2_nztm.plot(ax=ax, color='lightgrey', edgecolor='black')
+zones_in_buffer.plot(ax=ax, color='red', alpha=0.5)
+buffer_800m.boundary.plot(ax=ax, color='blue', linewidth=2)
+plt.title('SA2 Zones Within 800m of Sensor')
+plt.show()
+```
+
+## Spatial Operations: Union
+
+**Union**: Combine geometries
+
+```python
+# Combine adjacent SA2 zones
+cbd_zones = sa2_nztm[sa2_nztm['SA2_name'].isin([
+    'Auckland Central West',
+    'Auckland Central East'
+])]
+
+# Dissolve into single polygon
+cbd_combined = cbd_zones.dissolve()
+
+# Compare
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+cbd_zones.plot(ax=ax1, edgecolor='black')
+ax1.set_title('Separate Zones')
+
+cbd_combined.plot(ax=ax2, color='green', alpha=0.5)
+ax2.set_title('Combined Area')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Spatial Operations: Difference
+
+**Difference**: Subtract one geometry from another
+
+```python
+# Auckland region minus CBD
+auckland = sa2_nztm.dissolve()
+cbd = cbd_combined
+
+# Subtract CBD
+auckland_no_cbd = auckland.overlay(cbd, how='difference')
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 8))
+auckland.plot(ax=ax, color='lightblue', alpha=0.5, label='Full Auckland')
+auckland_no_cbd.plot(ax=ax, color='green', alpha=0.5, label='Minus CBD')
+cbd.plot(ax=ax, color='red', alpha=0.5, label='CBD')
+plt.legend()
+plt.title('Auckland Region Minus CBD')
+plt.show()
+```
+
+## Measuring Distance
+
+```python
+# Distance between two points
+queen_st = Point(1751234, 5920567)
+sky_tower = Point(1751456, 5920789)
+
+# Create GeoDataFrame
+points = gpd.GeoDataFrame(
+    {'name': ['Queen St', 'Sky Tower']},
+    geometry=[queen_st, sky_tower],
+    crs='EPSG:2193'
+)
+
+# Calculate distance (in metres because NZTM!)
+distance = points.geometry[0].distance(points.geometry[1])
+print(f"Distance: {distance:.1f} metres")
+```
+
+::: {.callout-warning}
+**Only works correctly in projected CRS (EPSG:2193)**
+:::
+
+## Measuring Area
+
+```python
+# Calculate area of each SA2 zone
+sa2_nztm['area_m2'] = sa2_nztm.geometry.area
+sa2_nztm['area_km2'] = sa2_nztm['area_m2'] / 1_000_000
+
+# Summary statistics
+print(sa2_nztm['area_km2'].describe())
+
+# Smallest and largest
+smallest = sa2_nztm.loc[sa2_nztm['area_km2'].idxmin()]
+largest = sa2_nztm.loc[sa2_nztm['area_km2'].idxmax()]
+
+print(f"Smallest: {smallest['SA2_name']} ({smallest['area_km2']:.2f} km²)")
+print(f"Largest: {largest['SA2_name']} ({largest['area_km2']:.2f} km²)")
+```
+
+## Spatial Joins
+
+**Join based on spatial relationship, not column values!**
+
+```python
+# Pedestrian sensors (points)
+sensors = gpd.GeoDataFrame(
+    {'sensor_id': ['PED_001', 'PED_002', 'PED_003'],
+     'count': [567, 234, 456]},
+    geometry=[Point(1751234, 5920567),
+              Point(1752456, 5921234),
+              Point(1750987, 5919876)],
+    crs='EPSG:2193'
+)
+
+# Which SA2 is each sensor in?
+sensors_with_sa2 = gpd.sjoin(
+    sensors,
+    sa2_nztm[['SA2_code', 'SA2_name', 'geometry']],
+    how='left',
+    predicate='within'
+)
+
+print(sensors_with_sa2[['sensor_id', 'SA2_name', 'count']])
+```
+
+## Spatial Join Types
+
+::: {style="font-size: 85%;"}
+**Predicates** (spatial relationships):
+
+- `'intersects'`: Geometries touch or overlap
+- `'within'`: Left geometry completely inside right
+- `'contains'`: Left geometry completely contains right
+- `'crosses'`: Geometries cross each other
+
+```python
+# Count sensors per SA2
+sensors_per_zone = gpd.sjoin(
+    sa2_nztm,
+    sensors,
+    how='left',
+    predicate='contains'
+)
+
+sensor_counts = sensors_per_zone.groupby('SA2_name').size()
+print(sensor_counts)
+```
+:::
+
+## Your Turn: Spatial Join
+
+::: {style="font-size: 110%;"}
+1. Load SA2 boundaries
+2. Load pedestrian sensor locations
+3. Perform spatial join to assign each sensor to an SA2
+4. Calculate average pedestrian count per SA2
+5. Create a choropleth map of average counts
+
+**Bonus**: Which SA2 has the highest average count?
+:::
+
+## Point in Polygon
+
+```python
+# Is a point inside a polygon?
+sky_tower = Point(1751456, 5920789)
+
+# Auckland CBD polygon
+cbd = sa2_nztm[sa2_nztm['SA2_name'] == 'Auckland Central West']
+
+# Check if inside
+is_inside = sky_tower.within(cbd.geometry.iloc[0])
+print(f"Sky Tower in CBD: {is_inside}")  # True
+
+# For all points at once
+points['in_cbd'] = points.geometry.within(cbd.geometry.iloc[0])
+```
+
+## Nearest Neighbour
+
+```python
+# Find nearest SA2 to each sensor
+from shapely.ops import nearest_points
+
+for idx, sensor in sensors.iterrows():
+    # Find nearest SA2 centroid
+    sa2_centroids = sa2_nztm.centroid
+    distances = sa2_centroids.distance(sensor.geometry)
+    nearest_idx = distances.idxmin()
+    nearest_sa2 = sa2_nztm.loc[nearest_idx, 'SA2_name']
+    
+    print(f"{sensor['sensor_id']} nearest to {nearest_sa2}")
+```
+
+## Creating Functions for Reusability
+
+**Problem**: Repeating same operations?
+
+```python
+def ensure_nztm(gdf):
+    """Reproject to NZTM if needed."""
+    if gdf.crs != 'EPSG:2193':
+        print(f"Reprojecting from {gdf.crs} to EPSG:2193")
+        return gdf.to_crs('EPSG:2193')
+    return gdf
+
+# Use it
+sa2 = gpd.read_file('boundaries.gpkg')
+sa2 = ensure_nztm(sa2)  # Now always NZTM!
+```
+
+## More Reusable Functions
+
+```python
+def calculate_density(gdf, value_col='population'):
+    """Calculate density per km²."""
+    gdf = ensure_nztm(gdf)
+    gdf['area_km2'] = gdf.geometry.area / 1_000_000
+    gdf['density'] = gdf[value_col] / gdf['area_km2']
+    return gdf
+
+def create_buffer_analysis(points_gdf, buffer_m=800):
+    """Create buffer and return buffered GeoDataFrame."""
+    points_gdf = ensure_nztm(points_gdf)
+    buffered = points_gdf.copy()
+    buffered['geometry'] = points_gdf.geometry.buffer(buffer_m)
+    return buffered
+```
+
+## Real Analysis: Pedestrian Accessibility
+
+```python
+# Load data
+sensors = gpd.read_file('sensors.gpkg')
+sa2 = gpd.read_file('auckland_sa2.gpkg')
+
+# Ensure NZTM
+sensors = ensure_nztm(sensors)
+sa2 = ensure_nztm(sa2)
+
+# Create 400m pedestrian catchment
+catchments = create_buffer_analysis(sensors, buffer_m=400)
+
+# Which SA2s have good pedestrian monitoring?
+monitored_zones = gpd.overlay(
+    sa2,
+    catchments,
+    how='intersection'
+)
+
+# Calculate coverage
+sa2['monitored_area_km2'] = gpd.sjoin(
+    sa2,
+    catchments,
+    how='left',
+    predicate='intersects'
+).groupby(level=0).size()
+
+sa2['coverage_%'] = (sa2['monitored_area_km2'] / sa2['area_km2'] * 100)
+```
+
+## Visualising Results
+
+```python
+# Create figure
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
+
+# Map 1: Sensors and catchments
+sa2.plot(ax=ax1, color='lightgrey', edgecolor='black', alpha=0.5)
+catchments.plot(ax=ax1, color='blue', alpha=0.3)
+sensors.plot(ax=ax1, color='red', markersize=50)
+ax1.set_title('Sensor Locations and 400m Catchments')
+
+# Map 2: Coverage choropleth
+sa2.plot(column='coverage_%', ax=ax2, legend=True,
+         cmap='YlGnBu', edgecolor='black',
+         legend_kwds={'label': 'Coverage (%)'})
+ax2.set_title('Pedestrian Monitoring Coverage by SA2')
+
+plt.tight_layout()
+plt.savefig('pedestrian_coverage.png', dpi=300, bbox_inches='tight')
+plt.show()
+```
+
+## Common Pitfalls
+
+::: {style="font-size: 85%;"}
+**1. Wrong CRS for calculations**
+```python
+# ❌ Wrong
+distance = point1.distance(point2)  # In WGS84 - wrong!
+
+# ✅ Correct
+points = points.to_crs('EPSG:2193')
+distance = point1.distance(point2)  # In NZTM - correct!
+```
+
+**2. Forgetting to align CRS**
+```python
+# ❌ Wrong - different CRS
+result = gpd.overlay(sa2_wgs84, buffer_nztm, how='intersection')
+
+# ✅ Correct - same CRS
+sa2_wgs84 = sa2_wgs84.to_crs('EPSG:2193')
+result = gpd.overlay(sa2_wgs84, buffer_nztm, how='intersection')
+```
+:::
+
+## Common Pitfalls (continued)
+
+::: {style="font-size: 85%;"}
+**3. Using wrong spatial predicate**
+```python
+# Points in polygons: use 'within'
+points_in_zones = gpd.sjoin(points, zones, predicate='within')
+
+# Overlapping polygons: use 'intersects'
+overlapping = gpd.sjoin(zones1, zones2, predicate='intersects')
+```
+
+**4. Not handling empty results**
+```python
+# ❌ Wrong
+result = gdf[gdf['area_km2'] > 100]
+print(result['SA2_name'].iloc[0])  # Crashes if empty!
+
+# ✅ Correct
+result = gdf[gdf['area_km2'] > 100]
+if len(result) > 0:
+    print(result['SA2_name'].iloc[0])
+else:
+    print("No zones found")
+```
+:::
+
+## Your Turn: Complete Analysis
+
+::: {style="font-size: 95%;"}
+**Task**: Analyze green space accessibility in Auckland
+
+1. Load SA2 boundaries
+2. Load parks/reserves as polygons
+3. Create 800m buffer around each park
+4. Calculate % of each SA2 within park catchment
+5. Create choropleth map
+6. Identify SA2s with <20% coverage
+
+**Bonus**: Which SA2 has best/worst access?
+:::
+
+## Best Practices Checklist
+
+::: {.incremental}
+- ✅ Always check CRS first
+- ✅ Use NZTM (EPSG:2193) for calculations
+- ✅ Create functions for repeated operations
+- ✅ Validate results (do numbers make sense?)
+- ✅ Comment your code
+- ✅ Save intermediate results
+- ✅ Use meaningful variable names
+:::
+
+## Assignment 1 Connection
+
+**Use these skills in your blog post:**
+
+- Load pedestrian sensor locations
+- Create catchment buffers
+- Spatial join with SA2
+- Calculate coverage statistics
+- Create professional maps
+- Write functions for your analysis
+
+## Summary
+
+::: {.incremental}
+* **CRS is critical** - always use NZTM for NZ
+* **Spatial operations**: buffer, intersect, union, difference
+* **Spatial joins**: Join based on location, not attributes
+* **Measurements**: Distance and area (need projected CRS!)
+* **Functions**: Make your code reusable
+* **Real analysis**: Combine tools for insights
+:::
+
+## Next Week
+
+**Week 6: Shiny for Python**
+
+::: {.incremental}
+* Guest lecture on transport accessibility (Alex Raichev)
+* From static to interactive
+* Building your first dashboard
+* Assignment 2 begins
+:::
+
+## Resources
+
+* GeoPandas documentation: geopandas.org
+* Shapely documentation: shapely.readthedocs.io
+* Python GIS book: automating-gis-processes.github.io
+* CRS reference: epsg.io
+
+## Thanks! <br> Q & A {style="text-align: center;"}
+
+<div style="width:840px"><iframe allow="fullscreen" frameBorder="0" height="480" src="https://giphy.com/embed/3o7aD2saalBwwftBIY/video" width="840"></iframe></div>

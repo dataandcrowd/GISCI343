@@ -1,0 +1,735 @@
+---
+title: "Production Quality Python Packages"
+subtitle: ": CI/CD, PyPI, and the Poster Showcase"
+date: 05/20/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+## Recap of Previous Lectures
+
+* Testing with pytest
+* Documentation with docstrings
+* Publishing to TestPyPI
+* Week 10 deliverable (5%)
+
+## Today's Lecture
+
+::: {.incremental}
+* Complete package walkthrough
+* **<span style="color:blue">CI/CD</span>** with GitHub Actions
+* Publishing to **<span style="color:blue">real PyPI</span>**
+* **<span style="color:blue">Poster design</span>** for showcase
+* Assignment 3 final requirements
+:::
+
+## Assignment 3 Timeline
+
+::: {style="font-size: 90%;"}
+**<span style="color:blue">Week 11 (This week)</span>**:
+- Polish your package
+- Set up CI/CD (optional)
+- Design poster
+- Optional: Publish to real PyPI
+
+**<span style="color:blue">Week 12 (Next week)</span>**:
+- **<span style="color:red">Thursday 5 June: Assignment 3 due (30%)</span>**
+- **<span style="color:red">Thursday 5 June: Poster showcase (10%)</span>**
+- Total: **<span style="color:red">40% of final grade</span>**
+:::
+
+# Part 1: Complete Package Example
+
+## Auckland GIS Toolkit
+
+**<span style="color:blue">Real-world package structure</span>**
+
+::: {style="font-size: 85%;"}
+```
+auckland-gis/
+├── .github/
+│   └── workflows/
+│       └── test.yml           # CI/CD
+├── src/
+│   └── auckland_gis/
+│       ├── __init__.py
+│       ├── data.py            # Data loading
+│       ├── metrics.py         # Calculations
+│       └── viz.py             # Visualizations
+├── tests/
+│   ├── test_data.py
+│   ├── test_metrics.py
+│   └── test_viz.py
+├── examples/
+│   └── usage_example.ipynb
+├── LICENSE
+├── pyproject.toml
+└── README.md
+```
+:::
+
+## Key Functions Overview
+
+::: {style="font-size: 90%;"}
+**<span style="color:blue">data.py</span>**
+- `load_sa2()` - Load Auckland boundaries
+- `validate_join()` - Safe spatial joins
+
+**<span style="color:blue">metrics.py</span>**
+- `calculate_density()` - Population density
+- `calculate_accessibility()` - Proximity analysis
+
+**<span style="color:blue">viz.py</span>**
+- `create_choropleth()` - Standard maps
+:::
+
+## Function 1: Load SA2 with Validation
+
+::: {style="font-size: 70%;"}
+```python
+# src/auckland_gis/data.py
+import geopandas as gpd
+from pathlib import Path
+import warnings
+
+def load_sa2(path=None, validate=True):
+    """
+    Load Auckland SA2 boundaries.
+    
+    Parameters
+    ----------
+    path : str, optional
+        Path to SA2 file. If None, downloads from repository.
+    validate : bool, default True
+        Whether to validate CRS and geometry
+    
+    Returns
+    -------
+    GeoDataFrame
+        SA2 boundaries in NZTM (EPSG:2193)
+    """
+    if path is None:
+        path = _download_sa2_boundaries()
+    
+    gdf = gpd.read_file(path)
+    
+    if validate:
+        gdf = _validate_sa2(gdf)
+    
+    return gdf
+
+def _validate_sa2(gdf):
+    """Validate SA2 GeoDataFrame."""
+    # Check CRS
+    if gdf.crs != 'EPSG:2193':
+        warnings.warn(f"Converting from {gdf.crs} to EPSG:2193")
+        gdf = gdf.to_crs('EPSG:2193')
+    
+    # Check required columns
+    required = ['SA2_code', 'SA2_name', 'geometry']
+    missing = set(required) - set(gdf.columns)
+    if missing:
+        raise ValueError(f"Missing columns: {missing}")
+    
+    return gdf
+```
+:::
+
+## Function 2: Safe Joins with Reporting
+
+::: {style="font-size: 70%;"}
+```python
+def validate_join(gdf, df, key, how='left'):
+    """
+    Join DataFrames with validation reporting.
+    
+    Returns
+    -------
+    result : GeoDataFrame
+        Joined GeoDataFrame
+    report : dict
+        Validation report with match statistics
+    """
+    # Check for duplicates
+    duplicates = df[key].duplicated()
+    if duplicates.any():
+        dup_keys = df.loc[duplicates, key].tolist()
+        raise ValueError(f"Duplicate keys: {dup_keys[:5]}")
+    
+    # Store original keys
+    left_keys = set(gdf[key].unique())
+    right_keys = set(df[key].unique())
+    
+    # Perform join
+    result = gdf.merge(df, on=key, how=how)
+    
+    # Generate report
+    unmatched = left_keys - right_keys
+    report = {
+        'all_matched': len(unmatched) == 0,
+        'unmatched_count': len(unmatched),
+        'unmatched_keys': sorted(list(unmatched)),
+    }
+    
+    return result, report
+```
+:::
+
+## Example Usage
+
+::: {style="font-size: 85%;"}
+```python
+from auckland_gis import (
+    load_sa2,
+    validate_join,
+    calculate_density,
+    create_choropleth
+)
+import pandas as pd
+
+# Load boundaries
+sa2 = load_sa2()
+
+# Load census
+census = pd.read_csv('census_2023.csv')
+
+# Safe join with reporting
+result, report = validate_join(sa2, census, key='SA2_code')
+
+if not report['all_matched']:
+    print(f"⚠️  {report['unmatched_count']} zones missing data")
+
+# Calculate density
+result = calculate_density(result)
+
+# Create map
+fig, ax = create_choropleth(result, column='density')
+```
+:::
+
+# Part 2: CI/CD with GitHub Actions
+
+## What is CI/CD?
+
+<div id="contentframe" style="position:absolute; top: 250px; left: 50px;">
+<iframe src="https://giphy.com/embed/3oKIPnAiaMCws8nOsE" width="350" height="250" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+</div>
+
+::: {style="position:absolute; top: 280px; left: 450px;"}
+**<span style="color:blue">CI/CD =</span>**
+
+**<span style="color:blue">Continuous Integration</span>**
+- Automatically test code
+
+**<span style="color:blue">Continuous Deployment</span>**
+- Automatically deploy
+
+**<span style="color:blue">Benefits:</span>**
+- Catch bugs early
+- Ensure quality
+- Automate boring tasks
+:::
+
+## GitHub Actions Workflow
+
+**<span style="color:blue">Create</span>** `.github/workflows/test.yml`:
+
+::: {style="font-size: 70%;"}
+```yaml
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install uv
+      run: pip install uv
+    
+    - name: Install dependencies
+      run: uv pip install -e ".[dev]"
+    
+    - name: Run tests
+      run: uv run pytest --cov=auckland_gis
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+```
+:::
+
+## What This Does
+
+::: {.incremental}
+* **<span style="color:blue">Runs on every push</span>** to main/develop
+* **<span style="color:blue">Tests on 3 operating systems</span>** (Ubuntu, Windows, macOS)
+* **<span style="color:blue">Tests on 3 Python versions</span>** (3.10, 3.11, 3.12)
+* **<span style="color:blue">Runs all tests</span>** automatically
+* **<span style="color:blue">Reports coverage</span>** to Codecov
+* **<span style="color:blue">Shows status badge</span>** on GitHub
+:::
+
+## Status Badges
+
+**<span style="color:blue">Add to your README.md:</span>**
+
+::: {style="font-size: 90%;"}
+```markdown
+# Auckland GIS Toolkit
+
+[![Tests](https://github.com/yourusername/auckland-gis/workflows/Tests/badge.svg)](https://github.com/yourusername/auckland-gis/actions)
+[![codecov](https://codecov.io/gh/yourusername/auckland-gis/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/auckland-gis)
+[![PyPI version](https://badge.fury.io/py/auckland-gis.svg)](https://pypi.org/project/auckland-gis/)
+
+Reusable utilities for Auckland urban analytics.
+```
+:::
+
+![](https://github.com/geopandas/geopandas/raw/main/doc/source/_static/geopandas_logo.png){fig-align=center width=40%}
+
+## Pre-commit Hooks
+
+**<span style="color:blue">Automatic code formatting</span>**
+
+::: {style="font-size: 85%;"}
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.13
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+```
+
+**Install:**
+```bash
+pip install pre-commit
+pre-commit install
+```
+:::
+
+## Your Turn: Set Up CI/CD
+
+::: {style="font-size: 110%;"}
+**<span style="color:blue">Task</span>** (Optional but encouraged):
+
+1. Create `.github/workflows/test.yml`
+2. Copy the workflow code
+3. Push to GitHub
+4. Check Actions tab
+5. Add badge to README
+
+**Time**: 15 minutes
+:::
+
+# Part 3: Publishing to Real PyPI
+
+## TestPyPI → Real PyPI
+
+::: {style="font-size: 90%;"}
+**<span style="color:blue">You've practiced with TestPyPI</span>**
+
+Now it's time for the **<span style="color:red">real thing</span>**!
+
+::: {.incremental}
+* **Permanent** - Can't delete
+* **Visible to everyone**
+* **Anyone can install**
+* **Part of your portfolio**
+* **Shows on your CV!**
+:::
+:::
+
+## Pre-Publication Checklist {.smaller}
+
+::: {style="font-size: 80%;"}
+**Code:**
+- [ ] All tests passing
+- [ ] Coverage >80%
+- [ ] No linting errors
+
+**Documentation:**
+- [ ] README complete
+- [ ] All functions documented
+- [ ] Examples working
+- [ ] CHANGELOG updated
+
+**Metadata:**
+- [ ] Version number correct (≥1.0.0)
+- [ ] Dependencies accurate
+- [ ] License file present
+- [ ] Classifiers appropriate
+
+**Testing:**
+- [ ] Tested in fresh environment
+- [ ] All examples work
+:::
+
+## Create PyPI Account
+
+::: {.incremental}
+1. Visit **<span style="color:blue">https://pypi.org/account/register/</span>**
+2. Use professional email
+3. **<span style="color:red">Enable 2FA</span>** (required!)
+4. Generate API token
+5. Scope: Project-specific (safer)
+:::
+
+## Publishing to PyPI
+
+::: {style="font-size: 90%;"}
+```bash
+# 1. Clean old builds
+rm -rf dist/
+
+# 2. Check version is unique
+grep "version" pyproject.toml
+
+# 3. Run tests one last time
+uv run pytest
+
+# 4. Build
+uv build
+
+# 5. Publish to real PyPI
+export UV_PUBLISH_TOKEN=pypi-YOUR_TOKEN
+uv publish
+
+# ✓ Successfully published to PyPI!
+```
+:::
+
+## Semantic Versioning
+
+**<span style="color:blue">Format</span>**: `MAJOR.MINOR.PATCH`
+
+::: {style="font-size: 90%;"}
+```
+1.2.3
+│ │ └─ Patch: Bug fixes
+│ └─── Minor: New features
+└───── Major: Breaking changes
+```
+
+**Examples:**
+- `0.1.0` → `0.1.1`: Fixed bug
+- `0.1.1` → `0.2.0`: Added feature
+- `0.2.0` → `1.0.0`: Changed API (breaking)
+:::
+
+## Maintaining Your Package
+
+::: {.incremental}
+* **<span style="color:blue">Respond to issues</span>** - Help users
+* **<span style="color:blue">Update dependencies</span>** - Keep secure
+* **<span style="color:blue">Fix bugs</span>** - Release patches
+* **<span style="color:blue">Add features</span>** - Minor versions
+* **<span style="color:blue">Document changes</span>** - CHANGELOG.md
+:::
+
+# Part 4: Poster Showcase
+
+## Poster Requirements
+
+**<span style="color:red">Due: Thursday 5 June (10% of grade)</span>**
+
+::: {style="font-size: 90%;"}
+**Format:**
+- **<span style="color:blue">A1 size</span>** (594mm × 841mm)
+- **<span style="color:blue">Portrait</span>** orientation
+- **<span style="color:blue">PDF</span>** for printing
+
+**Content:**
+- Package name and purpose
+- Key features
+- Code examples
+- Visual outputs
+- PyPI URL + QR code
+- Your contact info
+:::
+
+## Poster Layout Example {.smaller}
+
+::: {style="font-size: 75%;"}
+```
+┌─────────────────────────────────────────┐
+│  Micromobility Analytics Toolkit        │ ← Big title
+│  Your Name - University of Auckland     │
+├─────────────────────────────────────────┤
+│ THE PROBLEM                             │
+│ • E-scooters lack analysis tools        │
+│ • Trip data is messy                    │
+│ • Need standardized metrics             │
+├────────────────┬────────────────────────┤
+│  KEY FEATURES  │   CODE EXAMPLE         │
+│ • Trip process │ from micromobility...  │
+│ • Geofencing   │ trips = process_...    │
+│ • OD flows     │ flows = od_flows...    │
+├────────────────┴────────────────────────┤
+│  [Large visualization - map/chart]      │
+│                                          │
+├──────────────────────────────────────────┤
+│ APPLICATIONS        LINKS                │
+│ • Urban planning   [QR to PyPI]         │
+│ • Policy eval      your.email@...       │
+└──────────────────────────────────────────┘
+```
+:::
+
+## Design Tips
+
+::: {.incremental}
+* **<span style="color:blue">Large fonts</span>** - Readable from 2m (titles: 72pt+)
+* **<span style="color:blue">High contrast</span>** - Dark text on light background
+* **<span style="color:blue">White space</span>** - Don't cram everything in
+* **<span style="color:blue">One main message</span>** - What's the key point?
+* **<span style="color:blue">Visual hierarchy</span>** - Guide the eye
+:::
+
+## QR Code for PyPI
+
+**<span style="color:blue">Generate at</span>**: qr-code-generator.com
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/330px-QR_code_for_mobile_English_Wikipedia.svg.png){fig-align=center width=30%}
+
+**<span style="color:blue">Links to your PyPI package!</span>**
+
+## 2-Minute Pitch
+
+::: {style="font-size: 90%;"}
+**<span style="color:blue">Structure</span>**:
+
+1. **Hook** (15s) - Problem statement
+2. **Problem** (15s) - Why it matters
+3. **Solution** (30s) - Your package
+4. **Demo** (45s) - Code + results
+5. **Impact** (15s) - Who benefits
+
+**Tips:**
+- Practice timing
+- Don't read from poster
+- Make eye contact
+- Show enthusiasm!
+:::
+
+## Printing Your Poster
+
+::: {style="font-size: 90%;"}
+**<span style="color:blue">University Print Centre</span>**:
+- Website: printcentre.auckland.ac.nz
+- Cost: ~$25-30 for A1 colour
+- Turnaround: 24-48 hours
+- **<span style="color:red">Print by: 4 June</span>**
+
+**Backup**: Bring PDF on USB to showcase
+:::
+
+## Your Turn: Start Poster Design
+
+::: {style="font-size: 110%;"}
+**<span style="color:blue">Task</span>**: Create poster outline
+
+1. Choose package topic
+2. List key features (3-5)
+3. Select best visualization
+4. Draft main message
+5. Sketch layout on paper
+
+**Time**: 20 minutes
+:::
+
+# Assignment 3 Requirements
+
+## What to Submit (30% of Grade)
+
+**<span style="color:red">Due: Thursday 5 June, 5pm</span>**
+
+::: {style="font-size: 85%;"}
+**1. Published to PyPI**
+- Accessible at pypi.org
+- Installable via `pip install`
+
+**2. GitHub Repository**
+- Complete src/ layout
+- Tests (>80% coverage)
+- Professional README
+- MIT or similar license
+
+**3. Documentation**
+- Docstrings for all functions
+- Installation guide
+- Usage examples
+- API reference
+
+**4. Example Notebook**
+- Demonstrates key features
+- Real urban analytics
+- Clear, reproducible
+:::
+
+---
+
+### What to Submit (continued)
+
+::: {style="font-size: 85%;"}
+**5. Brief Report** (1-2 pages)
+- Package functionality
+- Design decisions
+- Potential applications
+- Challenges and solutions
+
+**Plus: Poster Showcase (10%)**
+- A1 poster printed
+- 2-minute pitch prepared
+:::
+
+## Evaluation Rubric {.smaller}
+
+::: {style="font-size: 75%;"}
+| Criterion | Weight | Excellent | Good | Adequate |
+|-----------|--------|-----------|------|----------|
+| **Code Quality** | 10% | Clean, organized, PEP 8 | Minor issues | Messy |
+| **Documentation** | 10% | Comprehensive | Complete | Basic |
+| **Testing** | 8% | >90% coverage | >80% coverage | >70% |
+| **Publication** | 2% | Works perfectly | Minor issues | Published |
+
+**Total Assignment 3: 30%**
+**Poster Showcase: 10%**
+**Combined: 40% of final grade**
+:::
+
+## Package Ideas
+
+::: {style="font-size: 90%;"}
+**Recommended:**
+- **<span style="color:blue">Micromobility toolkit</span>** - E-scooter analysis
+- **<span style="color:blue">Accessibility calculator</span>** - 15-minute city
+- **<span style="color:blue">Pedestrian analytics</span>** - Flow analysis
+- **<span style="color:blue">Network utilities</span>** - Street analysis
+- **<span style="color:blue">Urban form metrics</span>** - Morphology
+
+**Build on your assignments!**
+:::
+
+## Timeline for Success
+
+::: {style="font-size: 85%;"}
+**Week 11 (This week):**
+- [ ] Finalize package code
+- [ ] Add all tests (>80%)
+- [ ] Write documentation
+- [ ] Design poster
+- [ ] Optional: Publish to real PyPI
+
+**Week 12 (Next week):**
+- [ ] Final testing
+- [ ] Print poster
+- [ ] Practice pitch
+- [ ] Submit everything
+- [ ] Showcase presentation!
+:::
+
+## Summary
+
+::: {.incremental}
+* Complete package examples
+* CI/CD with GitHub Actions
+* Publishing to real PyPI
+* Poster design and showcase
+* Assignment 3 + Poster = 40%
+:::
+
+## Next Week
+
+**<span style="color:blue">Week 12: Final Week</span>**
+
+::: {.incremental}
+* King's Birthday (public holiday)
+* Labs operate normally
+* Assignment 3 due Thursday
+* **<span style="color:red">Poster Showcase Thursday!</span>**
+* Celebrate your achievements! 🎉
+:::
+
+## Tips for Final Week
+
+::: {.incremental}
+* **<span style="color:blue">Start poster early</span>** - Don't wait!
+* **<span style="color:blue">Test in fresh environment</span>** - Does it install?
+* **<span style="color:blue">Practice your pitch</span>** - Time yourself
+* **<span style="color:blue">Help each other</span>** - Review each other's work
+* **<span style="color:blue">Be proud!</span>** - You're publishing real software
+:::
+
+## Resources
+
+* GitHub Actions: docs.github.com/actions
+* PyPI Help: pypi.org/help
+* Semantic Versioning: semver.org
+* Poster design: canva.com (free templates)
+
+## You're Almost There!
+
+<div id="contentframe" style="position:absolute; top: 250px; left: 200px;">
+<iframe src="https://giphy.com/embed/3o7abKhOpu0NwenH3O" width="400" height="300" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+</div>
+
+::: {style="position:absolute; top: 580px; left: 100px; font-size: 120%;"}
+**<span style="color:blue">One more week until you're published Python package authors!</span>**
+:::
+
+## Thanks! <br> Q & A {style="text-align: center;"}
+
+**See you next week for the showcase!**
+
+<div style="width:840px"><iframe allow="fullscreen" frameBorder="0" height="480" src="https://giphy.com/embed/g9582DNuQppxC/video" width="840"></iframe></div>

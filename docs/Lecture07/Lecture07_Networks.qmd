@@ -1,0 +1,725 @@
+---
+title: "Network Analysis + Dashboard Work Session"
+subtitle: ": OSMnx, Routing, and Shiny Integration"
+date: 04/22/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+## Note: ANZAC Week
+
+* **Thursday 24 April**: ANZAC Day (Public Holiday)
+* **No formal lecture** on Tuesday
+* **Labs run as normal** - work session for Assignment 2
+* **Today**: Network analysis tools for your dashboards
+
+## Recap of Previous Lectures
+
+* GeoPandas and spatial operations
+* Shiny for Python basics
+* Reactive programming
+* Your first dashboards
+
+## Today's Focus
+
+::: {.incremental}
+* **Part 1**: Network analysis with OSMnx (45 mins)
+* **Part 2**: Routing with r5py (35 mins)
+* **Part 3**: Integrating into Shiny dashboards (30 mins)
+* **Remainder**: Assignment 2 work time
+:::
+
+## Assignment 2 Status Check
+
+**Due**: 8 May (Week 8)
+
+**Have you:**
+- ✅ Chosen your topic?
+- ✅ Created basic Shiny structure?
+- ✅ Added at least one input and output?
+- ✅ Started data collection/processing?
+
+**Today**: Add network analysis component!
+
+# Part 1: Network Analysis with OSMnx
+
+## What is a Street Network?
+
+![](https://geoffboeing.com/wp-content/uploads/2016/11/osmnx-street-network.png){fig-align=center}
+
+::: {style="font-size: 85%;"}
+**Graph Theory**:
+- **Nodes** (intersections, dead ends)
+- **Edges** (street segments)
+- **Attributes** (length, speed limit, one-way)
+:::
+
+## Why OSMnx?
+
+**OSMnx** = OpenStreetMap + NetworkX
+
+::: {.incremental}
+* Download street networks from anywhere
+* Analyze network topology
+* Calculate routes
+* Visualize networks
+* **Free and open source!**
+:::
+
+## Installing OSMnx
+
+```python
+# In Colab
+!pip install osmnx
+
+# Import
+import osmnx as ox
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Configure
+ox.settings.use_cache = True
+ox.settings.log_console = True
+```
+
+## Downloading a Network
+
+```python
+# Download Auckland CBD street network
+place = "Auckland CBD, New Zealand"
+
+# Get walking network
+G = ox.graph_from_place(
+    place,
+    network_type='walk'  # 'walk', 'bike', 'drive', 'all'
+)
+
+# Plot
+fig, ax = ox.plot_graph(G, 
+                         node_size=10,
+                         node_color='red',
+                         edge_color='grey',
+                         edge_linewidth=0.5)
+```
+
+## Network Types
+
+::: {style="font-size: 85%;"}
+```python
+# Different network types for different analyses
+G_walk = ox.graph_from_place(place, network_type='walk')
+G_bike = ox.graph_from_place(place, network_type='bike')
+G_drive = ox.graph_from_place(place, network_type='drive')
+G_all = ox.graph_from_place(place, network_type='all')
+```
+
+**Choose based on your analysis:**
+- **Pedestrian accessibility** → `'walk'`
+- **Cycling infrastructure** → `'bike'`
+- **Vehicle routing** → `'drive'`
+- **General network** → `'all'`
+:::
+
+## Alternative: Bounding Box
+
+```python
+# Download by bounding box
+north = -36.83
+south = -36.87
+east = 174.78
+west = 174.75
+
+G = ox.graph_from_bbox(
+    north, south, east, west,
+    network_type='walk'
+)
+
+# Or by distance from point
+point = (-36.8485, 174.7633)  # Sky Tower
+G = ox.graph_from_point(
+    point,
+    dist=1000,  # 1km radius
+    network_type='walk'
+)
+```
+
+## Network Statistics
+
+```python
+# Basic statistics
+stats = ox.basic_stats(G)
+
+print(f"Nodes: {stats['n']}")
+print(f"Edges: {stats['m']}")
+print(f"Total length: {stats['total_edge_length']/1000:.2f} km")
+print(f"Average degree: {stats['k_avg']:.2f}")
+
+# More detailed stats
+stats_extended = ox.extended_stats(G)
+print(f"Average street length: {stats_extended['street_length_avg']:.1f}m")
+print(f"Intersection count: {stats_extended['intersection_count']}")
+```
+
+## Network Centrality
+
+**Betweenness centrality**: Which streets are most important?
+
+```python
+# Calculate betweenness centrality
+bc = nx.betweenness_centrality(G, weight='length')
+
+# Add to edges
+for u, v, k in G.edges(keys=True):
+    G.edges[u, v, k]['betweenness'] = bc.get((u, v), 0)
+
+# Get edge colors based on betweenness
+ec = ox.plot.get_edge_colors_by_attr(
+    G, 'betweenness', cmap='plasma'
+)
+
+# Plot
+fig, ax = ox.plot_graph(G, edge_color=ec, 
+                         node_size=0, edge_linewidth=1.5)
+```
+
+::: {.callout-note}
+**High betweenness** = many shortest paths pass through it = important for connectivity
+:::
+
+## Closeness Centrality
+
+**How accessible is each intersection?**
+
+```python
+# Closeness centrality
+cc = nx.closeness_centrality(G, distance='length')
+
+# Get node colors
+nc = [cc[node] for node in G.nodes()]
+
+# Plot
+fig, ax = ox.plot_graph(G, 
+                         node_color=nc,
+                         node_size=30,
+                         cmap='YlOrRd',
+                         edge_color='grey',
+                         edge_linewidth=0.5)
+plt.title('Closeness Centrality (Accessibility)')
+plt.show()
+```
+
+## Your Turn: Download and Analyze
+
+::: {style="font-size: 110%;"}
+1. Download street network for your favourite suburb
+2. Calculate basic statistics
+3. Calculate betweenness centrality
+4. Create a visualization
+5. **Bonus**: Which street is most central?
+
+**Hint**: Use `ox.graph_from_place()` with place name
+:::
+
+# Part 2: Routing with r5py
+
+## Why r5py?
+
+**r5py** = Multi-modal transport routing
+
+::: {.incremental}
+* Purpose-built for transport analysis
+* **Much faster** than OSMnx for routing
+* Multi-modal (walk + bike + transit)
+* Time-dependent routing
+* Travel time matrices
+:::
+
+## Installing r5py
+
+```python
+# Requires Java JDK 11+
+!apt-get install -y openjdk-11-jdk-headless
+
+# Install r5py
+!pip install r5py
+
+# Import
+import r5py
+from r5py import TransportMode, LegMode
+from datetime import datetime
+```
+
+## Setting Up r5py
+
+```python
+# Download OSM extract for Auckland
+# From: https://download.geofabrik.de/australia-oceania.html
+
+# Initialize transport network
+transport_network = r5py.TransportNetwork(
+    "auckland.osm.pbf",
+    [  # Optional: GTFS feeds for public transport
+        "at-gtfs.zip"
+    ]
+)
+```
+
+::: {.callout-tip}
+Download OSM extract from Geofabrik: geofabrik.de
+:::
+
+## Simple Route Calculation
+
+```python
+# Origin and destination
+origin = (-36.8485, 174.7633)  # Sky Tower
+destination = (-36.8447, 174.7680)  # University
+
+# Calculate travel time
+travel_time_calculator = r5py.TravelTimeMatrixComputer(
+    transport_network,
+    origins=[origin],
+    destinations=[destination],
+    departure_time=datetime(2025, 4, 22, 9, 0),  # 9am
+    transport_modes=[LegMode.WALK]
+)
+
+# Get result
+travel_times = travel_time_calculator.compute_travel_times()
+print(f"Walking time: {travel_times['travel_time'].iloc[0]} minutes")
+```
+
+## Multi-Modal Routing
+
+```python
+# Walk + transit
+travel_time_calculator = r5py.TravelTimeMatrixComputer(
+    transport_network,
+    origins=[origin],
+    destinations=[destination],
+    departure_time=datetime(2025, 4, 22, 9, 0),
+    transport_modes=[
+        LegMode.WALK,
+        LegMode.TRANSIT
+    ],
+    max_time=datetime.timedelta(minutes=60)
+)
+
+travel_times = travel_time_calculator.compute_travel_times()
+```
+
+## Travel Time Matrix
+
+**Calculate travel times to many destinations**
+
+```python
+# Many destinations (e.g., SA2 centroids)
+origins_gdf = gpd.read_file('residential_points.gpkg')
+destinations_gdf = gpd.read_file('sa2_centroids.gpkg')
+
+# Calculate matrix
+travel_time_calculator = r5py.TravelTimeMatrixComputer(
+    transport_network,
+    origins=origins_gdf[['geometry']],
+    destinations=destinations_gdf[['geometry']],
+    departure_time=datetime(2025, 4, 22, 9, 0),
+    transport_modes=[LegMode.WALK, LegMode.TRANSIT]
+)
+
+# Result: DataFrame with origin, destination, travel_time
+matrix = travel_time_calculator.compute_travel_times()
+```
+
+## Time-Dependent Routing
+
+**Different times = different travel times!**
+
+```python
+# Peak hour (8am)
+peak = r5py.TravelTimeMatrixComputer(
+    transport_network,
+    origins=[origin],
+    destinations=destinations_gdf[['geometry']],
+    departure_time=datetime(2025, 4, 22, 8, 0),  # 8am
+    transport_modes=[LegMode.TRANSIT]
+)
+
+# Off-peak (11am)
+offpeak = r5py.TravelTimeMatrixComputer(
+    transport_network,
+    origins=[origin],
+    destinations=destinations_gdf[['geometry']],
+    departure_time=datetime(2025, 4, 22, 11, 0),  # 11am
+    transport_modes=[LegMode.TRANSIT]
+)
+
+# Compare
+peak_times = peak.compute_travel_times()
+offpeak_times = offpeak.compute_travel_times()
+```
+
+## Accessibility Analysis
+
+```python
+# How many jobs can you reach in 30 minutes?
+jobs_gdf = gpd.read_file('employment_locations.gpkg')
+
+# From each residential area
+accessibility = []
+for idx, home in origins_gdf.iterrows():
+    # Calculate travel times
+    calc = r5py.TravelTimeMatrixComputer(
+        transport_network,
+        origins=[home.geometry],
+        destinations=jobs_gdf[['geometry']],
+        departure_time=datetime(2025, 4, 22, 9, 0),
+        transport_modes=[LegMode.WALK, LegMode.TRANSIT]
+    )
+    
+    times = calc.compute_travel_times()
+    
+    # Count reachable in 30 mins
+    reachable = times[times['travel_time'] <= 30]
+    accessibility.append(len(reachable))
+
+origins_gdf['jobs_30min'] = accessibility
+```
+
+## Your Turn: Routing
+
+::: {style="font-size: 110%;"}
+1. Calculate travel time from your home to university
+2. Try different departure times (8am vs 11am)
+3. Compare walk-only vs walk+transit
+4. **Bonus**: Calculate to multiple destinations
+
+**Note**: Requires OSM extract and Java setup
+:::
+
+# Part 3: Integrating with Shiny
+
+## Network Visualization in Shiny
+
+```python
+from shiny import App, ui, render
+import osmnx as ox
+
+app_ui = ui.page_fluid(
+    ui.h2("Auckland Street Networks"),
+    ui.input_select(
+        "network_type",
+        "Network Type:",
+        choices=["walk", "bike", "drive"]
+    ),
+    ui.output_plot("network_map")
+)
+
+def server(input, output, session):
+    @output
+    @render.plot
+    def network_map():
+        # Download network based on selection
+        G = ox.graph_from_place(
+            "Auckland CBD, New Zealand",
+            network_type=input.network_type()
+        )
+        
+        fig, ax = ox.plot_graph(G, 
+                                 node_size=5,
+                                 edge_linewidth=0.5,
+                                 figsize=(12, 12))
+        return fig
+
+app = App(app_ui, server)
+```
+
+## Interactive Centrality Analysis
+
+```python
+from shiny import reactive
+
+app_ui = ui.page_fluid(
+    ui.h2("Network Centrality Analysis"),
+    ui.input_select("measure", "Centrality Measure:",
+                    choices=["betweenness", "closeness", "degree"]),
+    ui.output_plot("centrality_map"),
+    ui.output_text("stats")
+)
+
+def server(input, output, session):
+    @reactive.calc
+    def network():
+        # Load network once
+        return ox.graph_from_place("Auckland CBD, New Zealand",
+                                   network_type='walk')
+    
+    @reactive.calc
+    def centrality():
+        G = network()
+        measure = input.measure()
+        
+        if measure == "betweenness":
+            return nx.betweenness_centrality(G, weight='length')
+        elif measure == "closeness":
+            return nx.closeness_centrality(G, distance='length')
+        else:  # degree
+            return dict(G.degree())
+    
+    @output
+    @render.plot
+    def centrality_map():
+        G = network()
+        c = centrality()
+        
+        # Color nodes by centrality
+        node_colors = [c[node] for node in G.nodes()]
+        
+        fig, ax = ox.plot_graph(G, node_color=node_colors,
+                                 node_size=30, cmap='plasma')
+        return fig
+```
+
+## Routing Dashboard Example
+
+```python
+app_ui = ui.page_sidebar(
+    ui.sidebar(
+        ui.input_text("origin", "Origin:", 
+                      value="Sky Tower, Auckland"),
+        ui.input_text("destination", "Destination:", 
+                      value="University of Auckland"),
+        ui.input_select("mode", "Mode:",
+                        choices=["walk", "bike", "drive"]),
+        ui.input_action_button("calculate", "Calculate Route")
+    ),
+    ui.output_plot("route_map"),
+    ui.output_text_verbatim("route_info")
+)
+
+def server(input, output, session):
+    @reactive.event(input.calculate)
+    def route():
+        # Geocode locations
+        orig = ox.geocode(input.origin())
+        dest = ox.geocode(input.destination())
+        
+        # Get network
+        G = ox.graph_from_point(orig, dist=2000, 
+                                network_type=input.mode())
+        
+        # Find nearest nodes
+        orig_node = ox.distance.nearest_nodes(G, orig[1], orig[0])
+        dest_node = ox.distance.nearest_nodes(G, dest[1], dest[0])
+        
+        # Calculate shortest path
+        route_nodes = nx.shortest_path(G, orig_node, dest_node,
+                                       weight='length')
+        
+        return G, route_nodes
+    
+    @output
+    @render.plot
+    def route_map():
+        G, route_nodes = route()
+        fig, ax = ox.plot_graph_route(G, route_nodes, 
+                                       route_linewidth=4,
+                                       node_size=0)
+        return fig
+```
+
+## Assignment 2 Network Integration Ideas
+
+::: {style="font-size: 90%;"}
+**Pedestrian Dashboard:**
+- Show walking routes between sensors
+- Calculate betweenness of sensor locations
+- Identify important pedestrian corridors
+
+**E-Scooter Analysis:**
+- Network connectivity of trip origins/destinations
+- Identify high-centrality locations for rebalancing
+- Route clustering analysis
+
+**Accessibility Dashboard:**
+- Travel time isochrones
+- Multi-modal routing options
+- Job accessibility maps
+
+**15-Minute City:**
+- Calculate accessibility scores
+- Identify underserved areas
+- Compare different transport modes
+:::
+
+## Performance Tips
+
+::: {style="font-size: 85%;"}
+**1. Cache network downloads**
+```python
+@reactive.calc
+def network():
+    # Only downloads once
+    return ox.graph_from_place(place, network_type='walk')
+```
+
+**2. Limit analysis area**
+```python
+# Don't download all of Auckland!
+G = ox.graph_from_point(center, dist=2000)  # 2km radius
+```
+
+**3. Save networks locally**
+```python
+# Save for reuse
+ox.save_graphml(G, "auckland_cbd_walk.graphml")
+
+# Load later
+G = ox.load_graphml("auckland_cbd_walk.graphml")
+```
+:::
+
+## Common Issues
+
+::: {style="font-size: 85%;"}
+**1. Geocoding failures**
+```python
+# Be specific with place names
+place = "Auckland CBD, Auckland, New Zealand"  # ✅
+place = "Auckland"  # ❌ Too vague
+```
+
+**2. Empty networks**
+```python
+# Check before using
+if len(G.nodes()) == 0:
+    print("No network found! Check location and network_type")
+```
+
+**3. Memory issues**
+```python
+# Large networks can crash Colab
+# Limit by distance or bbox
+G = ox.graph_from_point(center, dist=1000)  # Not dist=10000!
+```
+:::
+
+## Your Turn: Dashboard Component
+
+::: {style="font-size: 100%;"}
+**Build a simple network dashboard:**
+
+1. Create Shiny app with network type selector
+2. Download and display network
+3. Add centrality calculation
+4. Show statistics
+5. **Bonus**: Add route calculation
+
+**Time**: 30 minutes
+**Ask for help if stuck!**
+:::
+
+# Assignment 2 Work Session
+
+## Remaining Time
+
+**Use lab time for:**
+- Network analysis implementation
+- Dashboard refinement
+- Data processing
+- Visualization improvements
+- Testing and debugging
+
+**Get help from:**
+- Instructor
+- TAs
+- Classmates
+
+## Assignment 2 Checklist
+
+::: {style="font-size: 90%;"}
+**Week 7 Goals:**
+- [ ] Multi-page structure complete
+- [ ] Interactive map working
+- [ ] At least 3 input widgets
+- [ ] At least 3 output displays
+- [ ] Network analysis (if applicable)
+- [ ] Data processing functions created
+- [ ] Basic styling applied
+
+**Next week (Week 8):**
+- Final features
+- Testing
+- Deployment to shinylive
+- Polish and documentation
+:::
+
+## Tips for Success
+
+::: {.incremental}
+* **Start with working code**, then add features
+* **Test frequently** - don't wait until the end
+* **Keep it simple** - focus on functionality
+* **Document as you go** - explain your choices
+* **Ask for help early** - don't struggle alone
+:::
+
+## Summary
+
+::: {.incremental}
+* **OSMnx**: Download and analyze street networks
+* **Network metrics**: Betweenness, closeness, degree
+* **r5py**: Fast multi-modal routing
+* **Shiny integration**: Interactive network dashboards
+* **Assignment 2**: Use these tools effectively
+:::
+
+## Next Week
+
+**Week 8: Advanced Dashboards + Deployment**
+
+::: {.incremental}
+* Temporal analysis in dashboards
+* Shinylive deployment walkthrough
+* Assignment 2 finalization
+* Testing and debugging
+:::
+
+## Resources
+
+* OSMnx documentation: geoffboeing.com/publications/osmnx-paper
+* r5py documentation: r5py.readthedocs.io
+* NetworkX tutorial: networkx.org/documentation/stable/tutorial.html
+* Shiny for Python: shiny.posit.co/py
+
+## Thanks! <br> Q & A {style="text-align: center;"}
+
+**Work time now!**
+
+Get started on:
+- Network analysis for Assignment 2
+- Dashboard improvements
+- Data processing
+
+<div style="width:840px"><iframe allow="fullscreen" frameBorder="0" height="480" src="https://giphy.com/embed/3oKIPnAiaMCws8nOsE/video" width="840"></iframe></div>

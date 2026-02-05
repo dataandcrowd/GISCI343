@@ -1,0 +1,745 @@
+---
+title: "Advanced Shiny Dashboards"
+subtitle: ": Deployment and Polish for Assignment 2"
+date: 04/29/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format: 
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+## Recap of Previous Lectures
+
+* Shiny basics (UI + Server + App)
+* Network analysis with OSMnx
+* Routing with r5py
+* Reactive programming
+
+## Today's Lecture
+
+::: {.incremental}
+* Temporal analysis in dashboards
+* Advanced reactive patterns
+* **Shinylive deployment**
+* Assignment 2 final requirements
+* Debugging and testing
+:::
+
+## Assignment 2 Due This Week!
+
+**<span style="color:red">Due: Thursday 8 May, 5pm</span>**
+
+::: {.incremental}
+* Worth **35% of your final grade**
+* Must be deployed with shinylive
+* Multi-page dashboard
+* Interactive map required
+* Today we'll cover deployment!
+:::
+
+## What Makes a Good Dashboard?
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*6RvBKT8nFDz_T5dHZOPV2A.png){fig-align=center width=70%}
+
+::: {.incremental}
+* **Clear purpose** - What question does it answer?
+* **Intuitive interface** - Easy to understand
+* **Fast response** - No 30-second loading times!
+* **Good design** - Professional appearance
+:::
+
+# Part 1: Temporal Analysis
+
+## Working with Time Data
+
+```python
+import pandas as pd
+from datetime import datetime
+
+# Load pedestrian data
+df = pd.read_csv('pedestrian_counts.csv')
+
+# Convert to datetime
+df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+# Extract time components
+df['hour'] = df['timestamp'].dt.hour
+df['day_of_week'] = df['timestamp'].dt.day_name()
+df['month'] = df['timestamp'].dt.month
+df['is_weekend'] = df['day_of_week'].isin(['Saturday', 'Sunday'])
+```
+
+## Temporal Aggregation
+
+::: {style="font-size: 90%;"}
+```python
+# Hourly averages
+hourly_avg = df.groupby('hour')['count'].mean()
+
+# Daily patterns
+daily_avg = df.groupby('day_of_week')['count'].mean()
+
+# By sensor and hour
+pivot = df.pivot_table(
+    values='count',
+    index='hour',
+    columns='sensor_id',
+    aggfunc='mean'
+)
+```
+:::
+
+## Time Slider in Shiny
+
+::: {style="font-size: 80%;"}
+```python
+from shiny import ui, render, reactive
+import matplotlib.pyplot as plt
+
+app_ui = ui.page_fluid(
+    ui.h2("Temporal Patterns"),
+    ui.input_slider(
+        "hour",
+        "Hour of Day:",
+        min=0,
+        max=23,
+        value=12,
+        step=1
+    ),
+    ui.output_plot("hourly_plot")
+)
+
+def server(input, output, session):
+    @output
+    @render.plot
+    def hourly_plot():
+        # Filter by selected hour
+        hour_data = df[df['hour'] == input.hour()]
+        
+        # Create plot
+        fig, ax = plt.subplots(figsize=(10, 6))
+        hour_data.groupby('sensor_id')['count'].mean().plot(kind='bar', ax=ax)
+        ax.set_title(f"Average Counts at {input.hour()}:00")
+        ax.set_ylabel("Pedestrian Count")
+        return fig
+```
+:::
+
+## Date Range Selector
+
+::: {style="font-size: 85%;"}
+```python
+app_ui = ui.page_fluid(
+    ui.input_date_range(
+        "dates",
+        "Date Range:",
+        start="2024-01-01",
+        end="2024-12-31"
+    ),
+    ui.output_plot("time_series")
+)
+
+def server(input, output, session):
+    @reactive.calc
+    def filtered_data():
+        # Get date range
+        start, end = input.dates()
+        
+        # Filter data
+        mask = (df['timestamp'] >= start) & (df['timestamp'] <= end)
+        return df[mask]
+    
+    @output
+    @render.plot
+    def time_series():
+        data = filtered_data()
+        
+        # Daily aggregation
+        daily = data.groupby(data['timestamp'].dt.date)['count'].sum()
+        
+        fig, ax = plt.subplots(figsize=(12, 6))
+        daily.plot(ax=ax)
+        ax.set_title("Daily Pedestrian Counts")
+        return fig
+```
+:::
+
+## Your Turn: Temporal Dashboard
+
+::: {style="font-size: 110%;"}
+**<span style="color:blue">Task</span>**: Create a dashboard page with:
+
+1. Hour slider (0-23)
+2. Day of week selector
+3. Plot showing filtered data
+
+**Bonus**: Add weekend/weekday toggle
+:::
+
+# Part 2: Advanced Reactive Patterns
+
+## Reactive Calculations {.smaller}
+
+**<span style="color:blue">Problem</span>**: Expensive operations running multiple times
+
+```python
+# ❌ Bad - processes data twice!
+@output
+@render.plot
+def plot1():
+    data = process_large_dataset(input.filter())  # Slow!
+    return create_plot(data)
+
+@output
+@render.table
+def table1():
+    data = process_large_dataset(input.filter())  # Slow again!
+    return data
+```
+
+---
+
+### Solution: @reactive.calc
+
+::: {style="font-size: 85%;"}
+```python
+# ✅ Good - processes data once!
+@reactive.calc
+def processed_data():
+    """Process data once, use many times."""
+    return process_large_dataset(input.filter())
+
+@output
+@render.plot
+def plot1():
+    data = processed_data()  # Uses cached result
+    return create_plot(data)
+
+@output
+@render.table
+def table1():
+    data = processed_data()  # Same cached result
+    return data
+```
+:::
+
+## Reactive Events
+
+**<span style="color:blue">Problem</span>**: Update only on button click, not on every input change
+
+::: {style="font-size: 85%;"}
+```python
+app_ui = ui.page_fluid(
+    ui.input_text("location", "Location:"),
+    ui.input_numeric("radius", "Radius (m):", value=1000),
+    ui.input_action_button("go", "Calculate!", class_="btn-primary"),
+    ui.output_plot("map")
+)
+
+def server(input, output, session):
+    @reactive.event(input.go)  # Only when button clicked!
+    def analysis():
+        # This runs only when button clicked
+        # Not when location or radius change
+        return calculate_expensive_analysis(
+            input.location(),
+            input.radius()
+        )
+    
+    @output
+    @render.plot
+    def map():
+        result = analysis()
+        return create_map(result)
+```
+:::
+
+## Conditional Panels
+
+**<span style="color:blue">Show/hide UI based on selections</span>**
+
+::: {style="font-size: 80%;"}
+```python
+app_ui = ui.page_fluid(
+    ui.input_radio_buttons(
+        "analysis_type",
+        "Analysis Type:",
+        choices=["Simple", "Advanced"]
+    ),
+    
+    # Only show advanced options when "Advanced" selected
+    ui.panel_conditional(
+        "input.analysis_type === 'Advanced'",
+        ui.input_slider("buffer", "Buffer Distance:", 0, 2000, 500),
+        ui.input_checkbox("include_transit", "Include Transit", True)
+    ),
+    
+    ui.output_plot("result_map")
+)
+```
+:::
+
+## Dynamic UI
+
+**<span style="color:blue">Generate UI elements based on data</span>**
+
+::: {style="font-size: 85%;"}
+```python
+from shiny import ui, render
+
+@output
+@render.ui
+def dynamic_selectors():
+    # Get available sensors
+    sensors = get_sensors_for_date(input.date())
+    
+    return ui.input_select(
+        "sensor",
+        "Available Sensors:",
+        choices=sensors
+    )
+```
+:::
+
+## Progress Indicators
+
+::: {style="font-size: 85%;"}
+```python
+from shiny import ui, render, reactive
+
+@reactive.calc
+def long_calculation():
+    with ui.Progress(min=0, max=100) as p:
+        p.set(message="Loading data...")
+        data = load_data()
+        
+        p.set(25, message="Processing...")
+        processed = process_data(data)
+        
+        p.set(50, message="Analyzing...")
+        results = analyze(processed)
+        
+        p.set(75, message="Creating visualizations...")
+        viz = create_viz(results)
+        
+        p.set(100, message="Complete!")
+        return viz
+```
+:::
+
+# Part 3: Shinylive Deployment
+
+## What is Shinylive?
+
+<div id="contentframe" style="position:absolute; top: 250px; left: 50px;">
+<iframe src="https://giphy.com/embed/3o7qE1YN7aBOFPRw8E" width="300" height="200" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+</div>
+
+::: {style="position:absolute; top: 250px; left: 400px;"}
+**<span style="color:blue">Shinylive = Shiny in WebAssembly</span>**
+
+::: {.incremental}
+* Runs Python **in your browser**!
+* No server needed
+* **Free hosting** (GitHub Pages)
+* Works offline
+* Fast (no server round-trips)
+:::
+:::
+
+## Traditional vs Shinylive
+
+::: {style="font-size: 85%;"}
+**Traditional Shiny:**
+```
+User Browser → Network → Python Server → Network → Browser
+               (slow)        (costs $)      (slow)
+```
+
+**Shinylive:**
+```
+User Browser → WebAssembly Python → Browser
+               (all local, fast, free!)
+```
+:::
+
+## Requirements for Shinylive
+
+::: {.incremental}
+1. **Simple file structure** - No complex imports
+2. **Single file app** - Or well-organized multi-file
+3. **Supported packages** - Most work, some don't
+4. **Small data files** - < 5MB recommended
+5. **Browser compatible** - Modern browsers only
+:::
+
+## What Works in Shinylive? {.smaller}
+
+::: {style="font-size: 85%;"}
+**✅ Works great:**
+- pandas, numpy, matplotlib
+- geopandas, shapely
+- ipyleaflet (for maps!)
+- seaborn, plotly
+
+**⚠️ Limited or slow:**
+- Large file operations
+- Computationally intensive tasks
+- Database connections
+
+**❌ Doesn't work:**
+- osmnx (requires network access)
+- r5py (requires Java)
+- Some external APIs
+:::
+
+## Step 1: Prepare Your App
+
+::: {style="font-size: 90%;"}
+```python
+# app.py - Your complete app in one file
+
+from shiny import App, ui, render
+import pandas as pd
+import geopandas as gpd
+from ipyleaflet import Map, Marker
+
+# Load data (small files only!)
+data = pd.read_csv('pedestrian_data.csv')
+
+app_ui = ui.page_fluid(
+    ui.h2("My Dashboard"),
+    # ... your UI here
+)
+
+def server(input, output, session):
+    # ... your server logic here
+    pass
+
+app = App(app_ui, server)
+```
+:::
+
+## Step 2: Install Shinylive
+
+::: {style="font-size: 110%;"}
+```bash
+# In terminal/Colab
+pip install shinylive
+```
+
+**<span style="color:blue">That's it!</span>** 🎉
+:::
+
+## Step 3: Export Your App
+
+::: {style="font-size: 95%;"}
+```bash
+# Create shinylive export
+shinylive export myapp site
+
+# This creates:
+site/
+├── index.html
+├── edit/
+└── app files...
+```
+
+**<span style="color:blue">The `site` folder can be deployed anywhere!</span>**
+:::
+
+## Step 4: Test Locally
+
+::: {style="font-size: 100%;"}
+```bash
+# Serve locally to test
+python -m http.server --directory site 8000
+
+# Open browser to:
+# http://localhost:8000
+```
+
+**<span style="color:blue">Test everything works before deploying!</span>**
+:::
+
+## Step 5: Deploy to GitHub Pages
+
+::: {style="font-size: 85%;"}
+**Option 1: Manual deployment**
+1. Create GitHub repository
+2. Upload `site` folder contents
+3. Enable GitHub Pages in Settings
+4. URL: `https://yourusername.github.io/reponame`
+
+**Option 2: GitHub Actions (automated)**
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy Shinylive
+on: [push]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pip install shinylive
+      - run: shinylive export app site
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+```
+:::
+
+## Your Turn: Deploy Simple App
+
+::: {style="font-size: 110%;"}
+**<span style="color:blue">Task</span>**: Export and test your dashboard
+
+1. Save app as single `app.py` file
+2. Run `shinylive export app site`
+3. Test locally with `python -m http.server`
+4. If works, deploy to GitHub Pages
+
+**<span style="color:red">Due Thursday!</span>**
+:::
+
+## Common Deployment Issues
+
+::: {style="font-size: 85%;"}
+**Issue 1: File paths**
+```python
+# ❌ Wrong - absolute paths don't work
+pd.read_csv('/Users/me/data.csv')
+
+# ✅ Correct - relative paths
+pd.read_csv('data.csv')
+```
+
+**Issue 2: Large files**
+```python
+# ❌ Wrong - 50MB CSV in repo
+pd.read_csv('huge_file.csv')
+
+# ✅ Correct - Load from URL or pre-process
+pd.read_csv('https://example.com/data.csv')
+```
+:::
+
+---
+
+### Common Issues (continued)
+
+::: {style="font-size: 85%;"}
+**Issue 3: Package imports**
+```python
+# ❌ Wrong - packages not in shinylive
+import osmnx as ox
+
+# ✅ Correct - use supported packages
+import geopandas as gpd
+from ipyleaflet import Map
+```
+
+**Issue 4: External dependencies**
+```python
+# ❌ Wrong - requires Java
+import r5py
+
+# ✅ Correct - pre-calculate and save results
+results = pd.read_csv('precalculated_routes.csv')
+```
+:::
+
+# Part 4: Assignment 2 Final Requirements
+
+## Technical Requirements Checklist {.smaller}
+
+::: {style="font-size: 85%;"}
+**Must have:**
+- [ ] Multi-page structure (3+ pages)
+- [ ] Interactive map (ipyleaflet or folium)
+- [ ] At least 5 different input widgets
+- [ ] At least 5 different outputs (plots, tables, maps)
+- [ ] Reactive calculations (efficient code)
+- [ ] Temporal or comparative analysis
+- [ ] Professional styling
+- [ ] **Deployed with shinylive**
+
+**Bonus points:**
+- [ ] Network analysis integration
+- [ ] Advanced reactive patterns
+- [ ] Creative visualization
+- [ ] User-friendly interface
+:::
+
+## Design Requirements
+
+::: {.incremental}
+* **<span style="color:blue">Clear navigation</span>** - Easy to find features
+* **<span style="color:blue">Consistent layout</span>** - Similar pages look similar
+* **<span style="color:blue">Readable text</span>** - Good font sizes, contrast
+* **<span style="color:blue">Responsive feedback</span>** - Loading indicators
+* **<span style="color:blue">Error handling</span>** - Helpful messages
+:::
+
+## Evaluation Criteria
+
+::: {style="font-size: 85%;"}
+| Criterion | Weight | What we're looking for |
+|-----------|--------|------------------------|
+| **Functionality** | 40% | All features work, no crashes |
+| **Design** | 20% | Professional, intuitive, clear |
+| **Analysis** | 20% | Meaningful insights, good visualizations |
+| **Technical** | 15% | Clean code, efficient, well-structured |
+| **Deployment** | 5% | Works in shinylive, accessible |
+
+**Total: 35% of final grade**
+:::
+
+## Example: Excellent Dashboard
+
+![](https://shiny.posit.co/r/gallery/interactive-visualizations/crime-explorer/thumbnail.png){fig-align=center width=60%}
+
+::: {style="font-size: 85%;"}
+**Why it's good:**
+* Clear purpose and title
+* Intuitive controls on left
+* Large, clear visualization
+* Multiple linked views
+* Professional appearance
+:::
+
+## Testing Your Dashboard
+
+::: {style="font-size: 90%;"}
+**Before submission, test:**
+
+1. **All inputs work** - Try every slider, selector, button
+2. **All outputs update** - Check reactivity
+3. **Edge cases** - What if no data selected?
+4. **Different browsers** - Chrome, Firefox, Safari
+5. **Mobile view** - Does it work on phone?
+6. **Fresh eyes** - Ask a friend to try it
+:::
+
+## Debugging Tips {.smaller}
+
+::: {style="font-size: 85%;"}
+**<span style="color:blue">Use print statements</span>**
+```python
+@reactive.calc
+def filtered_data():
+    print(f"Filter called with: {input.sensor()}")  # Debug
+    data = filter_function()
+    print(f"Returned {len(data)} rows")  # Debug
+    return data
+```
+
+**<span style="color:blue">Check browser console</span>**
+* Right-click → Inspect → Console
+* Look for JavaScript errors
+
+**<span style="color:blue">Test components separately</span>**
+```python
+# Test your functions outside Shiny first
+data = pd.read_csv('test.csv')
+result = your_analysis_function(data)
+print(result)  # Does it work?
+```
+:::
+
+## Time Management
+
+::: {style="font-size: 90%;"}
+**<span style="color:red">Due in 2 days!</span>**
+
+**Today (Tuesday):**
+- Finalize all features
+- Test everything
+- Fix bugs
+
+**Wednesday:**
+- Polish design
+- Export with shinylive
+- Deploy to GitHub Pages
+- Test deployed version
+
+**Thursday morning:**
+- Final checks
+- Submit to Canvas
+:::
+
+## Getting Help
+
+::: {.incremental}
+* **<span style="color:blue">Office hours</span>**: Today and tomorrow
+* **<span style="color:blue">Ed discussion</span>**: Post questions
+* **<span style="color:blue">Lab sessions</span>**: TAs available
+* **<span style="color:blue">Classmates</span>**: Help each other (but don't copy!)
+:::
+
+## Summary
+
+::: {.incremental}
+* **Temporal analysis** - Time sliders, date ranges
+* **Reactive patterns** - `@reactive.calc`, `@reactive.event`
+* **Shinylive deployment** - Export, test, deploy
+* **Assignment 2** - Due Thursday, 35% of grade
+* **You can do this!** 🚀
+:::
+
+## Next Week
+
+**<span style="color:blue">Week 9: Python Package Development</span>**
+
+::: {.incremental}
+* Micromobility and urban analytics
+* Why package your code?
+* Building your first package
+* Assignment 3 begins (30% + 10% poster = 40%)
+:::
+
+## Final Tips for Assignment 2
+
+::: {.incremental}
+* **<span style="color:blue">Keep it simple</span>** - Working is better than fancy but broken
+* **<span style="color:blue">Test early, test often</span>** - Don't wait until Wednesday night!
+* **<span style="color:blue">Document your choices</span>** - Comment your code
+* **<span style="color:blue">Make it yours</span>** - Show creativity and insight
+* **<span style="color:blue">Have fun!</span>** - This is your chance to build something real
+:::
+
+## Resources
+
+* Shiny for Python: shiny.posit.co/py
+* Shinylive docs: shiny.posit.co/py/docs/shinylive.html
+* ipyleaflet: ipyleaflet.readthedocs.io
+* GitHub Pages: pages.github.com
+
+## Thanks! <br> Q & A {style="text-align: center;"}
+
+**Good luck with Assignment 2!**
+
+You've got this! 💪
+
+<div style="width:840px"><iframe allow="fullscreen" frameBorder="0" height="480" src="https://giphy.com/embed/3oz8xAFtqoOUUrsh7W/video" width="840"></iframe></div>
