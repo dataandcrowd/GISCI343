@@ -256,27 +256,37 @@ not (x < 6)             # False
 
 ## <span style="color:green;">Practice 1: Fill in the blanks</span>
 
-::: {style="font-size: 130%;"}
+::: {style="font-size: 120%;"}
 
 ```python
-# 1. Store the Sky Tower coordinates
-latitude = ____
-longitude = ____
+# 1. Store information about two Auckland landmarks
+sky_tower_lat = ____
+sky_tower_lon = 174.7633
+gallery_lat = -36.8567
+gallery_lon = ____
 
-# 2. Create a formatted message
-message = f"Sky Tower is at ({____}, {____})"
-print(message)
+# 2. What data types are these?
+name = "Sky Tower"
+height = 328
+is_tallest_in_nz = ____
 
-# 3. Calculate distance from origin (simplified)
-distance = (latitude**2 + longitude**2) ____ 0.5
-print(f"Distance from (0,0): {distance:.2f} degrees")
+print(type(name))       # ____
+print(type(height))     # ____
+print(type(is_tallest_in_nz))  # ____
+
+# 3. Calculate the difference in latitude and longitude
+diff_lat = gallery_lat ____ sky_tower_lat
+diff_lon = gallery_lon - sky_tower_lon
+print(f"Latitude difference: {diff_lat:.4f}")
+print(f"Longitude difference: {____:.4f}")
 ```
 
 :::
 
 ::: {.fragment}
-*Hint*: Sky Tower lat = -36.8485, lon = 174.7633. The missing operator raises to a power.
+*Hint*: Sky Tower lat = -36.8485, Art Gallery lon = 174.7722. The Sky Tower **is** the tallest structure in NZ.
 :::
+
 
 
 # Part 2: Lists
@@ -609,10 +619,10 @@ score = calculate_walkability(streets, amenities)
 ## Documentation
 * *Hang on, do I have to memorise everything?*
 * The answer is **NO**
+* LLMs (Yes, but please go back and examine retrospectively)
+* **Web book**: [https://dataandcrowd.github.io/python-gis/](https://pythongis.org/)
 * Visit https://www.python.org/doc
-* Google your problem (StackOverflow)
-* ChatGPT and Gemini (🧐)
-* **Web book**: [pythongis.org](https://pythongis.org/)
+* Google your problem
 
 
 ## Summary
