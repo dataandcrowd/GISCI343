@@ -50,9 +50,7 @@ include-in-header:
 - Merging DataFrames
 - Quick Visualisation
 
-::: notes
-Target: 60-70 minutes. Mix of toy examples for concepts and the Auckland pedestrian count data for applied work.
-:::
+
 
 
 ## What will we "really" cover this week?
@@ -194,12 +192,21 @@ When you fetch data from LINZ or OpenStreetMap APIs, you get dictionaries like t
 
 ## Your Turn (5 min)
 
-1. Create a dictionary with 3 Auckland pedestrian sensor names as keys and their average daily counts as values
-2. Use a `for` loop to print each sensor and its count
-3. Add a new sensor to the dictionary
-4. Check if `"Britomart"` exists in the dictionary
+The dictionary below has already been created for you:
 
----
+```python
+sensors = {
+    "Queen Street": 8500,
+    "Britomart": 6200,
+    "K Road": 3100
+}
+```
+
+1. Print the count for `"Queen Street"` using its key
+2. Add a new sensor: `"Wynyard Quarter"` with a count of `4800`
+3. Print all sensor names using `sensors.keys()`
+
+
 
 # Part 2: Getting Started with Pandas {style="text-align: center;"}
 
@@ -214,16 +221,15 @@ When you fetch data from LINZ or OpenStreetMap APIs, you get dictionaries like t
 
 ```python
 # Using pip
-pip install pandas openpyxl
+pip install pandas
 
 # Using conda
-conda install pandas openpyxl
+conda install pandas 
 
 # Using uv (recommended for this course)
-uv add pandas openpyxl
+uv add pandas 
 ```
 
-`openpyxl` is needed to read `.xlsx` files.
 
 
 ## How Imports Work {.smaller}
@@ -371,7 +377,7 @@ We have **hourly pedestrian counts from 20 sensor locations** across Auckland CB
 ```python
 import pandas as pd
 
-ped = pd.read_excel('data/All pedestrian data day by hour 2024.xlsx')
+ped = pd.read_csv('https://raw.githubusercontent.com/dataandcrowd/GISCI343/refs/heads/main/pedestrians/akl_ped-2024.csv')
 print(ped.shape)
 ```
 
@@ -537,7 +543,7 @@ morning_peak = ped[ped['Time'].isin(['7:00-7:59', '8:00-8:59', '9:00-9:59'])]
 ```
 
 
-## Your Turn (5 min)
+## Your Turn (3 min)
 
 Using the pedestrian data:
 

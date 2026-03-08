@@ -1,0 +1,28 @@
+/* Existing logo adjustments */
+.reveal .slide-logo {
+  height: 100px !important;
+  width: 300px !important;
+  max-width: unset !important;
+  max-height: unset !important;
+}
+
+/* Reduce general text size */
+.reveal p {
+    font-size: 80% !important; /* Adjust percentage as needed */
+}
+
+/* Reduce bullet point text size */
+.reveal ul li {
+    font-size: 80% !important; /* Adjust as needed */
+}
+
+/* Adjust header sizes */
+.reveal h1 {
+    font-size: 140% !important;
+}
+.reveal h2 {
+    font-size: 120% !important;
+}
+.reveal h3 {
+    font-size: 100% !important;
+}
