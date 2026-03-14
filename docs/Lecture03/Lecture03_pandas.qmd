@@ -1,0 +1,707 @@
+---
+title: "DataFrames and Pandas"
+subtitle: ": From Dictionaries to Data Analysis"
+date: 2026-03-16
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format:
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Recap of Previous Lecture
+
+- Dictionaries
+- Introduction to `pandas`
+- Reading the Auckland pedestrian data
+
+
+## Today's Lecture
+
+- Exploring and filtering DataFrames
+- The importance of `.copy()`
+- Groupby and Aggregation
+- Reshaping data (Melt and Pivot)
+- Merging DataFrames
+- Quick Visualisation
+- GIS
+
+
+# Part 1: Selecting and Filtering {style="text-align: center;"}
+
+
+## Series vs DataFrame: Why the Brackets Matter {.smaller}
+
+Single brackets give you a **Series** (just the values, like a list with an index). Double brackets give you a **DataFrame** (a mini table that keeps the column header).
+
+```python
+df['name']          # Series
+df[['name']]        # DataFrame (one column, still a table)
+```
+
+The easiest way to see the difference is to run both and look at the output. A Series prints as a plain list of values. A DataFrame prints with the column name on top, like a table.
+
+
+## Grabbing Multiple Columns {.smaller}
+
+To grab two or more columns, put the names inside a list, which goes inside the brackets:
+
+```python
+df[['name', 'age']]   # DataFrame with two columns
+```
+
+You cannot do this with single brackets because single brackets only accept one column name (a string), not a list. So the pattern is always: **double brackets when you want columns back as a table**.
+
+A quick mental shortcut: if you are passing a **list** of column names, you need the outer brackets too, which is why you end up with two layers of brackets.
+
+
+## Selecting Columns
+
+```python
+# Single column (returns a Series)
+queen_st = ped['45 Queen Street']
+
+# Single column (returns a DataFrame)
+queen_st_df = ped[['45 Queen Street']]
+
+# Multiple columns
+subset = ped[['Date', 'Time', '45 Queen Street', '150 K Road']]
+```
+
+Single brackets `['col']` returns a Series; double brackets `[['col']]` returns a DataFrame.
+
+
+## `loc` and `iloc` {.smaller}
+
+- `.loc[]`: label-based selection
+- `.iloc[]`: integer position-based selection
+
+```python
+# iloc: by position
+ped.iloc[0:5, 0:4]  # First 5 rows, first 4 columns
+
+# loc: by label
+ped.loc[0:2, ['Date', 'Time', '45 Queen Street']]
+```
+
+Key difference:
+
+- `.iloc[0:3]` returns rows 0, 1, 2 (excludes 3)
+- `.loc[0:3]` returns rows 0, 1, 2, 3 (includes 3)
+
+
+## Boolean Indexing (Filtering) {.smaller}
+
+Uses **conditionals** from last lecture:
+
+```python
+# Hours where Queen Street had > 500 pedestrians
+busy = ped[ped['45 Queen Street'] > 500]
+
+# Multiple conditions (AND) - use &
+both_busy = ped[
+    (ped['45 Queen Street'] > 500) &
+    (ped['150 K Road'] > 200)
+]
+
+# Multiple conditions (OR) - use |
+waterfront = ped[
+    (ped['107 Quay Street'] > 300) |
+    (ped['Te Ara Tahuhu Walkway'] > 300)
+]
+```
+
+
+## The `query()` Method {.smaller}
+
+Cleaner syntax for filtering (column names with spaces need backticks):
+
+```python
+ped.query('`45 Queen Street` > 500')
+
+# Multiple conditions
+ped.query('`45 Queen Street` > 500 and `150 K Road` > 200')
+
+# Using external variables with @
+threshold = 300
+ped.query('`107 Quay Street` > @threshold')
+```
+
+
+## Filtering by Date and Time {.smaller}
+
+```python
+# Ensure Date is datetime
+ped['Date'] = pd.to_datetime(ped['Date'])
+
+# Filter for March 2024
+march = ped[ped['Date'].dt.month == 3]
+
+# Weekdays only (Monday=0 to Friday=4)
+weekdays = ped[ped['Date'].dt.dayofweek < 5]
+
+# Morning peak hours
+morning_peak = ped[ped['Time'].isin(['7:00-7:59', '8:00-8:59', '9:00-9:59'])]
+```
+
+
+## Your Turn (3 min)
+
+Using the pedestrian data:
+
+1. Select only the `Date`, `Time`, and `45 Queen Street` columns
+2. Filter for rows where `45 Queen Street` > 300
+3. Filter for weekend data only (Saturday and Sunday)
+4. How many rows does each filter produce?
+
+---
+
+# Part 2: Don't Forget `.copy()` {style="text-align: center;"}
+
+
+## The Problem {.smaller}
+
+Assignment in Python creates a **reference**, not a copy:
+
+```python
+pandas_df_new = pandas_df   # NOT a copy!
+pandas_df_new['d'] = [13, 14, 15, 16]
+
+print(pandas_df)  # The original is also modified!
+```
+
+```
+   a  b   d
+0  1  5  13
+1  2  6  14
+2  3  7  15
+3  4  8  16
+```
+
+Both variables point to the **same object** in memory.
+
+
+## The Solution: `.copy()` {.smaller}
+
+```python
+pandas_df_new = pandas_df.copy()  # A true, independent copy
+pandas_df_new['d'] = [13, 14, 15, 16]
+
+print(pandas_df)      # Unchanged!
+print(pandas_df_new)  # Only this one has column 'd'
+```
+
+**Rule of thumb**: if you plan to modify a filtered or sliced DataFrame, always call `.copy()` first.
+
+```python
+# Safe pattern for working with subsets
+march_data = ped[ped['Date'].dt.month == 3].copy()
+march_data['total'] = march_data['45 Queen Street'] + march_data['150 K Road']
+```
+
+
+## Your Turn (3 min)
+
+1. Create a toy DataFrame: `pd.DataFrame({'a': [1,2,3,4], 'b': [5,6,7,8]})`
+2. Copy it using `.copy()` and assign as `pandas_df_new`
+3. Add a column `'c'` with values `[9, 10, 11, 12]` to the copy
+4. Print both DataFrames and confirm the original is unchanged
+
+---
+
+# Part 3: Manipulating Data {style="text-align: center;"}
+
+
+## Creating New Columns {.smaller}
+
+```python
+df = ped.copy()
+df['Date'] = pd.to_datetime(df['Date'])
+
+# Extract temporal features
+df['Month'] = df['Date'].dt.month
+df['DayOfWeek'] = df['Date'].dt.day_name()
+df['IsWeekend'] = df['Date'].dt.dayofweek >= 5
+
+# Extract the starting hour from the Time string
+df['Hour'] = df['Time'].str.split(':').str[0].astype(int)
+
+# Total pedestrians across all sensors
+location_cols = df.columns[2:22]
+df['Total'] = df[location_cols].sum(axis=1)
+```
+
+
+## Conditional Columns {.smaller}
+
+Using `.apply()` with a custom function:
+
+```python
+def time_of_day(hour):
+    if hour < 7:
+        return 'Early Morning'
+    elif hour < 10:
+        return 'Morning Peak'
+    elif hour < 16:
+        return 'Midday'
+    elif hour < 19:
+        return 'Evening Peak'
+    else:
+        return 'Night'
+
+df['Period'] = df['Hour'].apply(time_of_day)
+```
+
+Or using `np.where()` for binary classification:
+
+```python
+import numpy as np
+df['QueenSt_Busy'] = np.where(df['45 Queen Street'] > 300, 'Busy', 'Quiet')
+```
+
+---
+
+# Part 4: Groupby and Aggregation {style="text-align: center;"}
+
+
+## The Split-Apply-Combine Pattern {.smaller}
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiUr0NSceFvB3vYV39lO01DRDld0HGEONzBiPZZCGUUQ&s){width=100%}
+
+::: {style="font-size: 50%;"}
+Source: Soner Yildirim, Towards Data Science
+:::
+:::
+
+::: {.column width="15%"}
+
+:::
+
+::: {.column width="45%"}
+::: {style="font-size: 80%;"}
+
+- **Split** data into groups based on some criterion
+- **Apply** a function to each group independently
+- **Combine** the results into a new data structure
+
+:::
+:::
+
+::::
+
+
+## Basic Groupby {.smaller}
+
+```python
+# Average pedestrian count on Queen Street by day of week
+df.groupby('DayOfWeek')['45 Queen Street'].mean()
+```
+
+```
+DayOfWeek
+Friday       285.3
+Monday       270.1
+Saturday     310.5
+Sunday       195.2
+Thursday     278.9
+Tuesday      265.4
+Wednesday    272.8
+```
+
+
+## Multiple Aggregations {.smaller}
+
+```python
+# Multiple stats for one column
+df.groupby('DayOfWeek')['45 Queen Street'].agg(['mean', 'median', 'max', 'count'])
+
+# Different stats for different columns
+df.groupby('Period').agg({
+    '45 Queen Street': ['mean', 'max'],
+    '150 K Road': ['mean', 'max'],
+    '107 Quay Street': ['mean', 'max']
+}).round(1)
+```
+
+
+## Grouping by Multiple Variables
+
+```python
+# Average count by day of week AND time period
+cross_tab = df.groupby(['DayOfWeek', 'Period'])['45 Queen Street'].mean().round(1)
+
+# Unstack for readability (rows = days, columns = periods)
+cross_tab.unstack()
+```
+
+This is essentially a cross-tabulation: how does foot traffic vary by both day and time?
+
+
+## Your Turn (5 min)
+
+1. Calculate the average hourly count at `19 Shortland Street` by month
+2. Which month has the highest average?
+3. Calculate the total annual count for each of the 20 sensor locations. You will notice that the top three sensors are all located on the same street. **Add together the street numbers of these locations.**
+4. Which location is the busiest? Which code gives you the answer sorted from highest to lowest?
+
+
+# Part 5: Reshaping Data {style="text-align: center;"}
+
+
+## Wide vs Long: Why Does It Matter? {.smaller}
+
+**Wide format** is what most people are used to: each variable gets its own column. Think of a spreadsheet where columns are `2021_pop`, `2022_pop`, `2023_pop`. Easy to read as a human.
+
+**Long format** stacks those into rows instead, so you get a `year` column and a `pop` column. Fewer columns, more rows.
+
+Why does this matter? Because **plotting libraries and many pandas operations prefer long format**. If you want to plot population over time and colour by region, tools like `seaborn` expect one column for the value and one column for the grouping variable. Wide format makes that awkward.
+
+The short version: **melt for analysis, pivot for presentation**.
+
+
+## Melt and Pivot
+
+![](https://hausetutorials.netlify.app/posts/2020-05-14-reshaping-data-in-python-pandas/pic5.png){fig-align=center}
+
+- `melt()`: wide to long format
+- `pivot()` / `pivot_table()`: long to wide format
+
+
+## Melt: Wide to Long {.smaller}
+
+The pedestrian data has 20 location columns. We can "melt" them into two columns: `Location` and `Count`.
+
+```python
+ped_long = df.melt(
+    id_vars=['Date', 'Time', 'Hour', 'Month', 'DayOfWeek', 'IsWeekend', 'Period'],
+    value_vars=location_cols,
+    var_name='Location',
+    value_name='Count'
+)
+
+print(f"Wide shape: {df.shape}")
+print(f"Long shape: {ped_long.shape}")
+```
+
+```
+Wide shape: (8796, 30)
+Long shape: (175920, 9)
+```
+
+8,796 rows x 20 locations = 175,920 rows
+
+
+## Pivot Table: Long to Wide {.smaller}
+
+```python
+# Average hourly count by location and time period
+pivot = ped_long.pivot_table(
+    values='Count',
+    index='Location',
+    columns='Period',
+    aggfunc='mean'
+).round(1)
+
+print(pivot)
+```
+
+**Rule of thumb**: making a table? Pivot. Making a plot? Melt.
+
+---
+
+# Part 6: Handling Missing Data {style="text-align: center;"}
+
+
+## Why Missing Data Matters {.smaller}
+
+Real-world sensor data is messy. Sensors malfunction, get obscured, or lose power. If you ignore missing values or handle them carelessly, your results can be **silently wrong**.
+
+Consider the Auckland pedestrian sensors:
+
+- A sensor that **fails during heavy rain** will undercount pedestrians precisely when behaviour changes most. Filling those gaps with the overall mean pretends rain makes no difference.
+- A sensor **not yet installed** at the start of the year has no observations. Filling with zero implies "we saw nobody," which is not the same as "we were not looking."
+- A sensor that **briefly loses power** one afternoon is genuinely missing at random. Interpolation or a mean fill is reasonable here.
+
+The method you choose should match **why** the data is missing.
+
+
+## Three Types of Missingness {.smaller}
+
+| Type | Example | Safe to fill? |
+|------|---------|---------------|
+| Missing at random | Sensor glitch on a Tuesday afternoon | Yes, mean or interpolation |
+| Missing systematically | Sensor fails every time it rains | Filling naively **biases** results |
+| Missing by design | Sensor installed in March, no Jan/Feb data | Keep as `NaN`, do not fill with zero |
+
+In geospatial work specifically, missing **coordinates** usually mean you must drop the record, because there is no meaningful way to impute a location. Missing **attributes**, by contrast, can sometimes be filled using spatial neighbours.
+
+Whatever you do, **document it** in your code or report.
+
+
+## Detecting Missing Values {.smaller}
+
+```python
+# Count missing values per column
+ped.isnull().sum()
+
+# Total missing
+ped.isnull().sum().sum()
+
+# Percentage missing per column
+(ped.isnull().sum() / len(ped) * 100).round(2)
+```
+
+
+## Filling Missing Values {.smaller}
+
+Different approaches for different situations:
+
+```python
+# Fill with zero (sensor was working, no one walked by)
+ped_zero = ped.fillna(0)
+
+# Fill with column mean (sensor was temporarily offline)
+ped_mean = ped.copy()
+ped_mean['45 Queen Street'] = ped_mean['45 Queen Street'].fillna(
+    ped_mean['45 Queen Street'].mean()
+)
+
+# Forward fill (use previous hour's value for brief gaps)
+ped_ffill = ped.fillna(method='ffill')
+
+# Interpolation (best for time series)
+ped_interp = ped.copy()
+ped_interp['45 Queen Street'] = ped_interp['45 Queen Street'].interpolate(
+    method='linear'
+)
+```
+
+
+
+## Think Before You Fill!
+
+- **Missing at random** (sensor malfunction): safe to fill with mean/interpolation
+- **Missing systematically** (fails during rain): filling naively biases your results
+- **Missing by design** (sensor not yet installed): keep as `NaN`, do not fill with zero
+
+Always document what you did and why.
+
+[Visit fillna pandas website](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.fillna.html)
+
+---
+
+# Part 7: Merging DataFrames {style="text-align: center;"}
+
+
+## Join Types
+
+![](https://media.geeksforgeeks.org/wp-content/uploads/joinimages.png){fig-align=center}
+
+
+## Example: Two DataFrames {.smaller}
+
+```python
+df1 = pd.DataFrame({
+    'ID': [1, 2, 3, 4],
+    'Name': ['Tom', 'Nick', 'Krish', 'Jack'],
+    'Age': [20, 21, 19, 18]
+})
+
+df2 = pd.DataFrame({
+    'ID': [3, 4, 5, 6],
+    'Subject': ['Maths', 'English', 'Science', 'History'],
+    'Score': [88, 75, 90, 85]
+})
+```
+
+---
+
+### Merging
+
+```python
+# Inner: only matching rows
+pd.merge(df1, df2, on='ID', how='inner')
+
+# Left: keep all from left
+pd.merge(df1, df2, on='ID', how='left')
+
+# Outer: keep everything
+pd.merge(df1, df2, on='ID', how='outer')
+```
+
+
+## Merging with the Pedestrian Data {.smaller}
+
+Once we melt to long format, we can merge with sensor metadata:
+
+```python
+sensor_metadata = pd.DataFrame({
+    'Location': ['107 Quay Street', '45 Queen Street', '150 K Road'],
+    'Area': ['Waterfront', 'CBD', 'K Road'],
+    'Latitude': [-36.8430, -36.8442, -36.8580],
+    'Longitude': [174.7685, 174.7659, 174.7560]
+})
+
+merged = pd.merge(ped_long, sensor_metadata, on='Location', how='inner')
+```
+
+This adds spatial attributes (coordinates, area type) to each pedestrian count record. In Section 2.4, you will do this with geometry using **spatial joins** in GeoPandas.
+
+
+# Part 8: Quick Visualisation {style="text-align: center;"}
+
+
+## What is matplotlib? {.smaller}
+
+`matplotlib` is a Python library for making charts and graphs. Think of it as Python's drawing toolkit for data.
+
+```python
+import matplotlib.pyplot as plt   # We always import it like this
+```
+
+The basic recipe for any plot has three steps:
+
+1. **Create** a figure (the canvas)
+2. **Draw** something on it (a line, bars, dots, etc.)
+3. **Show** it with `plt.show()`
+
+
+## Step-by-step: Your First Plot {.smaller}
+
+```python
+import matplotlib.pyplot as plt
+
+# Step 1: Create a figure and set its size (width, height in inches)
+plt.figure(figsize=(8, 4))
+
+# Step 2: Draw a simple line plot
+x = [1, 2, 3, 4, 5]
+y = [10, 40, 25, 50, 35]
+plt.plot(x, y)
+
+# Step 3: Show it
+plt.show()
+```
+
+That is it! You have made a plot. Now let us make it look better.
+
+
+## Adding Labels and Titles {.smaller}
+
+Labels tell your reader what they are looking at. **Always** label your axes.
+
+```python
+plt.figure(figsize=(8, 4))
+plt.plot(x, y, marker='o', color='steelblue')   # marker='o' adds dots at each point
+
+plt.xlabel('Day')              # Label for the x-axis
+plt.ylabel('Pedestrian Count') # Label for the y-axis
+plt.title('Daily Counts')      # Title at the top
+plt.grid(True, alpha=0.3)      # Light gridlines (alpha = transparency)
+plt.tight_layout()             # Prevent labels from being cut off
+plt.show()
+```
+
+
+## Common Plot Types {.smaller}
+
+| What you want             | Code                          | `kind=` for pandas |
+|---------------------------|-------------------------------|--------------------|
+| Line chart                | `plt.plot(x, y)`              | `'line'`           |
+| Bar chart (vertical)      | `plt.bar(x, y)`               | `'bar'`            |
+| Bar chart (horizontal)    | `plt.barh(x, y)`              | `'barh'`           |
+| Scatter plot              | `plt.scatter(x, y)`           | `'scatter'`        |
+| Histogram                 | `plt.hist(values, bins=20)`   | `'hist'`           |
+
+pandas DataFrames can call these directly, e.g. `df['col'].plot(kind='hist')`.
+
+
+## pandas Plotting {.smaller}
+
+pandas DataFrames have built-in plotting via matplotlib:
+
+```python
+import matplotlib.pyplot as plt
+
+# Bar chart of average hourly counts by location
+location_means = ped[location_cols].mean().sort_values(ascending=False)
+location_means.plot(kind='barh', figsize=(10, 8), color='steelblue')
+plt.xlabel('Average Hourly Pedestrian Count')
+plt.title('Average Hourly Counts by Sensor Location (2024)')
+plt.tight_layout()
+plt.show()
+```
+
+
+## Hourly Pattern {.smaller}
+
+```python
+# Recall: df is the copy of ped we created in Part 3, 
+# with columns like Hour, IsWeekend, Total already added
+
+# Weekday vs Weekend hourly pattern
+weekday_avg = df[~df['IsWeekend']].groupby('Hour')['Total'].mean()
+weekend_avg = df[df['IsWeekend']].groupby('Hour')['Total'].mean()
+
+plt.figure(figsize=(10, 5))
+plt.plot(weekday_avg.index, weekday_avg.values, marker='o', label='Weekday')
+plt.plot(weekend_avg.index, weekend_avg.values, marker='s', label='Weekend')
+plt.xlabel('Hour of Day')
+plt.ylabel('Total Count (all sensors)')
+plt.title('Weekday vs Weekend Pedestrian Patterns')
+plt.legend()              # Shows the label for each line
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+We will learn much more about visualisation in the next lecture (Section 2.3).
+
+
+## Summary
+
+- **Dictionaries**: key-value structures, foundation for GeoJSON and APIs
+- **pandas DataFrames**: Python's answer to spreadsheets
+- **Reading data**: `pd.read_excel()`, `pd.read_csv()`
+- **Exploring**: `.head()`, `.info()`, `.describe()`, `.shape`
+- **Filtering**: boolean indexing, `.loc[]`, `.iloc[]`, `.query()`
+- **`.copy()`**: always copy before modifying subsets
+- **Groupby**: split-apply-combine for aggregation
+- **Reshaping**: `melt()` for wide-to-long, `pivot_table()` for long-to-wide
+- **Missing data**: detect, understand why, then fill appropriately
+- **Merging**: `pd.merge()` with inner, left, right, outer joins
+
+
+## Looking Ahead
+
+- **Section 2.3**: Data Visualisation with matplotlib and seaborn
+- **Section 2.4**: GeoPandas - adding geometry to your DataFrames
+    - A GeoDataFrame is just a DataFrame with a geometry column
+    - Every pandas skill you learned today transfers directly
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
