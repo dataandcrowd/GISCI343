@@ -1,0 +1,370 @@
+---
+title: "Handling Missing Data"
+subtitle: "Detecting, Removing, Filling, and Thinking About Missing Values"
+date: 03/23/2025
+date-format: long
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+format:
+  revealjs:
+      logo: Figs/uoa-logo.png
+      css: logo.css
+      slide-number: true
+      show-slide-number: print
+editor: source
+include-in-header:
+  - text: |
+      <style type="text/css">
+      ul li ul li {
+        font-size: 0.7em;
+      }
+      </style>
+---
+
+
+## Today's Lecture
+
+- Why missing data matters
+- Detecting missing values in pandas
+- Removing missing data with `.dropna()`
+- Filling missing data with `.fillna()` and `.interpolate()`
+- Choosing the right strategy
+- Best practices for geospatial contexts
+- Practical exercise: Auckland pedestrian data
+
+
+## Why Missing Data Matters{.smaller}
+
+Real-world sensor data is messy. Sensors malfunction, get obscured, or lose power.
+
+<br>
+
+* The Auckland pedestrian dataset contains hourly counts from **20 sensor locations** across the CBD
+* Some sensors have gaps where counts are missing
+* How we handle these gaps **directly affects** our analysis results
+
+<br>
+
+::: {.callout-important}
+Ignoring missing data or handling it carelessly can introduce **bias** into your results.
+:::
+
+
+## Loading the Data {.smaller}
+
+```python
+import pandas as pd
+import numpy as np
+
+url = 'https://raw.githubusercontent.com/dataandcrowd/GISCI343/refs/heads/main/pedestrians/akl_ped-2024.csv'
+ped = pd.read_csv(url)
+
+# Clean non-data rows
+ped = ped.dropna(subset=['Date', 'Time'])
+ped = ped[ped['Date'] != 'Daylight Savings']
+ped['Date'] = pd.to_datetime(ped['Date'])
+
+print(ped.shape)
+print(ped.head())
+```
+
+
+## Detecting Missing Data {.smaller}
+
+```python
+# Count missing values per column
+print(ped.isnull().sum())
+```
+
+```python
+# Grand total of missing values
+print(f"Total missing values: {ped.isnull().sum().sum()}")
+```
+
+```python
+# Percentage missing per column
+missing_pct = (ped.isnull().sum() / len(ped) * 100).round(2)
+print(missing_pct[missing_pct > 0])  # Show only columns with missing data
+```
+
+<br>
+
+* `.isnull()` returns a DataFrame of `True`/`False`
+* `.sum()` counts the `True` values (i.e. the missing ones)
+
+
+## Visualising Missingness {.smaller}
+
+A quick heatmap reveals **patterns** in missing data:
+
+```python
+import matplotlib.pyplot as plt
+
+location_cols = ped.columns[2:22]
+
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.imshow(ped[location_cols].isnull().T, aspect='auto', cmap='Reds',
+          interpolation='none')
+ax.set_yticks(range(len(location_cols)))
+ax.set_yticklabels(location_cols, fontsize=8)
+ax.set_xlabel('Row index (time)')
+ax.set_title('Missing Data Pattern (red = missing)')
+plt.tight_layout()
+plt.show()
+```
+
+<br>
+
+Look for: blocks of red (extended outages), scattered red (intermittent faults), or entire columns of red (sensor never installed).
+
+
+## Removing Missing Data {.smaller}
+
+The simplest approach -- but it **discards information**:
+
+```python
+# Drop rows where ANY value is missing
+clean = ped.dropna()
+print(f"Rows before: {len(ped)}, after: {len(clean)}")
+```
+
+```python
+# Drop rows where a SPECIFIC column is missing
+clean = ped.dropna(subset=['45 Queen Street'])
+```
+
+```python
+# Drop columns where ANY value is missing
+clean = ped.dropna(axis=1)
+```
+
+<br>
+
+::: {.callout-warning}
+Dropping all rows with any missing value can dramatically shrink your dataset. If 5 of 20 sensors have gaps at different times, you may lose most of your data.
+:::
+
+
+## Filling with a Constant {.smaller}
+
+```python
+# Fill with zero
+# Appropriate if missing means "no pedestrians detected"
+ped_zero = ped.fillna(0)
+```
+
+<br>
+
+**When to use**: the sensor was active but recorded nothing
+
+**When NOT to use**: the sensor was offline -- zero falsely implies "we observed no pedestrians"
+
+<br>
+
+```python
+# Fill with a specific value
+ped_filled = ped.fillna(-999)  # Sentinel value (use with caution)
+```
+
+
+## Filling with Column Statistics {.smaller}
+
+```python
+# Fill with the column mean
+ped_mean = ped.copy()
+ped_mean['45 Queen Street'] = ped_mean['45 Queen Street'].fillna(
+    ped_mean['45 Queen Street'].mean()
+)
+```
+
+```python
+# Fill with the column median (more robust to outliers)
+ped_median = ped.copy()
+ped_median['45 Queen Street'] = ped_median['45 Queen Street'].fillna(
+    ped_median['45 Queen Street'].median()
+)
+```
+
+<br>
+
+**When to use**: sensor temporarily offline; overall distribution is roughly stable
+
+**Limitation**: ignores temporal patterns (a mean value at 3 AM is very different from the mean at noon)
+
+
+## Forward and Backward Fill {.smaller}
+
+Use the **previous** or **next** observation to fill gaps:
+
+```python
+# Forward fill: carry the last known value forward
+ped_ffill = ped.fillna(method='ffill')
+
+# Backward fill: use the next known value
+ped_bfill = ped.fillna(method='bfill')
+```
+
+<br>
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Forward fill** is good for:
+
+* Brief sensor gaps
+* Slowly changing data
+* Time series where the last value is a reasonable proxy
+:::
+
+::: {.column width="50%"}
+**Backward fill** is good for:
+
+* Gaps at the start of a series
+* When the next observation better represents the missing period
+:::
+
+::::
+
+
+## Linear Interpolation {.smaller}
+
+Estimates missing values by drawing a straight line between known points:
+
+```python
+ped_interp = ped.copy()
+ped_interp['45 Queen Street'] = ped_interp['45 Queen Street'].interpolate(
+    method='linear'
+)
+```
+
+<br>
+
+**Best for**: time series with short gaps where values change gradually
+
+<br>
+
+Other interpolation methods:
+
+```python
+# Time-based interpolation (accounts for uneven time spacing)
+ped_interp['45 Queen Street'].interpolate(method='time')
+
+# Polynomial interpolation
+ped_interp['45 Queen Street'].interpolate(method='polynomial', order=2)
+```
+
+
+## Comparing Strategies {.smaller}
+
+```python
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 2, figsize=(14, 8), sharex=True, sharey=True)
+
+sample = ped['45 Queen Street'].iloc[100:200].copy()
+# Introduce artificial gaps
+sample.iloc[20:30] = np.nan
+
+sample.fillna(0).plot(ax=axes[0,0], title='Fill with Zero', color='steelblue')
+sample.fillna(sample.mean()).plot(ax=axes[0,1], title='Fill with Mean', color='coral')
+sample.fillna(method='ffill').plot(ax=axes[1,0], title='Forward Fill', color='forestgreen')
+sample.interpolate().plot(ax=axes[1,1], title='Linear Interpolation', color='purple')
+
+for ax in axes.flat:
+    ax.axvspan(120, 130, alpha=0.2, color='red', label='Gap')
+    ax.legend()
+plt.tight_layout()
+plt.show()
+```
+
+
+## Choosing the Right Strategy {.smaller}
+
+| Strategy | Best when | Watch out for |
+|----------|-----------|---------------|
+| **Drop** (`dropna`) | Few missing values; analysis requires complete cases | Large data loss if gaps are widespread |
+| **Zero** (`fillna(0)`) | Missing = "no activity detected" | Falsely implies zero activity when sensor was offline |
+| **Mean/Median** (`fillna(mean())`) | Sensor temporarily offline; stable distribution | Ignores temporal patterns (time of day, day of week) |
+| **Forward fill** (`ffill`) | Brief gaps; slowly changing data | Propagates stale values over long gaps |
+| **Backward fill** (`bfill`) | Gaps at series start | Can "leak" future information into past |
+| **Interpolation** (`interpolate`) | Short gaps in smooth time series | Poor for long gaps or abrupt changes |
+
+
+## Why the Data is Missing Matters 
+
+Before choosing a strategy, understand **why** data is missing:
+
+
+* <span style="color:blue">**Missing at random**</span> (e.g. sensor malfunction one afternoon)
+    - Safe to fill with mean or interpolated value
+
+
+* <span style="color:#E49B0F">**Missing systematically**</span> (e.g. sensor fails during heavy rain)
+    - Requires investigation; naive filling could **bias results**
+
+* <span style="color:red">**Missing by design**</span> (e.g. sensor not yet installed at start of year)
+    - Keep as `NaN` -- zero implies "no pedestrians"; `NaN` correctly states "no observation"
+
+
+## Best Practices {.smaller}
+
+::: {style="font-size: 90%;"}
+
+1. **Document your approach** explicitly in code or analysis report
+
+2. **Create indicator columns** so downstream analyses can account for imputed values:
+
+```python
+ped['queen_st_was_missing'] = ped['45 Queen Street'].isnull()
+ped['45 Queen Street'] = ped['45 Queen Street'].fillna(method='ffill')
+```
+
+3. **Report how many values were handled** and by which method
+
+4. **In geospatial contexts**:
+    - Missing **coordinates** or spatial identifiers $\rightarrow$ usually must **drop** (no meaningful way to impute a location)
+    - Missing **attributes** $\rightarrow$ can be filled using statistical methods or spatial neighbours
+
+:::
+
+
+## Your Turn {.smaller}
+
+Using the Auckland pedestrian data:
+
+```python
+url = 'https://raw.githubusercontent.com/dataandcrowd/GISCI343/refs/heads/main/pedestrians/akl_ped-2024.csv'
+ped = pd.read_csv(url)
+```
+
+<br>
+
+1. Which sensor location has the **most** missing values?
+2. What **percentage** of total values are missing?
+3. Pick one sensor and compare the **mean** before and after filling with forward fill vs. interpolation -- do the results differ?
+4. Create a `was_missing` indicator column, fill with `ffill`, then group by `was_missing` to see if imputed hours differ systematically from observed hours
+
+
+## Summary {.smaller}
+
+::: {style="font-size: 85%;"}
+
+- **Detect** missing values with `.isnull().sum()` and visualise the pattern
+- **Remove** with `.dropna()` -- simple but potentially wasteful
+- **Fill** with `.fillna()` using zero, mean/median, forward/backward fill
+- **Interpolate** with `.interpolate()` for smooth time series gaps
+- **Choose** your strategy based on *why* the data is missing
+- **Document** your choices and create indicator columns
+- In GIS: missing coordinates $\rightarrow$ drop; missing attributes $\rightarrow$ fill or interpolate
+
+:::
+
+
+## <br> Thanks! <br> Q & A {style="text-align: center;"}
