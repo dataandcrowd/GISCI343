@@ -47,11 +47,12 @@ include-in-header:
 
 :::
 
-## Assignment 1 Reminder
+## Assignment 1 Reminder {.smaller}
 
 **Due**: End of this week
 
 **Requirements:**
+
 - Pedestrian count analysis
 - Temporal patterns
 - Visualisations
@@ -85,6 +86,21 @@ def ensure_nztm(gdf):
         return gdf.to_crs('EPSG:2193')
     return gdf
 ```
+:::
+
+
+## Why write functions
+
+::: {.incremental}
+
+**Easier Maintenance**: If a bug is found or a change in logic is required, you only need to make the fix in one place: the function's definition. 
+
+**Modularity and Abstraction**: Functions promote modular programming by hiding the internal implementation details. A programmer can use a function knowing only what it does (e.g., calculate_average()), not necessarily how it does it, which simplifies the overall code structure.
+
+**Independent Testing and Debugging**: Smaller, self-contained functions (units) can be tested in isolation to ensure they work correctly. This makes the process of finding and fixing bugs much more efficient.
+
+**Collaboration**: Functions create clear boundaries between different parts of a program, making it easier for multiple team members to work on separate sections of the code in parallel without interfering with each other's work
+
 :::
 
 ## Anatomy of a Function
@@ -126,13 +142,15 @@ Functions make your code **testable**, **readable**, and **shareable**.
 
 ## Why Download Data Programmatically?
 
-::: {.incremental}
-* Manual downloads break **reproducibility**
-* Collaborators cannot re-run your workflow
-* Scripts document **exactly** what data you used
-* Easy to update when new data is released
-* Essential for open science and sharing via GitHub
-:::
+**We have done this!!**
+
+* ~~Manual downloads break **reproducibility**~~
+* ~~Collaborators cannot re-run your workflow~~
+* ~~Scripts document **exactly** what data you used~~
+* ~~Easy to update when new data is released~~
+* ~~Essential for open science and sharing via GitHub~~
+
+
 
 ::: {.fragment}
 > Your script **is** the download step.
@@ -202,7 +220,7 @@ Every dataset has a unique **Layer ID** in the URL:
 
 ```
 https://datafinder.stats.govt.nz/layer/123514-.../
-                                        ^^^^^^
+                                       ^^^^^^
                                     Layer ID
 ```
 
