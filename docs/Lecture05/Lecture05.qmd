@@ -366,6 +366,31 @@ def download_statsnz_wfs(layer_id, api_key,
     return gdf
 ```
 
+
+## Your Turn: Download SA2 via API
+
+::: {style="font-size: 105%;"}
+Write a function `download_statsnz_wfs(layer_id, api_key, bbox=None)` that:
+
+- Builds a **WFS URL** for Stats NZ / Koordinates
+- Optionally filters by **bounding box**
+- Returns a **GeoDataFrame**
+
+```python
+from config import API_KEY
+
+sa2 = download_statsnz_wfs(
+    layer_id=115187, api_key=API_KEY,
+    bbox="1740000,5900000,1820000,5950000"
+)
+print(f"Downloaded {len(sa2)} SA2 features")
+```
+
+**Hint**: Refer to the WFS slides earlier in this lecture.
+:::
+
+
+
 ## Using Your Function
 
 ```python
@@ -389,16 +414,45 @@ ta = download_statsnz_wfs(120946, API_KEY)
 One function, many datasets. This is the power of abstraction.
 :::
 
-## Your Turn: Download SA2 Boundaries
+## Your Turn: GeoDataFrame Summary Function
 
 ::: {style="font-size: 110%;"}
-1. Set up your API key in `config.py`
-2. Find the SA2 2025 layer ID on datafinder
-3. Use `download_statsnz_wfs()` to get Auckland SA2s
-4. Check the CRS and number of features
-5. Plot the boundaries
+Write a function `summarise_gdf(gdf)` that returns a dictionary with:
 
-**Bonus**: Add a `format` parameter to your function to support GeoJSON or GML output.
+1. `"count"`: number of features
+2. `"total_area_km2"`: total area in km²
+3. `"crs"`: the coordinate reference system
+4. `"bounds"`: the total bounding box
+
+**Hint**: Use `gdf.geometry.area` and `gdf.total_bounds`
+
+**Bonus**: Add input validation to check the CRS is projected.
+:::
+
+## GeoDataFrame Summary Function: Solution {.smaller}
+
+```python
+def summarise_gdf(gdf):
+    """Return key summary statistics for a GeoDataFrame."""
+    if not gdf.crs.is_projected:
+        raise ValueError("CRS must be projected for area calculations")
+
+    return {
+        "count": len(gdf),
+        "total_area_km2": gdf.geometry.area.sum() / 1_000_000,
+        "crs": str(gdf.crs),
+        "bounds": gdf.total_bounds,
+    }
+
+# Try it
+import geopandas as gpd
+sa2 = gpd.read_file("auckland_sa2_2026_filtered.gpkg")
+stats = summarise_gdf(sa2)
+print(f"{stats['count']} zones, {stats['total_area_km2']:.1f} km²")
+```
+
+::: {.callout-note}
+One function replaces five separate calls. If the data format changes, you fix one place.
 :::
 
 ## Filtering SA2 Boundaries
@@ -529,13 +583,41 @@ plt.title('800m Buffer Around Sensor')
 plt.show()
 ```
 
-## Your Turn: Buffer
+## Filtering by Distance from a Point {.smaller}
 
-::: {style="font-size: 120%;"}
-1. Load Auckland SA2 boundaries
-2. Select one SA2 (e.g., CBD)
-3. Create a 1000m buffer around it
-4. Plot both the original and buffer
+```python
+from shapely.geometry import Point
+
+sky_tower = Point(1757250, 5920930)   # NZTM coordinates
+
+# Centroid of each polygon
+centroids = sa2.geometry.centroid
+
+# Distance from each centroid to the Sky Tower (metres)
+sa2["dist_m"] = centroids.distance(sky_tower)
+```
+
+::: {.callout-note}
+`distance()` works in CRS units, so make sure the GeoDataFrame is in a **projected** CRS (e.g. EPSG:2193) before measuring in metres.
+:::
+
+## Your Turn: Filter by Distance
+
+::: {style="font-size: 80%;"}
+Write a function `filter_within_distance(gdf, point, distance)` that:
+
+1. Takes a GeoDataFrame, a point `(x, y)`, and a distance in metres
+2. Calculates the centroid of each feature
+3. Returns only features within the given distance
+
+**Test it**: Find all SA2s within 5 km of the Sky Tower `(1757250, 5920930)`
+
+```python
+# Keep only SA2s within 5 km
+nearby = sa2[sa2["dist_m"] <= 5000]
+print(f"{len(nearby)} SA2 zones within 5 km of the Sky Tower")
+
+```
 
 :::
 
@@ -700,18 +782,6 @@ sensors_per_zone = gpd.sjoin(
 sensor_counts = sensors_per_zone.groupby('SA2_name').size()
 print(sensor_counts)
 ```
-:::
-
-## Your Turn: Spatial Join
-
-::: {style="font-size: 110%;"}
-1. Load SA2 boundaries
-2. Load pedestrian sensor locations
-3. Perform spatial join to assign each sensor to an SA2
-4. Calculate average pedestrian count per SA2
-5. Create a choropleth map of average counts
-
-**Bonus**: Which SA2 has the highest average count?
 :::
 
 ## Point in Polygon
@@ -884,20 +954,88 @@ else:
 ```
 :::
 
-## Your Turn: Complete Analysis
+## Choropleth Maps with Classification Schemes {.smaller}
 
-::: {style="font-size: 95%;"}
-**Task**: Analyze green space accessibility in Auckland
+A **choropleth** colours polygons by a data column. The **classification scheme** controls how values are binned:
 
-1. Load SA2 boundaries
-2. Load parks/reserves as polygons
-3. Create 800m buffer around each park
-4. Calculate % of each SA2 within park catchment
-5. Create choropleth map
-6. Identify SA2s with <20% coverage
+```python
+# uv pip install mapclassify
+import matplotlib.pyplot as plt
 
-**Bonus**: Which SA2 has best/worst access?
+sa2["area_km2"] = sa2.geometry.area / 1_000_000
+
+fig, axes = plt.subplots(1, 3, figsize=(18, 8))
+
+for ax, scheme in zip(axes, ["quantiles", "equal_interval", "natural_breaks"]):
+    sa2.plot(
+        ax=ax,
+        column="area_km2",
+        scheme=scheme,        # mapclassify handles the binning
+        k=5,                  # number of classes
+        cmap="YlOrRd",
+        legend=True,
+        edgecolor="black", linewidth=0.3,
+    )
+    ax.set_title(scheme.replace("_", " ").title())
+    ax.set_axis_off()
+
+plt.tight_layout()
+```
+
+::: {.callout-note}
+`gdf.plot(scheme=...)` requires `mapclassify`. Common schemes: `"quantiles"` (equal count per bin), `"equal_interval"` (equal value range), `"natural_breaks"` (Jenks).
 :::
+
+## Your Turn: Multi-Scheme Choropleth Maps
+
+::: {style="font-size: 110%;"}
+Write `compare_classifications(gdf, column, schemes, k=5)` that:
+
+- Creates **side-by-side** maps, one per classification scheme
+- Accepts schemes like `"quantiles"`, `"equal_interval"`, `"natural_breaks"`
+
+```python
+sa2["area_km2"] = sa2.geometry.area / 1_000_000
+compare_classifications(
+    sa2, "area_km2",
+    schemes=["quantiles", "equal_interval", "natural_breaks"]
+)
+```
+
+**Hint**: `plt.subplots(1, len(schemes))` and `gdf.plot(scheme=...)`.
+You may need `uv pip install mapclassify`.
+:::
+
+## Multi-Scheme Choropleth: Key Ingredients {.smaller}
+
+```python
+import matplotlib.pyplot as plt
+
+def compare_classifications(gdf, column, schemes, k=5):
+    n = len(schemes)
+    fig, axes = plt.subplots(1, n, figsize=(6 * n, 8))
+    if n == 1:
+        axes = [axes]          # keep iterable for a single scheme
+
+    for ax, scheme in zip(axes, schemes):
+        gdf.plot(
+            ax=ax, column=column,
+            scheme=scheme, k=k,  # <-- mapclassify does the work
+            cmap="YlOrRd", legend=True,
+            edgecolor="black", linewidth=0.3,
+            legend_kwds={"loc": "lower left", "fontsize": 7},
+        )
+        ax.set_title(scheme.replace("_", " ").title())
+        ax.set_axis_off()
+
+    plt.tight_layout()
+    return fig
+```
+
+::: {.callout-tip}
+`gdf.plot(scheme=...)` delegates to `mapclassify` under the hood, so `pip install mapclassify` first.
+:::
+
 
 ## Best Practices Checklist
 
