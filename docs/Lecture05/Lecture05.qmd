@@ -89,19 +89,15 @@ def ensure_nztm(gdf):
 :::
 
 
-## Why write functions
+## Why Write Functions {.smaller}
 
 ::: {.incremental}
-
-**Easier Maintenance**: If a bug is found or a change in logic is required, you only need to make the fix in one place: the function's definition. 
-
-**Modularity and Abstraction**: Functions promote modular programming by hiding the internal implementation details. A programmer can use a function knowing only what it does (e.g., calculate_average()), not necessarily how it does it, which simplifies the overall code structure.
-
-**Independent Testing and Debugging**: Smaller, self-contained functions (units) can be tested in isolation to ensure they work correctly. This makes the process of finding and fixing bugs much more efficient.
-
-**Collaboration**: Functions create clear boundaries between different parts of a program, making it easier for multiple team members to work on separate sections of the code in parallel without interfering with each other's work
-
+- **Easier Maintenance**: If a bug is found or a change in logic is required, you only need to make the fix in one place: the function's definition.
+- **Modularity and Abstraction**: Functions promote modular programming by hiding internal implementation details. A programmer can use a function knowing only what it does (e.g., `calculate_average()`), not how it does it, which simplifies the overall code structure.
+- **Independent Testing and Debugging**: Smaller, self-contained functions can be tested in isolation to ensure they work correctly, making it much more efficient to find and fix bugs.
+- **Collaboration**: Functions create clear boundaries between different parts of a programme, making it easier for multiple team members to work on separate sections in parallel without interfering with each other's work.
 :::
+
 
 ## Anatomy of a Function
 
@@ -121,24 +117,89 @@ def function_name(parameter1, parameter2="default"):
 * **Return**: sends a value back to the caller
 :::
 
-## Functions with Multiple Returns
+## `def` functions
 
 ```python
-def summarise_geodataframe(gdf):
-    """Return key summary statistics of a GeoDataFrame."""
-    n_features = len(gdf)
-    crs = gdf.crs
-    bounds = gdf.total_bounds  # [minx, miny, maxx, maxy]
-    return n_features, crs, bounds
+def add_numbers(a, b):
+  """This function adds two numbers and returns the result."""
+  result = a + b
+  return result
 
-# Unpack the returned values
-n, crs, bbox = summarise_geodataframe(sa2)
-print(f"Features: {n}, CRS: {crs}")
+# Calling the function
+sum_result = add_numbers(3, 4)
+print("The sum is:", sum_result)
+```
+
+
+## Functions with Multiple Returns
+
+When two outputs are **logically coupled** -- you always need them together -- returning both avoids duplicate work.
+
+```python
+def find_nearest_sensor(point, sensors_gdf):
+    """Return the nearest sensor and its distance (m)."""
+    distances = sensors_gdf.geometry.distance(point)
+    idx = distances.idxmin()
+    return sensors_gdf.loc[idx], distances[idx]
+
+# Usage
+nearest, dist = find_nearest_sensor(sample_pt, sensors)
+print(f"Nearest sensor: {nearest['Address']} ({dist:.0f} m)")
 ```
 
 ::: {.callout-tip}
-Functions make your code **testable**, **readable**, and **shareable**.
+Multiple returns shine when the outputs are **always needed together** and computing them separately would mean repeating work.
 :::
+
+## Your Turn: Nearest Sensor Exercise {.smaller}
+
+15 sample points have been generated between the Auckland CBD pedestrian sensors.
+
+```python
+sensors = pd.read_csv("data/akl_ped-Geodata.csv").dropna(subset=["Latitude"])
+samples = pd.read_csv("data/sample_points.csv")
+```
+
+**Task**: Write a function `find_nearest_sensor(point, sensors_gdf)` that:
+
+1. Takes a single `Point` and a sensors `GeoDataFrame`
+2. Returns **both** the nearest sensor row **and** the distance in metres
+3. Loop over sample points and print the nearest sensor for each
+
+**Hint**: Reproject to EPSG:2193 before calculating distances!
+
+## Nearest Sensor: Solution {.smaller}
+
+```python
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import Point
+
+sensors = pd.read_csv("data/akl_ped-Geodata.csv").dropna(subset=["Latitude"])
+samples = pd.read_csv("data/sample_points.csv")
+
+sensors_gdf = gpd.GeoDataFrame(
+    sensors,
+    geometry=gpd.points_from_xy(sensors.Longitude, sensors.Latitude),
+    crs="EPSG:4326"
+).to_crs("EPSG:2193")
+
+samples_gdf = gpd.GeoDataFrame(
+    samples,
+    geometry=gpd.points_from_xy(samples.longitude, samples.latitude),
+    crs="EPSG:4326"
+).to_crs("EPSG:2193")
+
+def find_nearest_sensor(point, sensors_gdf):
+    """Return the nearest sensor and its distance (m)."""
+    distances = sensors_gdf.geometry.distance(point)
+    idx = distances.idxmin()
+    return sensors_gdf.loc[idx], distances[idx]
+
+for _, row in samples_gdf.iterrows():
+    nearest, dist = find_nearest_sensor(row.geometry, sensors_gdf)
+    print(f"{row['sample_id']} -> {nearest['Address']} ({dist:.0f} m)")
+```
 
 ## Why Download Data Programmatically?
 
