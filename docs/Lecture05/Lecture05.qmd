@@ -493,6 +493,23 @@ ta = download_statsnz_wfs(120946, API_KEY)
 One function, many datasets. This is the power of abstraction.
 :::
 
+## How to Write a function - Descriptive Statistics
+
+
+```python
+def summarise_gdf(gdf):
+    """Return key summary statistics for a GeoDataFrame."""
+    if not gdf.crs.is_projected:
+        raise ValueError("CRS must be projected for area calculations")
+
+    return {
+        "count": ______,
+        "total_area_km2": ______________ / 1_000_000,
+        "crs": ______________,
+        "bounds": gdf.total_bounds,
+    }
+```
+
 ## Your Turn: GeoDataFrame Summary Function
 
 ::: {style="font-size: 110%;"}
