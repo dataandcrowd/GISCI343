@@ -1,0 +1,721 @@
+---
+title: "Part 3: Interactive Dashboards with Shiny for Python"
+subtitle: "GISCI 343, Week 6"
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+date: 04/20/2026
+date-format: long
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    code-line-numbers: false
+    highlight-style: github
+    transition: slide
+    logo: Figs/uoa-logo.png
+    css: Figs/logo.css
+    #width: 1280
+    #height: 720
+    #fontsize: 1.6em
+    code-block-height: 480px
+    footer: "GISCI 343 | Week 6 | Shiny for Python"
+---
+
+## Today's plan
+
+| Time | Topic |
+|------|-------|
+| 13:00 to 14:00 | Lecture: from static maps to reactive dashboards |
+| 14:00 to 15:00 | Guest lecture: Alex Raichev (MRCagney) |
+
+---
+
+## The problem with static maps
+
+In Part 2 you made choropleth maps of Auckland.
+
+They told a clear story, but the reader was stuck with **whatever you chose**:
+
+- one time period
+- one classification
+- one colour scheme
+
+. . .
+
+> "What does it look like for just the central suburbs?"
+
+Your only option: reopen the notebook and rerun.
+
+---
+
+## What if the user could choose?
+
+**Assignment 1** (static):
+
+```python
+sa2.plot(column="density", legend=True)
+plt.savefig("map.png")   # fixed image, one view
+```
+
+. . .
+
+**Assignment 2** (interactive):
+
+```python
+# User picks a date range   -> map updates
+# User chooses a metric     -> colours change
+# User filters by category  -> everything refreshes
+# All in real time, in their browser
+```
+
+---
+
+## Why Shiny?
+
+**Traditional web development** (HTML + JavaScript):
+
+```javascript
+document.getElementById("map").addEventListener("click",
+  function(e) {
+    // 50 lines of wiring code ...
+  }
+);
+```
+
+. . .
+
+**Shiny** (Python):
+
+```python
+@render.plot
+def chart():
+    return filtered().plot.bar(x="suburb", y="population")
+```
+
+Write Python, get a web app. Shiny handles HTML, CSS, JavaScript, and browser communication for you.
+
+---
+
+## Shiny mental model {.smaller}
+
+```
++------------------------------------------+
+|  Browser (what the user sees)            |
+|  +----------------+  +-----------------+ |
+|  |    Inputs      |  |    Outputs      | |
+|  |  [ Slider  ]   |  |   [ Map    ]    | |
+|  |  [ Select  ]   |  |   [ Chart  ]    | |
+|  |  [ Checkbox]   |  |   [ Table  ]    | |
+|  +----------------+  +-----------------+ |
++------------------------------------------+
+          |                    ^
+          v                    |
++------------------------------------------+
+|  Python server (your code)               |
+|                                          |
+|  @reactive.calc    -->  @render.plot     |
+|  def filtered():        def chart():    |
+|      ...                    ...         |
++------------------------------------------+
+```
+
+The user touches the left side. Your Python fills the right side. Shiny manages the arrows.
+
+---
+
+## Three components of every Shiny app {.smaller}
+
+::: {.columns}
+
+::: {.column width="55%"}
+```python
+from shiny import App, ui, render
+
+# 1. UI: what the user sees
+app_ui = ui.page_fluid(
+    ui.h2("Hello Shiny"),
+    ui.input_slider("n", "Pick a number",
+                    0, 100, 50),
+    ui.output_text("echo"),
+)
+
+# 2. Server: how outputs are computed
+def server(input, output, session):
+    @render.text
+    def echo():
+        return f"You picked {input.n()}"
+
+# 3. App object: glues them together
+app = App(app_ui, server)
+```
+:::
+
+::: {.column width="45%"}
+
+| Piece | Job |
+|-------|-----|
+| **UI** | Inputs + output placeholders |
+| **Server** | Python logic that fills the outputs |
+| **App** | Connects them so Shiny can run |
+
+That is a **complete, runnable** app.
+:::
+
+:::
+
+---
+
+## The reactive loop
+
+```
+input.n()  (user moves slider)
+    |
+    v
+echo()  recalculates automatically
+    |
+    v
+Browser text updates
+```
+
+You did **not** write any code to detect the change.
+
+Shiny noticed that `echo` reads `input.n()`, and that is enough.
+
+. . .
+
+This is **reactive programming**, the single idea that makes dashboards tractable.
+
+---
+
+## The shape of a Shiny project
+
+```
+myapp/
++-- app.py              # the app itself
++-- pyproject.toml      # dependencies
++-- data/               # CSV, GeoJSON, GeoPackage
++-- www/                # static assets (images, CSS)
++-- README.md
+```
+
+Two conventions:
+
+- Anything in `www/` is served at `/your-file.png`
+- Shiny looks for the variable called **`app`**. Rename it and Shiny will not find it.
+
+---
+
+## Scaffolding with `shiny create`
+
+```bash
+shiny create
+```
+
+Pick a template:
+
+| Template | What you get |
+|----------|-------------|
+| `basic-app` | One input, one output |
+| `basic-navigation` | Multi-page navbar |
+| `dashboard` | Sidebar + cards |
+
+Each drops a folder with a working `app.py` you can run immediately.
+
+---
+
+## Running the app
+
+Three options (most common first):
+
+1. **Positron / VS Code**: click the green "Run Shiny App" button
+2. **Terminal**: `shiny run --reload app.py`
+3. **Custom port**: `shiny run --port 8080 --reload app.py`
+
+. . .
+
+`--reload` = restart on every save. Always use it while developing.
+
+Stop with `Ctrl+C`.
+
+
+
+## Core vs Express syntax
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Core (we use this)
+```python
+app_ui = ui.page_fluid(
+    ui.input_slider("n", "N", 0, 100, 50),
+    ui.output_text("echo"),
+)
+
+def server(input, output, session):
+    @render.text
+    def echo():
+        return f"{input.n()}"
+
+app = App(app_ui, server)
+```
+:::
+
+::: {.column width="50%"}
+### Express (shorter, less control)
+```python
+from shiny.express import input, render, ui
+
+ui.input_slider("n", "N", 0, 100, 50)
+
+@render.text
+def echo():
+    return f"{input.n()}"
+```
+:::
+
+:::
+
+. . .
+
+**Stick to Core.** It scales better and matches what the R community expects.
+
+---
+
+## Input widgets: what the user touches
+
+**Numbers:**
+
+```python
+ui.input_slider("hour", "Hour:", min=0, max=23, value=12)
+ui.input_numeric("count", "Count:", value=100)
+```
+
+**Choices:**
+
+```python
+ui.input_select("day", "Day:", choices=["Mon", "Tue", "Wed"])
+ui.input_radio_buttons("view", "View:", choices=["Map", "Chart"])
+ui.input_checkbox("weekend", "Include weekends?", value=True)
+ui.input_checkbox_group("modes", "Modes:", choices=["Bus", "Train", "Ferry"])
+```
+
+**Actions:**
+
+```python
+ui.input_action_button("go", "Recompute")
+```
+
+---
+
+## Output types: what the user sees
+
+```python
+# Text
+ui.output_text("message")
+
+# Plot (matplotlib)
+ui.output_plot("chart")
+
+# Table
+ui.output_table("summary")
+ui.output_data_frame("detail")    # interactive, sortable
+
+# ipyleaflet map (via shinywidgets)
+from shinywidgets import output_widget
+output_widget("map")
+```
+
+Each placeholder waits for a matching function in the server.
+
+## Now let's roll our sleeves
+
+Open your positron.
+
+Visit the python gis webbook and click 3.1
+
+Go to the heading starting with Scaffolding with `shiny create`
+
+With your group members, solve Q1 and Q2.
+
+
+
+## Wiring inputs to outputs
+
+```python
+def server(input, output, session):
+
+    @render.text
+    def message():
+        count = input.count()
+        if count > 500:
+            return f"{count}: high traffic"
+        return f"{count}: normal traffic"
+```
+
+Key rule: **call inputs with parentheses**.
+
+```python
+input.hour     # the function object (wrong)
+input.hour()   # the current value   (right)
+```
+
+---
+
+## Three kinds of reactive node
+
+```{mermaid}
+%%| fig-width: 10
+graph LR
+    A["input.city()"] --> C["@reactive.calc<br/>filtered()"]
+    B["input.min_pop()"] --> C
+    C --> D["@render.table<br/>tbl"]
+    C --> E["@render.plot<br/>chart"]
+    F["input.log()"] --> G["@reactive.effect<br/>log click"]
+    C -.-> G
+```
+
+| Kind | Example | Behaviour |
+|------|---------|-----------|
+| **Source** | `input.x()`, `reactive.value()` | Changes from outside; no dependencies |
+| **Expression** | `@reactive.calc` | Lazy, cached, returns a value |
+| **Observer** | `@render.*`, `@reactive.effect` | Eager, runs for side effects |
+
+---
+
+## `@reactive.calc`: calculate once, reuse everywhere
+
+```python
+@reactive.calc
+def filtered():
+    df = data[data["city"] == input.city()]
+    return df[df["population"] >= input.min_pop()]
+```
+
+- Define **inside** `server`
+- **Call with parentheses**: `filtered()`
+- Result is **cached**: call it ten times, runs once
+
+. . .
+
+Rule of thumb: if two outputs do the same filter, lift it into a `@reactive.calc`.
+
+---
+
+## Without `@reactive.calc` (inefficient)
+
+```python
+@render.plot
+def plot1():
+    data = load_and_process()   # slow!
+    return make_plot(data)
+
+@render.table
+def table1():
+    data = load_and_process()   # slow again!
+    return data
+```
+
+. . .
+
+## With `@reactive.calc` (efficient)
+
+```python
+@reactive.calc
+def processed():
+    return load_and_process()   # once!
+
+@render.plot
+def plot1():
+    return make_plot(processed())   # reuses cache
+
+@render.table
+def table1():
+    return processed()              # reuses cache
+```
+
+---
+
+## `@reactive.effect`: for things the user does not see
+
+```python
+@reactive.effect
+def log_year():
+    print(f"[{input.year()}] user changed the year filter")
+```
+
+Same dependency tracking, but:
+
+- **No return value**
+- **No caching**
+- Runs for side effects (logging, writing a file)
+
+. . .
+
+If the user needs to **see** it, use `@render.*`, not `@reactive.effect`.
+
+---
+
+## `@reactive.event`: "only when I say so"
+
+```python
+@reactive.calc
+@reactive.event(input.go)
+def total():
+    return input.a() + input.b()
+```
+
+Move the sliders: nothing happens.
+
+Click "Recompute": `total` updates.
+
+. . .
+
+Perfect for expensive computations where the user should control the timing.
+
+---
+
+## Quick reference {.smaller}
+
+| Decorator | Returns value? | Cached? | When does it run? |
+|-----------|:-:|:-:|-------------------|
+| `@reactive.calc` | Yes | Yes | When read, if stale |
+| `@reactive.effect` | No | No | Whenever deps change |
+| `@render.text` / `@render.plot` | Yes (to browser) | No | Whenever deps change |
+| `@reactive.event(input.x)` | (modifier) | | Only when `input.x` fires |
+
+---
+
+## Worked example: suburbs explorer {.smaller}
+
+::: {.columns}
+
+::: {.column width="55%"}
+```python
+@reactive.calc
+def filtered():
+    df = data[data["city"] == input.city()]
+    return df[df["population"] >= input.min_pop()]
+
+@render.table
+def tbl():
+    return filtered()
+
+@render.plot
+def chart():
+    df = filtered()
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.barh(df["suburb"], df["median_income"],
+            color="steelblue")
+    ax.set_xlabel("Median income")
+    return fig
+
+@reactive.effect
+@reactive.event(input.log)
+def _():
+    print(f"[LOG] {input.city()}, "
+          f"n={len(filtered())} rows")
+```
+:::
+
+::: {.column width="45%"}
+**What happens:**
+
+- Change city or slider: table + chart redraw
+- Click "Log": message prints, nothing visible changes
+- `filtered()` runs **once** per change, shared by both outputs
+:::
+
+:::
+
+---
+
+## Walk through the reactive graph
+
+- **Two sources**: `input.city()` and `input.min_pop()`
+- **One expression**: `filtered()`, cached and shared
+- **Two render observers**: `tbl` and `chart`, redraw when `filtered` changes
+- **One effect observer**: `_`, gated by `@reactive.event(input.log)`, only the button triggers it
+
+. . .
+
+This pattern (shared calc, multiple render outputs, one gated effect) covers most dashboards you will ever build.
+
+---
+
+## ipyleaflet + shinywidgets (for next week in the lab) {.smaller}
+
+```python
+from shinywidgets import output_widget, render_widget
+from ipyleaflet import Map, GeoData
+import geopandas as gpd
+
+layer = gpd.read_file("data/sa2.geojson").to_crs(4326)
+
+# UI
+output_widget("map")
+
+# Server
+@render_widget
+def map():
+    m = Map(center=(-36.85, 174.77), zoom=11)
+    m.add_layer(GeoData(
+        geo_dataframe=filtered_layer(),
+        style={"color": "#d73027", "weight": 2,
+               "fillOpacity": 0.4},
+    ))
+    return m
+```
+
+Two things to remember:
+
+- **CRS**: ipyleaflet needs WGS84 (`EPSG:4326`)
+- **Layer refresh**: return a **new** `Map` each time inside `@render_widget`
+
+---
+
+## Layout: sidebar + cards
+
+```python
+app_ui = ui.page_sidebar(
+    ui.sidebar(
+        ui.input_select("city", "City", choices=cities),
+        ui.input_slider("min_pop", "Min population",
+                        0, 20000, 0, step=1000),
+    ),
+    ui.card(
+        ui.card_header("Chart"),
+        ui.output_plot("chart"),
+    ),
+    ui.card(
+        ui.card_header("Map"),
+        output_widget("map"),
+    ),
+    title="Auckland dashboard",
+)
+```
+
+Cards group related content. Sidebar keeps inputs out of the way.
+
+---
+
+## Debugging: four techniques that solve 90% of problems
+
+**1. Read the traceback** (last line first)
+
+```
+AttributeError: 'Inputs' object has no attribute 'n'
+```
+
+You wrote `input.n` instead of `input.n()`, or the id does not match.
+
+. . .
+
+**2. `print()` is your friend**
+
+```python
+@render.text
+def echo():
+    print(f"echo running with n={input.n()}")
+    return f"You picked {input.n()}"
+```
+
+If it does not print, the function is not running.
+
+---
+
+## Debugging (continued)
+
+**3. Silent failures = name mismatches**
+
+```python
+ui.output_text("echo")     # placeholder: "echo"
+
+@render.text
+def eccho():                # function: "eccho" (typo!)
+    ...                     # blank output, no error
+```
+
+. . .
+
+**4. Test your functions outside Shiny first**
+
+```python
+# In a notebook or script
+data = pd.read_csv("data/test.csv")
+result = your_filter_function(data, "Auckland")
+print(result.head())       # does it work?
+```
+
+If the function is correct, the Shiny wiring is the only suspect.
+
+---
+
+## Deploying with shinylive: no server needed
+
+**Traditional web app:**
+
+```
+User  -->  Server (running Python)  -->  Response
+             (costs money, needs maintenance)
+```
+
+. . .
+
+**Shinylive (WebAssembly):**
+
+```
+User  -->  Browser (runs Python via Pyodide)  -->  Response
+             (free, no server, works offline)
+```
+
+Your app becomes static HTML files hosted on **GitHub Pages** for free.
+
+
+## Quiz 3: Shiny Dashboard Exploration {.smaller}
+
+1. Load your Shiny dashboard-tip in the browser using the code: <br> `shiny create --template dashboard-tips`
+3. Render the template using <br> `shiny run --reload [dashboard folder path]/app.py`
+4. Answer the Canvas question
+
+
+## Key takeaways {.smaller}
+
+1. A Shiny app has three pieces: **UI**, **server**, **App**
+2. **Reactive programming**: describe what depends on what, Shiny handles when
+3. Three reactive nodes: **sources** (inputs), **expressions** (`@reactive.calc`), **observers** (`@render.*`, `@reactive.effect`)
+4. `@reactive.calc` = cached shared value; `@reactive.effect` = side effects; `@reactive.event` = gated trigger
+5. `ipyleaflet` maps go inside Shiny via `output_widget` + `@render_widget`
+6. `shinylive export . docs` turns your app into a free static site
+
+---
+
+## After the break: Alex Raichev (MRCagney)
+
+Alex will talk about how interactive dashboards are used in real transport consulting work in Auckland.
+
+**Expect:**
+
+- Examples of dashboards MRCagney has built for clients
+- What questions clients actually ask of a dashboard, vs a static report
+- What separates a useful dashboard from a beautiful but unread one
+
+. . .
+
+Take notes. The design report will be stronger if you can connect your design choices to professional practice.
+
+---
+
+## Further reading
+
+- Posit, [Shiny for Python: Create and run](https://shiny.posit.co/py/get-started/create-run.html)
+- Posit, [Shiny for Python: Debug, troubleshoot, and help](https://shiny.posit.co/py/get-started/debug.html)
+- Posit, [Reactivity patterns](https://shiny.posit.co/py/docs/reactive-patterns.html)
+- Wickham, [Mastering Shiny, Ch 1](https://mastering-shiny.org/basic-app.html) and [Ch 3](https://mastering-shiny.org/action-intro.html)
+- [Shinylive examples gallery](https://shinylive.io/py/examples/)
