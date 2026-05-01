@@ -21,10 +21,6 @@ format:
     transition: slide
     logo: Figs/uoa-logo.png
     css: Figs/logo.css
-    #width: 1280
-    #height: 720
-    #margin: 0.05
-    #fontsize: 1.4em
     code-block-height: 480px
     smaller: true
     footer: "GISCI 343 | Week 8 | From Data to Dashboard"
@@ -197,22 +193,24 @@ m
 
 ## Every penguin on the map
 
-Since each penguin has its own coordinate, we can plot all 344 as individual `CircleMarker`s. Hover over a dot to see the island and species:
+Since each penguin has its own coordinate, we can plot all 344 as individual `CircleMarker`s. Click any dot to see its island and species:
 
 ```{python}
 from ipyleaflet import Map, CircleMarker, basemaps
+from ipywidgets import HTML
 
 m = Map(center=(-64.8, -64.5), zoom=9, basemap=basemaps.Esri.WorldImagery)
 
 for _, row in penguins_geo.dropna(subset=["latitude"]).iterrows():
-    m.add(CircleMarker(
+    marker = CircleMarker(
         location=(row["latitude"], row["longitude"]),
         radius=3,
         color="#447099",
         fill_color="#447099",
         fill_opacity=0.5,
-        title=f"{row['island']}: {row['species']}",
-    ))
+    )
+    marker.popup = HTML(value=f"<b>{row['island']}</b>: {row['species']}")
+    m.add(marker)
 m
 ```
 
@@ -226,6 +224,7 @@ Each species gets its own colour, so we can see how they distribute across islan
 
 ```{python}
 from ipyleaflet import Map, CircleMarker, basemaps
+from ipywidgets import HTML
 
 species_colours = {"Adelie": "#ff6f00", "Gentoo": "#1565c0", "Chinstrap": "#2e7d32"}
 
@@ -233,27 +232,30 @@ m = Map(center=(-64.8, -64.5), zoom=9, basemap=basemaps.Esri.WorldImagery)
 
 for _, row in penguins_geo.dropna(subset=["latitude"]).iterrows():
     colour = species_colours[row["species"]]
-    m.add(CircleMarker(
+    marker = CircleMarker(
         location=(row["latitude"], row["longitude"]),
         radius=3,
         color=colour,
         fill_color=colour,
         fill_opacity=0.6,
-        title=f"{row['island']}: {row['species']}",
-    ))
+    )
+    marker.popup = HTML(
+        value=f"<b>{row['species']}</b><br>Island: {row['island']}<br>Mass: {row['body_mass_g']} g"
+    )
+    m.add(marker)
 m
 ```
 
-Now you can see that islands are **not** single-species. Biscoe has both orange (Adelie) and blue (Gentoo). Dream has orange (Adelie) and green (Chinstrap). Only Torgersen is single-species (Adelie only). Hover over any dot to confirm.
+Now you can see that islands are **not** single-species. Biscoe has both orange (Adelie) and blue (Gentoo). Dream has orange (Adelie) and green (Chinstrap). Only Torgersen is single-species (Adelie only). Click any dot to confirm.
 
 ---
 
 ## Adding popups to markers
 
-Popups let users click a marker and see information. Use the `Popup` widget or attach an `HTML` widget to a marker:
+Popups let users click a marker and see information. Attach an `HTML` widget to any marker:
 
 ```python
-from ipyleaflet import Map, Marker, Popup
+from ipyleaflet import Map, Marker
 from ipywidgets import HTML
 
 island_summary = penguins_geo.groupby("island").agg(
@@ -266,14 +268,13 @@ m = Map(center=(-64.8, -64.5), zoom=9, basemap=basemaps.Esri.WorldImagery)
 
 for _, row in island_summary.iterrows():
     marker = Marker(location=(row["lat"], row["lon"]))
-    popup_content = HTML(
+    marker.popup = HTML(
         value=f"<b>{row['island']}</b><br>{int(row['n'])} penguins"
     )
-    marker.popup = popup_content
     m.add(marker)
 ```
 
-This is useful when each point has attributes you want to display on click, exactly like your Assignment 2 data.
+This works on both `Marker` and `CircleMarker`. For your Assignment 2, use popups to show attributes when users click on features.
 
 ---
 
@@ -358,12 +359,14 @@ def server(input, output, session):
 
         m = Map(center=(-64.8, -64.5), zoom=9,
                 basemap=basemaps.Esri.WorldImagery)
-        for _, row in sel.iterrows():
-            m.add(CircleMarker(
+        for _, row in sel.dropna(subset=["latitude"]).iterrows():
+            marker = CircleMarker(
                 location=(row["latitude"], row["longitude"]),
-                radius=8, color="#447099",
+                radius=4, color="#447099",
                 fill_color="#447099", fill_opacity=0.7,
-            ))
+            )
+            marker.popup = HTML(value=f"<b>{row['species']}</b><br>{row['island']}")
+            m.add(marker)
         return m
 ```
 
@@ -377,6 +380,7 @@ Every time the user picks a different species, `map()` re-runs and the browser u
 from shiny import App, ui, render, reactive
 from shinywidgets import output_widget, render_widget
 from ipyleaflet import Map, CircleMarker, basemaps
+from ipywidgets import HTML
 import pandas as pd
 
 penguins_geo = pd.read_csv("data/penguins_geo.csv")
@@ -400,15 +404,19 @@ def server(input, output, session):
 
     @render_widget
     def map():
-        sel = filtered()
+        sel = filtered().dropna(subset=["latitude"])
         m = Map(center=(-64.8, -64.5), zoom=9,
                 basemap=basemaps.Esri.WorldImagery)
-        for _, row in sel.drop_duplicates("island").iterrows():
-            m.add(CircleMarker(
+        for _, row in sel.iterrows():
+            marker = CircleMarker(
                 location=(row["latitude"], row["longitude"]),
-                radius=12, color="#447099",
+                radius=4, color="#447099",
                 fill_color="#447099", fill_opacity=0.7,
-            ))
+            )
+            marker.popup = HTML(
+                value=f"<b>{row['species']}</b><br>Island: {row['island']}<br>Mass: {row['body_mass_g']} g"
+            )
+            m.add(marker)
         return m
 
     @render.text
@@ -628,7 +636,7 @@ You do not need to run it yet. The goal is to plan the logic before writing the 
 
 ```python
 # Wrong:
-m = Map(...)           # created once at module level
+m = Map(...)           # created once, never refreshed
 @render_widget
 def map():
     m.add_layer(...)   # tries to mutate, will not update
@@ -650,7 +658,7 @@ The penguin app is a toy example, but the structure maps directly to your projec
 
 | Penguin app | Your dashboard |
 |-------------|---------------|
-| `palmerpenguins` CSV | Your dataset (AT, Census, crashes) |
+| `penguins_geo.csv` | Your dataset (AT, Census, crashes) |
 | `island_coords` merge | Joining your data to geometries |
 | `input.species()` | Your filter (route, year, suburb) |
 | `@reactive.calc filtered()` | Your shared filtered dataset |
@@ -687,10 +695,10 @@ def server(input, output, session):
 
 How many times does `filtered()` execute when the user changes `input.region()` once?
 
-* A. Zero
-* B. One
-* C. Two
-* D. Three
+A. Zero
+B. One
+C. Two
+D. Three
 
 ---
 
@@ -708,10 +716,10 @@ def summry():
     return f"{len(filtered())} rows"
 ```
 
-* A. `@render.text` cannot return an f-string
-* B. The function name `summry` does not match the output id `summary`
-* C. `filtered()` returns an empty DataFrame
-* D. You need `@reactive.calc` before `@render.text`
+A. `@render.text` cannot return an f-string
+B. The function name `summry` does not match the output id `summary`
+C. `filtered()` returns an empty DataFrame
+D. You need `@reactive.calc` before `@render.text`
 
 ---
 
@@ -719,10 +727,10 @@ def summry():
 
 Your GeoDataFrame is in EPSG:2193 (NZTM). You load it and add it to an ipyleaflet map, but the map appears empty. What is the most likely cause?
 
-* A. The file is corrupt
-* B. ipyleaflet expects EPSG:4326 (WGS84), and you forgot `.to_crs(4326)`
-* C. You need to install a separate projection library
-* D. NZTM coordinates are too large for ipyleaflet to render
+A. The file is corrupt
+B. ipyleaflet expects EPSG:4326 (WGS84), and you forgot `.to_crs(4326)`
+C. You need to install a separate projection library
+D. NZTM coordinates are too large for ipyleaflet to render
 
 ---
 
@@ -730,10 +738,33 @@ Your GeoDataFrame is in EPSG:2193 (NZTM). You load it and add it to an ipyleafle
 
 You have two inputs (`input.species()` and `input.island()`) and you want the dashboard to update **only** when the user clicks an "Apply" button. Which decorator combination should you use?
 
-* A. `@reactive.calc` only
-* B. `@reactive.effect` only
-* C. `@reactive.calc` with `@reactive.event(input.apply)`
-* D. `@render.plot` with `@reactive.effect`
+A. `@reactive.calc` only
+B. `@reactive.effect` only
+C. `@reactive.calc` with `@reactive.event(input.apply)`
+D. `@render.plot` with `@reactive.effect`
+
+---
+
+## Question 5
+
+You want both a map and a chart to update whenever the user changes a dropdown. What is the best way to avoid filtering the data twice?
+
+A. Copy and paste the same filtering code into both `@render_widget` and `@render.plot`
+B. Filter once inside a `@reactive.calc` function and call it from both outputs
+C. Use `@reactive.effect` to filter and store the result in a global variable
+D. Put the filter in the UI definition
+
+---
+
+## Checklist before you leave
+
+- [ ] Pair quiz submitted on Canvas
+- [ ] Your own dataset loaded in `app.py`
+- [ ] At least one ipyleaflet map displaying your data
+- [ ] At least one input widget connected to the map
+- [ ] `@reactive.calc` used if you have more than one output
+
+---
 
 ## Further reading
 
