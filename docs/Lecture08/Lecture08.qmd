@@ -10,7 +10,7 @@ author:
         address: 23 Symonds Street
         city: Auckland
         postal-code: 1010
-date: 05/05/2026
+date: 05/04/2026
 date-format: long
 format:
   revealjs:
@@ -21,8 +21,8 @@ format:
     transition: slide
     logo: Figs/uoa-logo.png
     css: Figs/logo.css
-    code-block-height: 480px
-    smaller: true
+    code-block-height: 400px
+    #smaller: true
     footer: "GISCI 343 | Week 8 | From Data to Dashboard"
 jupyter: python3
 ---
@@ -58,7 +58,7 @@ app = App(app_ui, server)       # 3. App: connects them
 
 ---
 
-## Recap: reactive nodes (Week 6)
+## Recap: reactive nodes (Week 6) {.smaller}
 
 | Decorator | Purpose | Cached? |
 |-----------|---------|:-------:|
@@ -87,7 +87,7 @@ Today we build on that. Instead of bus routes, we will use **penguins** to pract
 
 ---
 
-## The palmerpenguins dataset
+## The palmerpenguins dataset {.smaller}
 
 The `palmerpenguins` package provides measurements for 344 penguins from three species, collected at Palmer Station, Antarctica. We have prepared a version with individual latitude/longitude coordinates for each penguin (jittered around island centroids).
 
