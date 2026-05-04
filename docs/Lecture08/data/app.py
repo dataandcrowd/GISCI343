@@ -1,5 +1,5 @@
 from shiny import App, ui, render, reactive
-from shinywidgets import output_widget, render_widget
+from shinywidgets import output_widget, register_widget
 from ipyleaflet import Map, CircleMarker, basemaps
 from ipywidgets import HTML
 import pandas as pd
@@ -46,20 +46,29 @@ app_ui = ui.page_sidebar(
 # --- Server ---
 def server(input, output, session):
 
+    # Create the map ONCE and register it with the output.
+    # We update layers in place using @reactive.effect instead of
+    # recreating the whole map, because @render_widget does not
+    # reliably re-render ipyleaflet maps when inputs toggle.
+    m = Map(
+        center=(-64.8, -64.5),
+        zoom=9,
+        basemap=basemaps.Esri.WorldImagery,
+    )
+    register_widget("map", m)
+
     @reactive.calc
     def filtered():
         df = penguins_geo[penguins_geo["species"].isin(input.species())]
         return df[df["island"].isin(input.islands())]
 
-    @render_widget
-    def map():
+    @reactive.effect
+    def _update_map():
         sel = filtered().dropna(subset=["latitude"])
 
-        m = Map(
-            center=(-64.8, -64.5),
-            zoom=9,
-            basemap=basemaps.Esri.WorldImagery,
-        )
+        # Remove old markers (keep the basemap layer at index 0)
+        m.layers = [m.layers[0]]
+
         for _, row in sel.iterrows():
             colour = species_colours[row["species"]]
             marker = CircleMarker(
@@ -78,7 +87,6 @@ def server(input, output, session):
                 )
             )
             m.add(marker)
-        return m
 
     @render.text
     def summary():
