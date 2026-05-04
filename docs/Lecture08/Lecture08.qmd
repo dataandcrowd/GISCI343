@@ -33,8 +33,8 @@ jupyter: python3
 2. The palmerpenguins dataset, with real coordinates
 3. ipyleaflet: plotting penguins on a map
 4. Wrapping the map in Shiny (notebook to app)
-5. GeoDataFrame and `GeoData` layers
-6. Popups and action buttons
+5. Popups and action buttons
+6. **Group activity**: complete TASKs 1 to 5 in `app.py`
 7. **Pair quiz** (submit on Canvas before you leave)
 
 ---
@@ -133,22 +133,7 @@ For your Assignment 2, your data likely already has real coordinates, so you wil
 
 ---
 
-## Merging data: a pattern you will use
-
-Even though our penguin CSV already has coordinates, the **merge pattern** is something you will use constantly in Assignment 2 when your attributes and geometries live in separate files:
-
-```python
-# Your own version might look like:
-stops = pd.read_csv("data/stops.csv")           # has stop_id, lat, lon
-boardings = pd.read_csv("data/boardings.csv")   # has stop_id, count
-combined = boardings.merge(stops, on="stop_id")  # now has geometry
-```
-
-The idea: one table has the _what_, another has the _where_. Merge them on a shared key.
-
----
-
-## Your Turn: explore the data
+## Your Turn: explore the data (Quiz 1-2)
 
 With your partner, run the following in a notebook and discuss:
 
@@ -171,6 +156,8 @@ Think about: which of these summaries could become an output in a dashboard?
 ---
 
 ## Our first penguin map: one marker per island
+Run `popup_markers.py`
+
 
 ```{python}
 from ipyleaflet import Map, Marker, basemaps
@@ -248,52 +235,11 @@ m
 
 Now you can see that islands are **not** single-species. Biscoe has both orange (Adelie) and blue (Gentoo). Dream has orange (Adelie) and green (Chinstrap). Only Torgersen is single-species (Adelie only). Click any dot to confirm.
 
----
-
-## Adding popups to markers
-
-Popups let users click a marker and see information. Attach an `HTML` widget to any marker:
-
-```python
-from ipyleaflet import Map, Marker
-from ipywidgets import HTML
-
-island_summary = penguins_geo.groupby("island").agg(
-    n=("species", "size"),
-    lat=("latitude", "mean"),
-    lon=("longitude", "mean"),
-).reset_index()
-
-m = Map(center=(-64.8, -64.5), zoom=9, basemap=basemaps.Esri.WorldImagery)
-
-for _, row in island_summary.iterrows():
-    marker = Marker(location=(row["lat"], row["lon"]))
-    marker.popup = HTML(
-        value=f"<b>{row['island']}</b><br>{int(row['n'])} penguins"
-    )
-    m.add(marker)
-```
-
-This works on both `Marker` and `CircleMarker`. For your Assignment 2, use popups to show attributes when users click on features.
-
----
-
 ## Your Turn: add species breakdown to popups
 
-Modify the popup example so that each island marker shows a **breakdown by species**, for example: "Torgersen: 52 Adelie". You will need to group by both island and species.
+Modify the popup example so that each island marker shows a **breakdown by species**.
 
-Hint:
-
-```python
-breakdown = penguins_geo.groupby(["island", "species"]).size().reset_index(name="n")
-# For each island, build a multi-line popup string
-for island in breakdown["island"].unique():
-    sub = breakdown[breakdown["island"] == island]
-    lines = [f"{r['species']}: {r['n']}" for _, r in sub.iterrows()]
-    popup_text = f"<b>{island}</b><br>" + "<br>".join(lines)
-```
-
-Try it with your partner. You have about five minutes.
+Run `popup_species_breakdown.py`
 
 ---
 
@@ -387,9 +333,10 @@ penguins_geo = pd.read_csv("data/penguins_geo.csv")
 
 app_ui = ui.page_sidebar(
     ui.sidebar(
-        ui.input_radio_buttons(
+        ui.input_checkbox_group(
             "species", "Species",
             choices=["Adelie", "Gentoo", "Chinstrap"],
+            selected=["Adelie", "Gentoo", "Chinstrap"],
         ),
     ),
     ui.output_text("summary"),
@@ -400,7 +347,7 @@ app_ui = ui.page_sidebar(
 def server(input, output, session):
     @reactive.calc
     def filtered():
-        return penguins_geo[penguins_geo["species"] == input.species()]
+        return penguins_geo[penguins_geo["species"].isin(input.species())]
 
     @render_widget
     def map():
@@ -408,10 +355,11 @@ def server(input, output, session):
         m = Map(center=(-64.8, -64.5), zoom=9,
                 basemap=basemaps.Esri.WorldImagery)
         for _, row in sel.iterrows():
+            colour = species_colours[row["species"]]
             marker = CircleMarker(
                 location=(row["latitude"], row["longitude"]),
-                radius=4, color="#447099",
-                fill_color="#447099", fill_opacity=0.7,
+                radius=4, color=colour,
+                fill_color=colour, fill_opacity=0.7,
             )
             marker.popup = HTML(
                 value=f"<b>{row['species']}</b><br>Island: {row['island']}<br>Mass: {row['body_mass_g']} g"
@@ -424,7 +372,8 @@ def server(input, output, session):
         sel = filtered()
         n = len(sel.dropna(subset=["bill_length_mm"]))
         avg_mass = sel["body_mass_g"].mean()
-        return (f"{input.species()}: {n} penguins, "
+        species_list = ", ".join(sorted(sel["species"].unique()))
+        return (f"{species_list}: {n} penguins, "
                 f"avg body mass {avg_mass:,.0f} g")
 
 app = App(app_ui, server)
@@ -437,10 +386,10 @@ app = App(app_ui, server)
 ```python
 @reactive.calc
 def filtered():
-    return penguins_geo[penguins_geo["species"] == input.species()]
+    return penguins_geo[penguins_geo["species"].isin(input.species())]
 ```
 
-Both `map()` and `summary()` call `filtered()`. The filtering runs **once** per species change, not twice.
+Both `map()` and `summary()` call `filtered()`. The filtering runs **once** per input change, not twice.
 
 This is the same pattern from Week 6, and the same pattern you should use in Assignment 2.
 
@@ -454,44 +403,6 @@ Copy the complete app code into an `app.py` file and run it with `shiny run --re
 2. Does the summary text update at the same time?
 3. Try adding `print(f"filtered ran for {input.species()}")` inside `filtered()`. How many times does it print when you switch species?
 
----
-
-## Adding an action button with `@reactive.event`
-
-Sometimes you do not want every change to trigger an update immediately, especially if the computation is expensive. An action button lets the user adjust several inputs first, then click once:
-
-```python
-# In app_ui, inside ui.sidebar():
-ui.input_action_button("apply", "Apply filters"),
-
-# In server:
-@reactive.calc
-@reactive.event(input.apply, ignore_none=False)
-def filtered():
-    df = penguins_geo[penguins_geo["species"] == input.species()]
-    return df[df["island"].isin(input.islands())]
-```
-
-Now `filtered()` only recalculates when the user clicks "Apply filters", not on every radio button or checkbox change.
-
----
-
-## When to use `@reactive.event`
-
-Use it when:
-
-- The user adjusts **multiple inputs** before wanting results (avoids flickering)
-- The computation is **slow** (large dataset, network call)
-- You want the user to **confirm** before the dashboard updates
-
-Do not use it when:
-
-- You only have one input (the button adds unnecessary friction)
-- The computation is fast and instant feedback is helpful
-
-For Assignment 2, if your filtering is quick, you probably do not need `@reactive.event`. If loading or processing takes more than a second, consider it.
-
----
 
 ## Adding a second input: island filter
 
@@ -508,7 +419,7 @@ ui.input_checkbox_group(
 # In server:
 @reactive.calc
 def filtered():
-    df = penguins_geo[penguins_geo["species"] == input.species()]
+    df = penguins_geo[penguins_geo["species"].isin(input.species())]
     return df[df["island"].isin(input.islands())]
 ```
 
@@ -549,8 +460,9 @@ Map and chart share `filtered()`. One `@reactive.calc`, two outputs.
 ```python
 app_ui = ui.page_sidebar(
     ui.sidebar(
-        ui.input_radio_buttons("species", "Species",
-                               choices=["Adelie", "Gentoo", "Chinstrap"]),
+        ui.input_checkbox_group("species", "Species",
+                                choices=["Adelie", "Gentoo", "Chinstrap"],
+                                selected=["Adelie", "Gentoo", "Chinstrap"]),
         ui.input_checkbox_group("islands", "Islands",
                                 choices=["Torgersen", "Biscoe", "Dream"],
                                 selected=["Torgersen", "Biscoe", "Dream"]),
@@ -565,66 +477,6 @@ app_ui = ui.page_sidebar(
     title="Palmer Penguins Explorer",
 )
 ```
-
----
-
-## Using `GeoData` with a GeoDataFrame
-
-For Assignment 2, most of you will work with polygons or lines (SA2 boundaries, bus routes, crash zones), not point markers. Use `GeoData` instead of `CircleMarker`:
-
-```python
-from ipyleaflet import Map, GeoData
-import geopandas as gpd
-
-gdf = gpd.read_file("data/sa2.geojson").to_crs(4326)  # always reproject!
-
-m = Map(center=(-36.85, 174.77), zoom=11)
-m.add_layer(GeoData(
-    geo_dataframe=gdf,
-    style={"color": "#d73027", "weight": 2, "fillOpacity": 0.4},
-    hover_style={"fillColor": "yellow", "fillOpacity": 0.6},
-    name="SA2 boundaries",
-))
-```
-
-`hover_style` gives visual feedback when the user moves their mouse over a polygon, no extra code needed.
-
----
-
-## `GeoData` inside Shiny
-
-The pattern is identical to what we did with `CircleMarker`:
-
-```python
-@reactive.calc
-def filtered_gdf():
-    gdf = all_data[all_data["category"] == input.category()]
-    return gdf.to_crs(4326)
-
-@render_widget
-def map():
-    m = Map(center=(-36.85, 174.77), zoom=11)
-    m.add_layer(GeoData(
-        geo_dataframe=filtered_gdf(),
-        style={"color": "#1565c0", "weight": 2, "fillOpacity": 0.4},
-        hover_style={"fillColor": "yellow", "fillOpacity": 0.6},
-    ))
-    return m
-```
-
-Remember: return a **new** `Map()` each time. Do not try to mutate a map created at module level.
-
----
-
-## Your Turn: sketch your own `@reactive.calc`
-
-With your partner, write (on paper or in a text file) the `@reactive.calc` function for your Assignment 2 dashboard. Think about:
-
-1. What inputs does it depend on? (dropdown, slider, checkbox?)
-2. What columns does it filter on?
-3. Which outputs will call it? (map, chart, text summary?)
-
-You do not need to run it yet. The goal is to plan the logic before writing the app.
 
 ---
 
@@ -652,78 +504,32 @@ def map():
 
 ---
 
-## From penguins to your Assignment 2
 
-The penguin app is a toy example, but the structure maps directly to your project:
+## Group activity: complete TASKs 1 to 5 {.smaller}
 
-| Penguin app | Your dashboard |
-|-------------|---------------|
-| `penguins_geo.csv` | Your dataset (AT, Census, crashes) |
-| `island_coords` merge | Joining your data to geometries |
-| `input.species()` | Your filter (route, year, suburb) |
-| `@reactive.calc filtered()` | Your shared filtered dataset |
-| `CircleMarker` / `GeoData` | Your map layer (points or polygons) |
-| `@render.plot hist` | Your chart (bar, line, histogram) |
-| `@reactive.event` | Optional: "Apply" button if filtering is slow |
+Open the `app.py` file provided in the `week08/` folder. It is a working skeleton of the Palmer Penguins Explorer. Your job is to complete **five small tasks** (each is only 1 to 2 lines of code):
 
----
+| Task | What to do | Where |
+|------|-----------|-------|
+| TASK 1 | Add island filtering to `filtered()` | `df = df[df["island"].isin(input.islands())]` |
+| TASK 2 | Colour each dot by species | `colour = species_colours[row["species"]]` |
+| TASK 3 | Uncomment the popup lines | Already written, just remove `#` |
+| TASK 4 | Add island names to the summary text | Build `islands` string, add to return |
+| TASK 5 | Colour each histogram bar by species | `color=species_colours[sp]` |
 
-## Pair Quiz
-
-Work in pairs. Submit your answers on **Canvas** before the end of class.
+Run with: `shiny run --reload app.py`
 
 ---
 
-## Question 1
+## Tips for the group activity
 
-Consider this server code:
+- The app **already runs** before you change anything. Each task makes it better.
+- Look at the **existing pattern** above each task. For example, species filtering is done for you; island filtering follows the same `.isin()` pattern.
+- After each task, save the file. Because you used `--reload`, the browser updates automatically.
+- If you get stuck, compare with the code we built together in the earlier slides.
 
-```python
-def server(input, output, session):
-    @reactive.calc
-    def filtered():
-        return data[data["region"] == input.region()]
 
-    @render.text
-    def count():
-        return f"{len(filtered())} rows"
-
-    @render.plot
-    def chart():
-        return filtered().plot.bar(x="suburb", y="pop")
-```
-
-How many times does `filtered()` execute when the user changes `input.region()` once?
-
-A. Zero
-B. One
-C. Two
-D. Three
-
----
-
-## Question 2
-
-You write this server code, but the text output is blank with no error. What is the most likely cause?
-
-```python
-# In UI:
-ui.output_text("summary")
-
-# In server:
-@render.text
-def summry():
-    return f"{len(filtered())} rows"
-```
-
-A. `@render.text` cannot return an f-string
-B. The function name `summry` does not match the output id `summary`
-C. `filtered()` returns an empty DataFrame
-D. You need `@reactive.calc` before `@render.text`
-
----
-
-## Question 3
+## Canvas quiz 3
 
 Your GeoDataFrame is in EPSG:2193 (NZTM). You load it and add it to an ipyleaflet map, but the map appears empty. What is the most likely cause?
 
@@ -734,35 +540,27 @@ D. NZTM coordinates are too large for ipyleaflet to render
 
 ---
 
-## Question 4
-
-You have two inputs (`input.species()` and `input.island()`) and you want the dashboard to update **only** when the user clicks an "Apply" button. Which decorator combination should you use?
-
-A. `@reactive.calc` only
-B. `@reactive.effect` only
-C. `@reactive.calc` with `@reactive.event(input.apply)`
-D. `@render.plot` with `@reactive.effect`
-
----
-
-## Question 5
-
-You want both a map and a chart to update whenever the user changes a dropdown. What is the best way to avoid filtering the data twice?
-
-A. Copy and paste the same filtering code into both `@render_widget` and `@render.plot`
-B. Filter once inside a `@reactive.calc` function and call it from both outputs
-C. Use `@reactive.effect` to filter and store the result in a global variable
-D. Put the filter in the UI definition
-
----
-
 ## Checklist before you leave
 
+- [ ] Completed TASKs 1 to 5 in `app.py`
 - [ ] Pair quiz submitted on Canvas
-- [ ] Your own dataset loaded in `app.py`
-- [ ] At least one ipyleaflet map displaying your data
-- [ ] At least one input widget connected to the map
-- [ ] `@reactive.calc` used if you have more than one output
+- [ ] Understand the notebook-to-Shiny pattern
+- [ ] Know how `@reactive.calc` shares data between outputs
+
+
+
+## From penguins to your Assignment 2
+
+The penguin app is a toy example, but the structure maps directly to your project:
+
+| Penguin app | Your dashboard |
+|-------------|---------------|
+| `penguins_geo.csv` | Your dataset (AT, Census, crashes) |
+| `input.species()` | Your filter (route, year, suburb) |
+| `@reactive.calc filtered()` | Your shared filtered dataset |
+| `CircleMarker` | Your map layer (points or polygons) |
+| `@render.plot hist` | Your chart (bar, line, histogram) |
+| `@reactive.event` | Optional: "Apply" button if filtering is slow |
 
 ---
 

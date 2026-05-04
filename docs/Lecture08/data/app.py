@@ -16,9 +16,10 @@ species_colours = {
 # --- UI ---
 app_ui = ui.page_sidebar(
     ui.sidebar(
-        ui.input_radio_buttons(
+        ui.input_checkbox_group(
             "species", "Species",
             choices=["Adelie", "Gentoo", "Chinstrap"],
+            selected=["Adelie", "Gentoo", "Chinstrap"],
         ),
         ui.input_checkbox_group(
             "islands", "Islands",
@@ -47,13 +48,12 @@ def server(input, output, session):
 
     @reactive.calc
     def filtered():
-        df = penguins_geo[penguins_geo["species"] == input.species()]
+        df = penguins_geo[penguins_geo["species"].isin(input.species())]
         return df[df["island"].isin(input.islands())]
 
     @render_widget
     def map():
         sel = filtered().dropna(subset=["latitude"])
-        colour = species_colours[input.species()]
 
         m = Map(
             center=(-64.8, -64.5),
@@ -61,6 +61,7 @@ def server(input, output, session):
             basemap=basemaps.Esri.WorldImagery,
         )
         for _, row in sel.iterrows():
+            colour = species_colours[row["species"]]
             marker = CircleMarker(
                 location=(row["latitude"], row["longitude"]),
                 radius=4,
@@ -84,9 +85,10 @@ def server(input, output, session):
         sel = filtered()
         n = len(sel.dropna(subset=["bill_length_mm"]))
         avg_mass = sel["body_mass_g"].mean()
+        species_list = ", ".join(sorted(sel["species"].unique()))
         islands = ", ".join(sorted(sel["island"].unique()))
         return (
-            f"{input.species()}: {n} penguins on {islands}, "
+            f"{species_list}: {n} penguins on {islands}, "
             f"avg body mass {avg_mass:,.0f} g"
         )
 
@@ -95,17 +97,22 @@ def server(input, output, session):
         import matplotlib.pyplot as plt
 
         sel = filtered()
-        colour = species_colours[input.species()]
+        selected_species = sorted(sel["species"].unique())
+
         fig, ax = plt.subplots(figsize=(7, 3))
-        ax.hist(
-            sel["bill_length_mm"].dropna(),
-            bins=15,
-            color=colour,
-            edgecolor="white",
-        )
+        for sp in selected_species:
+            sub = sel[sel["species"] == sp]
+            ax.hist(
+                sub["bill_length_mm"].dropna(),
+                bins=15,
+                color=species_colours[sp],
+                edgecolor="white",
+                alpha=0.7,
+                label=sp,
+            )
         ax.set_xlabel("Bill length (mm)")
         ax.set_ylabel("Count")
-        ax.set_title(f"{input.species()} bill lengths")
+        ax.legend()
         return fig
 
 # --- App ---
