@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="Lecture09_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Lecture09_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Lecture09_files/libs/quarto-html/popper.min.js"></script>
+<script src="Lecture09_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Lecture09_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Lecture09_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Lecture09_files/libs/quarto-html/quarto-syntax-highlighting-234273d1456647dabc34a594ac50e507.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
+
+  <meta name="author" content="Hyesop Shin">
+  <meta name="dcterms.date" content="2026-05-11">
+  <title>From Scripts to Packages: Build, Install, Share</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Lecture09_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Lecture09_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="Lecture09_files/libs/revealjs/dist/theme/quarto-bdc00e421f0f67bb1c8a574e443af4bf.css">
+  <link rel="stylesheet" href="Figs/logo.css">
+  <link href="Lecture09_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Lecture09_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Lecture09_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Lecture09_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">From Scripts to Packages: Build, Install, Share</h1>
+  <p class="subtitle">GISCI 343, Week 9</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a>
+</div>
+<div class="quarto-title-author-email">
+<a href="mailto:hyesop.shin@auckland.ac.nz">hyesop.shin@auckland.ac.nz</a>
+</div>
+        <p class="quarto-title-affiliation">
+            University of Auckland
+          </p>
+    </div>
+</div>
+
+  <p class="date">May 11, 2026</p>
+</section>
+<section id="todays-plan-90-min" class="slide level2">
+<h2>Today’s plan (90 min)</h2>
+<ol type="1">
+<li>Recap of Part 3 and welcome to Part 4</li>
+<li>Why we package code (the copy-paste problem)</li>
+<li>Anatomy of a Python package</li>
+<li>Live demo: build <code>geohello</code> in four steps</li>
+<li><strong>Hands-on</strong>: build <code>geohello-yourname</code> (in pairs)</li>
+<li>A real package tour: <code>akl-ped-counts</code></li>
+<li><strong>Assignment 3</strong>: the five package briefs</li>
+<li><strong>Pair formation and topic raffle</strong></li>
+</ol>
+</section>
+<section id="from-part-3-to-part-4" class="slide level2">
+<h2>From Part 3 to Part 4</h2>
+<p>In Part 3 you turned a notebook into a Shiny app and deployed it to a browser. Anyone with the URL could use it.</p>
+<div class="fragment">
+<p>In Part 4 we go one step further. You will turn analysis code into a <strong>Python package</strong> and publish it so anyone with <code>pip</code> can install it.</p>
+</div>
+<div class="fragment">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part 3</th>
+<th>Part 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Static notebook becomes interactive web app</td>
+<td>Scattered scripts become one installable package</td>
+</tr>
+<tr class="even">
+<td>Deploy with <code>shinylive</code></td>
+<td>Publish with <code>uv</code> to PyPI</td>
+</tr>
+<tr class="odd">
+<td>Audience clicks a URL</td>
+<td>Audience runs <code>pip install your-package</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="the-four-week-arc" class="slide level2">
+<h2>The four-week arc</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 26%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Week</th>
+<th>Focus</th>
+<th>Deliverable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>9</strong></td>
+<td>Package fundamentals (today + lab)</td>
+<td><code>geohello-yourname</code> builds locally</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Tests, docs, TestPyPI rehearsal</td>
+<td>TestPyPI release of A3 package</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Polish + <strong>poster showcase</strong></td>
+<td>A1 poster, 25 May, B301-G10</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>PyPI deploy + fit interview</td>
+<td>Production PyPI release</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>Today’s job: get every pair building a working package by the end of the lecture.</p>
+</div>
+</section>
+<section id="why-we-package-code" class="slide level2">
+<h2>Why we package code</h2>
+<p>Imagine you wrote a walkability function for Project A.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># project1/analysis.py</span></span>
+<span id="cb1-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_walkability(streets, amenities, buffer_m<span class="op">=</span><span class="dv">800</span>):</span>
+<span id="cb1-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 50 lines of careful code</span></span>
+<span id="cb1-4"><a href="" aria-hidden="true" tabindex="-1"></a>    ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Six months later, Project B needs the same function. What do you do?</p>
+<div class="fragment">
+<p>Most people copy-paste. Then they fix a bug in Project A and forget Project B. Now there are two versions of “the same” function and neither matches.</p>
+</div>
+</section>
+<section id="packaging-in-one-slide" class="slide level2">
+<h2>Packaging in one slide</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Once: build and publish</span></span>
+<span id="cb2-2"><a href="" aria-hidden="true" tabindex="-1"></a>pip install my<span class="op">-</span>urban<span class="op">-</span>toolkit</span>
+<span id="cb2-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Forever: import in any project</span></span>
+<span id="cb2-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> my_urban_toolkit <span class="im">import</span> calculate_walkability</span>
+<span id="cb2-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> calculate_walkability(streets, amenities)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>One source of truth. One install command. Every project (and every collaborator) gets the same function.</p>
+</div>
+</section>
+<section id="what-is-a-python-package-really" class="slide level2">
+<h2>What is a Python package, really?</h2>
+<ul>
+<li class="fragment">A <strong>module</strong> is a single <code>.py</code> file.</li>
+<li class="fragment">A <strong>package</strong> is a folder of modules with an <code>__init__.py</code>.</li>
+<li class="fragment">A <strong>distribution</strong> is the <code>.whl</code> or <code>.tar.gz</code> file you install.</li>
+<li class="fragment">A <strong>PyPI release</strong> is a distribution uploaded to https://pypi.org so <code>pip install</code> can find it.</li>
+</ul>
+<div class="fragment">
+<p>Today we go: file → folder → distribution. Publishing to PyPI is Week 12.</p>
+</div>
+</section>
+<section id="anatomy-of-a-package-the-src-layout" class="slide level2 smaller">
+<h2>Anatomy of a package: the <code>src/</code> layout</h2>
+<pre><code>geohello-yourname/                # The repository
+├── src/
+│   └── geohello_yourname/        # The Python package (underscores)
+│       ├── __init__.py           # Makes the folder importable
+│       └── py.typed              # Optional type-checker marker
+├── tests/                        # pytest finds these next week
+├── pyproject.toml                # Package configuration
+├── README.md                     # What people see on PyPI
+└── .gitignore</code></pre>
+<div class="fragment">
+<p>Two names to keep apart:</p>
+<ul>
+<li><strong>PyPI name</strong> (in <code>pyproject.toml</code>): hyphenated, e.g.&nbsp;<code>geohello-yourname</code></li>
+<li><strong>Python package name</strong> (folder under <code>src/</code>): underscored, e.g.&nbsp;<code>geohello_yourname</code></li>
+</ul>
+<p><code>pip install geohello-yourname</code> then <code>from geohello_yourname import hello</code>.</p>
+</div>
+</section>
+<section id="pyproject.toml-the-configuration-hub" class="slide level2">
+<h2><code>pyproject.toml</code>, the configuration hub</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb4-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[build-system]</span></span>
+<span id="cb4-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">requires</span> <span class="op">=</span> <span class="op">[</span><span class="st">"hatchling"</span><span class="op">]</span></span>
+<span id="cb4-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">build-backend</span> <span class="op">=</span> <span class="st">"hatchling.build"</span></span>
+<span id="cb4-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project]</span></span>
+<span id="cb4-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">"geohello-yourname"</span></span>
+<span id="cb4-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">version</span> <span class="op">=</span> <span class="st">"0.1.0"</span></span>
+<span id="cb4-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">description</span> <span class="op">=</span> <span class="st">"A simple geospatial greeting"</span></span>
+<span id="cb4-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">readme</span> <span class="op">=</span> <span class="st">"README.md"</span></span>
+<span id="cb4-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">requires-python</span> <span class="op">=</span> <span class="st">"&gt;=3.10"</span></span>
+<span id="cb4-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">dependencies</span> <span class="op">=</span> <span class="op">[]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Two sections. <code>[build-system]</code> says how to build. <code>[project]</code> says what the package is. We add <code>dependencies</code> and <code>[project.optional-dependencies]</code> later.</p>
+</div>
+</section>
+<section id="live-demo-four-steps-to-a-working-package" class="slide level2">
+<h2>Live demo: four steps to a working package</h2>
+<p>We will build <code>geohello</code> together. Same commands you will run in pairs in 10 minutes.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: scaffold</span></span>
+<span id="cb5-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--lib</span> geohello</span>
+<span id="cb5-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> geohello</span>
+<span id="cb5-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: edit src/geohello/__init__.py (one function)</span></span>
+<span id="cb5-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: build</span></span>
+<span id="cb5-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span>
+<span id="cb5-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: try it</span></span>
+<span id="cb5-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello import hello; print(hello())"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-1-scaffold-with-uv" class="slide level2">
+<h2>Step 1: scaffold with uv</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--lib</span> geohello</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This creates the whole folder for you.</p>
+<pre><code>geohello/
+├── src/geohello/__init__.py
+├── tests/
+├── pyproject.toml
+├── README.md
+└── .gitignore</code></pre>
+<div class="fragment">
+<p><code>uv</code> already filled in a working <code>pyproject.toml</code> and made the <code>src/</code> layout correctly. <strong>You did not have to remember any of it.</strong></p>
+</div>
+</section>
+<section id="step-2-write-one-function" class="slide level2">
+<h2>Step 2: write one function</h2>
+<p>Open <code>src/geohello/__init__.py</code> and replace the contents:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co">"""A simple geospatial greeting package."""</span></span>
+<span id="cb8-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="" aria-hidden="true" tabindex="-1"></a>__version__ <span class="op">=</span> <span class="st">"0.1.0"</span></span>
+<span id="cb8-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello(place<span class="op">=</span><span class="st">"Auckland"</span>):</span>
+<span id="cb8-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return a greeting for a place."""</span></span>
+<span id="cb8-8"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Hello from </span><span class="sc">{</span>place<span class="sc">}</span><span class="ss">!"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>That is the entire package. One function, one docstring, one version.</p>
+</div>
+</section>
+<section id="step-3-build-the-distributions" class="slide level2">
+<h2>Step 3: build the distributions</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This creates a <code>dist/</code> folder.</p>
+<pre><code>dist/
+├── geohello-0.1.0-py3-none-any.whl    # the wheel
+└── geohello-0.1.0.tar.gz              # the source archive</code></pre>
+<div class="fragment">
+<p>The wheel is what <code>pip install</code> actually downloads. The <code>.tar.gz</code> is a backup that contains your source code.</p>
+</div>
+</section>
+<section id="step-4-try-it" class="slide level2">
+<h2>Step 4: try it</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the function in one line</span></span>
+<span id="cb11-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello import hello; print(hello())"</span></span>
+<span id="cb11-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Hello from Auckland!</span></span>
+<span id="cb11-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Or open Python interactively</span></span>
+<span id="cb11-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python</span>
+<span id="cb11-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> from <span class="ex">geohello</span> import hello</span>
+<span id="cb11-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hello<span class="kw">(</span><span class="st">"Tokyo"</span><span class="kw">)</span></span>
+<span id="cb11-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="st">'Hello from Tokyo!'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>That is what “building a package” feels like. Four commands.</p>
+</div>
+</section>
+<section id="your-turn-25-min-build-geohello-yourname" class="slide level2 smaller">
+<h2>Your turn (25 min): build <code>geohello-yourname</code></h2>
+<p>Pair up. <strong>Both partners commit code.</strong> This is also your A3 partner from this week onwards.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 61%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Command or action</th>
+<th style="text-align: center;">Tick</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><code>uv init --lib geohello-yourname</code></td>
+<td style="text-align: center;">☐</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Edit <code>src/geohello_yourname/__init__.py</code>, add <code>hello()</code></td>
+<td style="text-align: center;">☐</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Update <code>name</code>, <code>description</code>, both <code>authors</code> in <code>pyproject.toml</code></td>
+<td style="text-align: center;">☐</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td><code>uv build</code> produces <code>dist/*.whl</code> and <code>dist/*.tar.gz</code></td>
+<td style="text-align: center;">☐</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><code>uv run python -c "from geohello_yourname import hello; print(hello())"</code></td>
+<td style="text-align: center;">☐</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Push to a shared GitHub repo</td>
+<td style="text-align: center;">☐</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>Demonstrators will circulate. Wave a hand if <code>uv build</code> complains.</p>
+</div>
+</section>
+<section id="common-errors-and-fixes" class="slide level2">
+<h2>Common errors and fixes</h2>
+<ul>
+<li class="fragment"><strong><code>ImportError: No module named geohello_yourname</code></strong>. Check the folder under <code>src/</code> exists and uses underscores.</li>
+<li class="fragment"><strong><code>name 'geohello' is already taken</code></strong> (later, on TestPyPI). Add your initials to the <code>name</code> field.</li>
+<li class="fragment"><strong>Build fails on the first line of <code>pyproject.toml</code></strong>. Usually a TOML syntax typo. Read the first error message carefully.</li>
+<li class="fragment"><strong>The function works in <code>uv run python</code> but not in plain <code>python</code></strong>. You are not in the project’s virtual environment. Use <code>uv run</code> or <code>source .venv/bin/activate</code>.</li>
+</ul>
+</section>
+<section id="a-real-package-akl-ped-counts" class="slide level2 smaller">
+<h2>A real package: <code>akl-ped-counts</code></h2>
+<p><a href="https://github.com/dataandcrowd/akl-ped-counts">github.com/dataandcrowd/akl-ped-counts</a></p>
+<p>A small package on PyPI that ships hourly Heart of the City pedestrian counts (21 sensors, 2019 to 2025).</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="" aria-hidden="true" tabindex="-1"></a>pip install akl<span class="op">-</span>ped<span class="op">-</span>counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> akl_ped_counts <span class="im">import</span> load_hourly, load_locations, list_sensors</span>
+<span id="cb13-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(list_sensors()))   <span class="co"># 21</span></span>
+<span id="cb13-4"><a href="" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> load_hourly()</span>
+<span id="cb13-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(counts.shape)          <span class="co"># (61367, 24)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Three functions, one short README, one PyPI release. <strong>This is the size and shape your A3 should aim for.</strong></p>
+</div>
+</section>
+<section id="whats-inside-the-repo" class="slide level2">
+<h2>What’s inside the repo</h2>
+<pre><code>akl-ped-counts/
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── CONTRIBUTING.md
+├── examples/
+│   └── march_trajectories.png
+└── src/akl_ped_counts/
+    ├── __init__.py            # Re-exports the public API
+    ├── loader.py              # The actual functions
+    ├── polars_loader.py       # Optional Polars backend
+    └── data/                  # Bundled CSV files</code></pre>
+<div class="fragment">
+<p>The patterns we just covered are all there. <code>src/</code> layout, thin <code>__init__.py</code>, hatchling backend, optional dependencies for <code>[plot]</code> and <code>[geo]</code>.</p>
+</div>
+</section>
+<section id="optional-dependencies-an-idea-worth-copying" class="slide level2">
+<h2>Optional dependencies, an idea worth copying</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb15-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project]</span></span>
+<span id="cb15-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">dependencies</span> <span class="op">=</span> <span class="op">[</span><span class="st">"pandas&gt;=1.5.0"</span><span class="op">]</span>   <span class="co"># core only</span></span>
+<span id="cb15-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project.optional-dependencies]</span></span>
+<span id="cb15-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">polars</span> <span class="op">=</span> <span class="op">[</span><span class="st">"polars&gt;=0.20.0"</span><span class="op">]</span></span>
+<span id="cb15-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">plot</span> <span class="op">=</span> <span class="op">[</span><span class="st">"matplotlib&gt;=3.5.0"</span><span class="op">,</span> <span class="st">"seaborn&gt;=0.12.0"</span><span class="op">]</span></span>
+<span id="cb15-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">geo</span> <span class="op">=</span> <span class="op">[</span><span class="st">"folium&gt;=0.14.0"</span><span class="op">]</span></span>
+<span id="cb15-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">all</span> <span class="op">=</span> <span class="op">[</span><span class="st">"polars&gt;=0.20.0"</span><span class="op">,</span> <span class="st">"matplotlib&gt;=3.5.0"</span><span class="op">,</span></span>
+<span id="cb15-9"><a href="" aria-hidden="true" tabindex="-1"></a>       <span class="st">"seaborn&gt;=0.12.0"</span><span class="op">,</span> <span class="st">"folium&gt;=0.14.0"</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>A user who only wants the data installs <code>pip install akl-ped-counts</code>. A user who wants plotting installs <code>pip install "akl-ped-counts[plot]"</code>. The core install stays small.</p>
+</div>
+</section>
+<section class="slide level2">
+
+</section>
+<section>
+<section id="assignment-3-the-briefs" class="title-slide slide level1 center">
+<h1>Assignment 3, the briefs</h1>
+
+</section>
+<section id="assignment-3-in-one-slide" class="slide level2 smaller">
+<h2>Assignment 3 in one slide</h2>
+<ul>
+<li class="fragment"><strong>Pairs</strong> (announced today by raffle).</li>
+<li class="fragment">Pick <strong>one of five package briefs</strong>.</li>
+<li class="fragment">Three required functions per brief.</li>
+<li class="fragment">One demonstration notebook with a map or chart.</li>
+<li class="fragment">TestPyPI in Week 10, PyPI in Week 12.</li>
+<li class="fragment">A1 poster on <strong>Tuesday 25 May (B301-G10)</strong>.</li>
+<li class="fragment">Short <strong>fit interview</strong> in the Week 12 lab (5 to 10 min per person).</li>
+</ul>
+<div class="fragment">
+<p>Read the full brief in the textbook chapter 4.5.</p>
+</div>
+</section>
+<section id="brief-1-pedestrian-exposure" class="slide level2">
+<h2>Brief 1: <code>pedestrian-exposure</code></h2>
+<p><strong>Cumulative exposure along a walking route.</strong></p>
+<ul>
+<li class="fragment"><code>load_route(origin, destination, place)</code> from OSMnx</li>
+<li class="fragment"><code>add_exposure_layer(route_gdf, layer_gdf, column)</code> joins an environmental layer to route edges</li>
+<li class="fragment"><code>summarise_exposure(route_gdf)</code> returns per-edge and route-level scores</li>
+<li class="fragment"><strong>Demo</strong>: hotcity.co.nz route + Sentinel-2 NDVI greenery layer</li>
+<li class="fragment"><strong>Difficulty</strong>: intermediate (CRS alignment is the trick)</li>
+</ul>
+</section>
+<section id="brief-2-equitransport" class="slide level2">
+<h2>Brief 2: <code>equitransport</code></h2>
+<p><strong>Transport accessibility by deprivation quintile.</strong></p>
+<ul>
+<li class="fragment"><code>load_nzdep(sa2_gdf)</code> joins NZDep2018 scores by SA2</li>
+<li class="fragment"><code>compute_access(gdf, metric_col)</code> calculates the metric per polygon</li>
+<li class="fragment"><code>equity_summary(gdf)</code> returns quintile means + Gini coefficient</li>
+<li class="fragment"><strong>Demo</strong>: Auckland SA2s + AT GTFS PT-stop counts, choropleth by deprivation</li>
+<li class="fragment"><strong>Difficulty</strong>: intermediate (meshblock-to-SA2 aggregation)</li>
+</ul>
+</section>
+<section id="brief-3-treecrown-nz" class="slide level2">
+<h2>Brief 3: <code>treecrown-nz</code></h2>
+<p><strong>Urban tree canopy coverage and route shade.</strong></p>
+<ul>
+<li class="fragment"><code>load_canopy(bbox)</code> fetches LINZ canopy polygons</li>
+<li class="fragment"><code>canopy_coverage(area_gdf)</code> percentage cover per polygon</li>
+<li class="fragment"><code>route_shade(route_gdf, buffer_m)</code> canopy fraction along a route</li>
+<li class="fragment"><strong>Demo</strong>: three Auckland suburbs + shade along one walking route</li>
+<li class="fragment"><strong>Difficulty</strong>: intermediate to ambitious (LINZ API quirks)</li>
+</ul>
+</section>
+<section id="brief-4-pavescore" class="slide level2">
+<h2>Brief 4: <code>pavescore</code></h2>
+<p><strong>Pavement condition score from a photo.</strong></p>
+<ul>
+<li class="fragment"><code>score_image(path_or_url)</code> returns a <code>PavementResult</code> dataclass</li>
+<li class="fragment"><code>score_batch(image_list)</code> returns a summary DataFrame</li>
+<li class="fragment"><code>to_geodataframe(results, coords)</code> returns a mappable GeoDataFrame</li>
+<li class="fragment"><strong>Demo</strong>: Mapillary images along Dominion Road or Queen Street</li>
+<li class="fragment"><strong>Difficulty</strong>: ambitious, the most open-ended brief</li>
+</ul>
+<div class="fragment">
+<p>A simple texture-based scorer that works beats an ambitious classifier that breaks.</p>
+</div>
+</section>
+<section id="brief-5-escooter-akl" class="slide level2">
+<h2>Brief 5: <code>escooter-akl</code></h2>
+<p><strong>Clean OD flows and geofence violations from raw e-scooter trips.</strong></p>
+<ul>
+<li class="fragment"><code>load_trips(path)</code> reads CSV, returns trip GeoDataFrame in EPSG:2193</li>
+<li class="fragment"><code>od_flows(trips_gdf, zones_gdf)</code> returns origin-destination matrix by zone</li>
+<li class="fragment"><code>geofence_violations(trips_gdf, no_park_gdf)</code> flags trips ending in no-park zones</li>
+<li class="fragment"><strong>Demo</strong>: sample of Auckland CBD trips + SA2 zones + CBD pedestrianised polygons</li>
+<li class="fragment"><strong>Difficulty</strong>: intermediate (messy data, loud failure beats silent failure)</li>
+</ul>
+</section>
+<section id="pair-formation-3-min" class="slide level2">
+<h2>Pair formation (3 min)</h2>
+<ul>
+<li class="fragment">Find a partner you can meet <strong>outside lectures and labs</strong>. Time-zone overlap matters.</li>
+<li class="fragment">Confirm both of you have GitHub accounts.</li>
+<li class="fragment">Write your two names on the pair sheet at the front of the room.</li>
+<li class="fragment">If you cannot find a partner, raise a hand and we will pair you up.</li>
+</ul>
+</section>
+<section id="the-raffle-5-min" class="slide level2">
+<h2>The raffle (5 min)</h2>
+<p>The five briefs are written on slips of paper. Each pair draws once, in the order you appear on the pair sheet.</p>
+<div class="fragment">
+<ul>
+<li class="fragment">No swaps after the draw.</li>
+<li class="fragment">Two pairs <strong>may</strong> end up with the same brief, that is fine. You will not share code, but you will see how two teams interpret the same problem.</li>
+<li class="fragment">Once you have your brief, write it next to your names on the pair sheet.</li>
+</ul>
+</div>
+</section>
+<section id="what-to-do-this-week" class="slide level2">
+<h2>What to do this week</h2>
+<ul>
+<li class="fragment"><strong>Today, after the lecture</strong>: read your brief end to end.</li>
+<li class="fragment"><strong>In the Week 9 lab</strong>: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.</li>
+<li class="fragment"><strong>Before next lecture</strong>: each partner writes a 100 to 150 word reflection on (a) what is unclear, (b) which function you will own, (c) what you do not yet understand.</li>
+</ul>
+</section>
+<section id="wrap-up-checklist" class="slide level2">
+<h2>Wrap-up checklist</h2>
+<ul class="task-list">
+<li class="fragment"><label><input type="checkbox">You and your partner can run <code>uv build</code> on <code>geohello-yourname</code> without errors.</label></li>
+<li class="fragment"><label><input type="checkbox">Your shared GitHub repo exists and you can both push.</label></li>
+<li class="fragment"><label><input type="checkbox">You know which of the five briefs you are doing.</label></li>
+<li class="fragment"><label><input type="checkbox">You have read your brief at least once.</label></li>
+<li class="fragment"><label><input type="checkbox">You know the date of the poster showcase (Tuesday 25 May).</label></li>
+</ul>
+</section>
+<section id="further-reading" class="slide level2">
+<h2>Further reading</h2>
+<ul>
+<li>Textbook 4.0, <strong>Part 4 overview</strong></li>
+<li>Textbook 4.1, <strong>Package fundamentals</strong> (the source for this lecture)</li>
+<li>Textbook 4.3, <strong><code>akl-ped-counts</code> walkthrough</strong></li>
+<li>Textbook 4.5, <strong>Assignment 3 briefs in full</strong></li>
+<li>Python Packaging Guide, https://packaging.python.org/</li>
+<li>uv documentation, https://docs.astral.sh/uv/</li>
+<li><code>akl-ped-counts</code> on GitHub, https://github.com/dataandcrowd/akl-ped-counts</li>
+</ul>
+</section>
+<section id="see-you-in-the-lab" class="slide level2">
+<h2>See you in the lab</h2>
+<p>Bring your laptop, your partner, and your brief.</p>
+<p>The Week 9 lab is the <strong>first hands-on session of A3</strong>. By the end of the lab your pair will have a package skeleton on GitHub.</p>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<p><img src="Figs/uoa-logo.png" class="slide-logo"></p>
+<div class="footer footer-default">
+<p>GISCI 343 | Week 9 | From Scripts to Packages</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Lecture09_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Lecture09_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="Lecture09_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Lecture09_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

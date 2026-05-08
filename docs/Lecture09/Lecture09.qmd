@@ -1,0 +1,536 @@
+---
+title: "From Scripts to Packages: Build, Install, Share"
+subtitle: "GISCI 343, Week 9"
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+date: 05/11/2026
+date-format: long
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    code-line-numbers: false
+    highlight-style: github
+    transition: slide
+    logo: Figs/uoa-logo.png
+    css: Figs/logo.css
+    code-block-height: 400px
+    footer: "GISCI 343 | Week 9 | From Scripts to Packages"
+jupyter: python3
+---
+
+## Today's plan (90 min)
+
+1. Recap of Part 3 and welcome to Part 4
+2. Why we package code (the copy-paste problem)
+3. Anatomy of a Python package
+4. Live demo: build `geohello` in four steps
+5. **Hands-on**: build `geohello-yourname` (in pairs)
+6. A real package tour: `akl-ped-counts`
+7. **Assignment 3**: the five package briefs
+8. **Pair formation and topic raffle**
+
+---
+
+## From Part 3 to Part 4
+
+In Part 3 you turned a notebook into a Shiny app and deployed it to a browser. Anyone with the URL could use it.
+
+. . .
+
+In Part 4 we go one step further. You will turn analysis code into a **Python package** and publish it so anyone with `pip` can install it.
+
+. . .
+
+| Part 3 | Part 4 |
+|--------|--------|
+| Static notebook becomes interactive web app | Scattered scripts become one installable package |
+| Deploy with `shinylive` | Publish with `uv` to PyPI |
+| Audience clicks a URL | Audience runs `pip install your-package` |
+
+---
+
+## The four-week arc
+
+| Week | Focus | Deliverable |
+|------|-------|-------------|
+| **9** | Package fundamentals (today + lab) | `geohello-yourname` builds locally |
+| 10 | Tests, docs, TestPyPI rehearsal | TestPyPI release of A3 package |
+| 11 | Polish + **poster showcase** | A1 poster, 25 May, B301-G10 |
+| 12 | PyPI deploy + fit interview | Production PyPI release |
+
+. . .
+
+Today's job: get every pair building a working package by the end of the lecture.
+
+---
+
+## Why we package code
+
+Imagine you wrote a walkability function for Project A.
+
+```python
+# project1/analysis.py
+def calculate_walkability(streets, amenities, buffer_m=800):
+    # 50 lines of careful code
+    ...
+```
+
+Six months later, Project B needs the same function. What do you do?
+
+. . .
+
+Most people copy-paste. Then they fix a bug in Project A and forget Project B. Now there are two versions of "the same" function and neither matches.
+
+---
+
+## Packaging in one slide
+
+```python
+# Once: build and publish
+pip install my-urban-toolkit
+
+# Forever: import in any project
+from my_urban_toolkit import calculate_walkability
+
+result = calculate_walkability(streets, amenities)
+```
+
+. . .
+
+One source of truth. One install command. Every project (and every collaborator) gets the same function.
+
+---
+
+## What is a Python package, really?
+
+::: {.incremental}
+* A **module** is a single `.py` file.
+* A **package** is a folder of modules with an `__init__.py`.
+* A **distribution** is the `.whl` or `.tar.gz` file you install.
+* A **PyPI release** is a distribution uploaded to https://pypi.org so `pip install` can find it.
+:::
+
+. . .
+
+Today we go: file → folder → distribution. Publishing to PyPI is Week 12.
+
+---
+
+## Anatomy of a package: the `src/` layout {.smaller}
+
+```
+geohello-yourname/                # The repository
+├── src/
+│   └── geohello_yourname/        # The Python package (underscores)
+│       ├── __init__.py           # Makes the folder importable
+│       └── py.typed              # Optional type-checker marker
+├── tests/                        # pytest finds these next week
+├── pyproject.toml                # Package configuration
+├── README.md                     # What people see on PyPI
+└── .gitignore
+```
+
+. . .
+
+Two names to keep apart:
+
+- **PyPI name** (in `pyproject.toml`): hyphenated, e.g. `geohello-yourname`
+- **Python package name** (folder under `src/`): underscored, e.g. `geohello_yourname`
+
+`pip install geohello-yourname` then `from geohello_yourname import hello`.
+
+---
+
+## `pyproject.toml`, the configuration hub
+
+```toml
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "geohello-yourname"
+version = "0.1.0"
+description = "A simple geospatial greeting"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+```
+
+. . .
+
+Two sections. `[build-system]` says how to build. `[project]` says what the package is. We add `dependencies` and `[project.optional-dependencies]` later.
+
+---
+
+## Live demo: four steps to a working package
+
+We will build `geohello` together. Same commands you will run in pairs in 10 minutes.
+
+. . .
+
+```bash
+# Step 1: scaffold
+uv init --lib geohello
+cd geohello
+
+# Step 2: edit src/geohello/__init__.py (one function)
+
+# Step 3: build
+uv build
+
+# Step 4: try it
+uv run python -c "from geohello import hello; print(hello())"
+```
+
+---
+
+## Step 1: scaffold with uv
+
+```bash
+uv init --lib geohello
+```
+
+This creates the whole folder for you.
+
+```
+geohello/
+├── src/geohello/__init__.py
+├── tests/
+├── pyproject.toml
+├── README.md
+└── .gitignore
+```
+
+. . .
+
+`uv` already filled in a working `pyproject.toml` and made the `src/` layout correctly. **You did not have to remember any of it.**
+
+---
+
+## Step 2: write one function
+
+Open `src/geohello/__init__.py` and replace the contents:
+
+```python
+"""A simple geospatial greeting package."""
+
+__version__ = "0.1.0"
+
+
+def hello(place="Auckland"):
+    """Return a greeting for a place."""
+    return f"Hello from {place}!"
+```
+
+. . .
+
+That is the entire package. One function, one docstring, one version.
+
+---
+
+## Step 3: build the distributions
+
+```bash
+uv build
+```
+
+This creates a `dist/` folder.
+
+```
+dist/
+├── geohello-0.1.0-py3-none-any.whl    # the wheel
+└── geohello-0.1.0.tar.gz              # the source archive
+```
+
+. . .
+
+The wheel is what `pip install` actually downloads. The `.tar.gz` is a backup that contains your source code.
+
+---
+
+## Step 4: try it
+
+```bash
+# Run the function in one line
+uv run python -c "from geohello import hello; print(hello())"
+# Hello from Auckland!
+
+# Or open Python interactively
+uv run python
+>>> from geohello import hello
+>>> hello("Tokyo")
+'Hello from Tokyo!'
+```
+
+. . .
+
+That is what "building a package" feels like. Four commands.
+
+---
+
+## Your turn (25 min): build `geohello-yourname` {.smaller}
+
+Pair up. **Both partners commit code.** This is also your A3 partner from this week onwards.
+
+| Step | Command or action | Tick |
+|------|-------------------|:----:|
+| 1 | `uv init --lib geohello-yourname` | ☐ |
+| 2 | Edit `src/geohello_yourname/__init__.py`, add `hello()` | ☐ |
+| 3 | Update `name`, `description`, both `authors` in `pyproject.toml` | ☐ |
+| 4 | `uv build` produces `dist/*.whl` and `dist/*.tar.gz` | ☐ |
+| 5 | `uv run python -c "from geohello_yourname import hello; print(hello())"` | ☐ |
+| 6 | Push to a shared GitHub repo | ☐ |
+
+. . .
+
+Demonstrators will circulate. Wave a hand if `uv build` complains.
+
+---
+
+## Common errors and fixes
+
+::: {.incremental}
+* **`ImportError: No module named geohello_yourname`**. Check the folder under `src/` exists and uses underscores.
+* **`name 'geohello' is already taken`** (later, on TestPyPI). Add your initials to the `name` field.
+* **Build fails on the first line of `pyproject.toml`**. Usually a TOML syntax typo. Read the first error message carefully.
+* **The function works in `uv run python` but not in plain `python`**. You are not in the project's virtual environment. Use `uv run` or `source .venv/bin/activate`.
+:::
+
+---
+
+## A real package: `akl-ped-counts` {.smaller}
+
+[github.com/dataandcrowd/akl-ped-counts](https://github.com/dataandcrowd/akl-ped-counts)
+
+A small package on PyPI that ships hourly Heart of the City pedestrian counts (21 sensors, 2019 to 2025).
+
+```python
+pip install akl-ped-counts
+```
+
+```python
+from akl_ped_counts import load_hourly, load_locations, list_sensors
+
+print(len(list_sensors()))   # 21
+counts = load_hourly()
+print(counts.shape)          # (61367, 24)
+```
+
+. . .
+
+Three functions, one short README, one PyPI release. **This is the size and shape your A3 should aim for.**
+
+---
+
+## What's inside the repo
+
+```
+akl-ped-counts/
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── CONTRIBUTING.md
+├── examples/
+│   └── march_trajectories.png
+└── src/akl_ped_counts/
+    ├── __init__.py            # Re-exports the public API
+    ├── loader.py              # The actual functions
+    ├── polars_loader.py       # Optional Polars backend
+    └── data/                  # Bundled CSV files
+```
+
+. . .
+
+The patterns we just covered are all there. `src/` layout, thin `__init__.py`, hatchling backend, optional dependencies for `[plot]` and `[geo]`.
+
+---
+
+## Optional dependencies, an idea worth copying
+
+```toml
+[project]
+dependencies = ["pandas>=1.5.0"]   # core only
+
+[project.optional-dependencies]
+polars = ["polars>=0.20.0"]
+plot = ["matplotlib>=3.5.0", "seaborn>=0.12.0"]
+geo = ["folium>=0.14.0"]
+all = ["polars>=0.20.0", "matplotlib>=3.5.0",
+       "seaborn>=0.12.0", "folium>=0.14.0"]
+```
+
+. . .
+
+A user who only wants the data installs `pip install akl-ped-counts`. A user who wants plotting installs `pip install "akl-ped-counts[plot]"`. The core install stays small.
+
+---
+
+# Assignment 3, the briefs
+
+---
+
+## Assignment 3 in one slide {.smaller}
+
+::: {.incremental}
+* **Pairs** (announced today by raffle).
+* Pick **one of five package briefs**.
+* Three required functions per brief.
+* One demonstration notebook with a map or chart.
+* TestPyPI in Week 10, PyPI in Week 12.
+* A1 poster on **Tuesday 25 May (B301-G10)**.
+* Short **fit interview** in the Week 12 lab (5 to 10 min per person).
+:::
+
+. . .
+
+Read the full brief in the textbook chapter 4.5.
+
+---
+
+## Brief 1: `pedestrian-exposure`
+
+**Cumulative exposure along a walking route.**
+
+::: {.incremental}
+* `load_route(origin, destination, place)` from OSMnx
+* `add_exposure_layer(route_gdf, layer_gdf, column)` joins an environmental layer to route edges
+* `summarise_exposure(route_gdf)` returns per-edge and route-level scores
+* **Demo**: hotcity.co.nz route + Sentinel-2 NDVI greenery layer
+* **Difficulty**: intermediate (CRS alignment is the trick)
+:::
+
+---
+
+## Brief 2: `equitransport`
+
+**Transport accessibility by deprivation quintile.**
+
+::: {.incremental}
+* `load_nzdep(sa2_gdf)` joins NZDep2018 scores by SA2
+* `compute_access(gdf, metric_col)` calculates the metric per polygon
+* `equity_summary(gdf)` returns quintile means + Gini coefficient
+* **Demo**: Auckland SA2s + AT GTFS PT-stop counts, choropleth by deprivation
+* **Difficulty**: intermediate (meshblock-to-SA2 aggregation)
+:::
+
+---
+
+## Brief 3: `treecrown-nz`
+
+**Urban tree canopy coverage and route shade.**
+
+::: {.incremental}
+* `load_canopy(bbox)` fetches LINZ canopy polygons
+* `canopy_coverage(area_gdf)` percentage cover per polygon
+* `route_shade(route_gdf, buffer_m)` canopy fraction along a route
+* **Demo**: three Auckland suburbs + shade along one walking route
+* **Difficulty**: intermediate to ambitious (LINZ API quirks)
+:::
+
+---
+
+## Brief 4: `pavescore`
+
+**Pavement condition score from a photo.**
+
+::: {.incremental}
+* `score_image(path_or_url)` returns a `PavementResult` dataclass
+* `score_batch(image_list)` returns a summary DataFrame
+* `to_geodataframe(results, coords)` returns a mappable GeoDataFrame
+* **Demo**: Mapillary images along Dominion Road or Queen Street
+* **Difficulty**: ambitious, the most open-ended brief
+:::
+
+. . .
+
+A simple texture-based scorer that works beats an ambitious classifier that breaks.
+
+---
+
+## Brief 5: `escooter-akl`
+
+**Clean OD flows and geofence violations from raw e-scooter trips.**
+
+::: {.incremental}
+* `load_trips(path)` reads CSV, returns trip GeoDataFrame in EPSG:2193
+* `od_flows(trips_gdf, zones_gdf)` returns origin-destination matrix by zone
+* `geofence_violations(trips_gdf, no_park_gdf)` flags trips ending in no-park zones
+* **Demo**: sample of Auckland CBD trips + SA2 zones + CBD pedestrianised polygons
+* **Difficulty**: intermediate (messy data, loud failure beats silent failure)
+:::
+
+---
+
+## Pair formation (3 min)
+
+::: {.incremental}
+* Find a partner you can meet **outside lectures and labs**. Time-zone overlap matters.
+* Confirm both of you have GitHub accounts.
+* Write your two names on the pair sheet at the front of the room.
+* If you cannot find a partner, raise a hand and we will pair you up.
+:::
+
+---
+
+## The raffle (5 min)
+
+The five briefs are written on slips of paper. Each pair draws once, in the order you appear on the pair sheet.
+
+. . .
+
+::: {.incremental}
+* No swaps after the draw.
+* Two pairs **may** end up with the same brief, that is fine. You will not share code, but you will see how two teams interpret the same problem.
+* Once you have your brief, write it next to your names on the pair sheet.
+:::
+
+---
+
+## What to do this week
+
+::: {.incremental}
+* **Today, after the lecture**: read your brief end to end.
+* **In the Week 9 lab**: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.
+* **Before next lecture**: each partner writes a 100 to 150 word reflection on (a) what is unclear, (b) which function you will own, (c) what you do not yet understand.
+:::
+
+---
+
+## Wrap-up checklist
+
+::: {.incremental}
+- [ ] You and your partner can run `uv build` on `geohello-yourname` without errors.
+- [ ] Your shared GitHub repo exists and you can both push.
+- [ ] You know which of the five briefs you are doing.
+- [ ] You have read your brief at least once.
+- [ ] You know the date of the poster showcase (Tuesday 25 May).
+:::
+
+---
+
+## Further reading
+
+- Textbook 4.0, **Part 4 overview**
+- Textbook 4.1, **Package fundamentals** (the source for this lecture)
+- Textbook 4.3, **`akl-ped-counts` walkthrough**
+- Textbook 4.5, **Assignment 3 briefs in full**
+- Python Packaging Guide, https://packaging.python.org/
+- uv documentation, https://docs.astral.sh/uv/
+- `akl-ped-counts` on GitHub, https://github.com/dataandcrowd/akl-ped-counts
+
+---
+
+## See you in the lab
+
+Bring your laptop, your partner, and your brief.
+
+The Week 9 lab is the **first hands-on session of A3**. By the end of the lab your pair will have a package skeleton on GitHub.

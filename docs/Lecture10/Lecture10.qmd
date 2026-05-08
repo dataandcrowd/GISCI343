@@ -1,0 +1,681 @@
+---
+title: "Trust Your Code: Tests, TestPyPI, and Posters"
+subtitle: "GISCI 343, Week 10"
+author:
+  - name: Hyesop Shin
+    orcid: 0000-0003-2637-7933
+    email: hyesop.shin@auckland.ac.nz
+    affiliations:
+      - name: University of Auckland
+        address: 23 Symonds Street
+        city: Auckland
+        postal-code: 1010
+date: 05/18/2026
+date-format: long
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    code-line-numbers: false
+    highlight-style: github
+    transition: slide
+    logo: Figs/uoa-logo.png
+    css: Figs/logo.css
+    code-block-height: 400px
+    footer: "GISCI 343 | Week 10 | Tests, TestPyPI, and Posters"
+jupyter: python3
+---
+
+## Today's plan (90 min)
+
+1. Recap of Week 9
+2. Why we test geospatial code (silent failures)
+3. pytest in three commands
+4. Three test patterns you will actually use
+5. **Hands-on**: write one test for your A3 package
+6. A real package tour: how `akl-ped-counts` is built and shipped
+7. TestPyPI rehearsal, end to end
+8. Poster outline, the seven-box rule
+9. Fit interview, what to expect
+
+---
+
+## Recap of Week 9
+
+Last week your pair did the following.
+
+. . .
+
+::: {.incremental}
+* Drew one of the five A3 briefs in the raffle.
+* Built `geohello-yourname` in pairs (`uv init --lib`, edit, `uv build`).
+* Scaffolded your A3 package on GitHub (Week 9 lab).
+* Implemented one function and wrote one test that passes.
+:::
+
+. . .
+
+This week we go from "one test that passes" to "a TestPyPI release that someone else can install".
+
+---
+
+## Where Week 10 fits
+
+| Week | What happens | Your output |
+|------|--------------|-------------|
+| 9 | Build skeleton, first function | Repo + one passing test |
+| **10** | **Tests, docs, TestPyPI** | **TestPyPI release** |
+| 11 | Polish + poster showcase (Tue 25 May) | A1 poster on the wall |
+| 12 | Production PyPI + fit interview | Published package |
+
+. . .
+
+By Friday this week, your package should install for anyone with `pip install --index-url https://test.pypi.org/simple/ your-package-name`.
+
+# Part 1: Why we test geospatial code
+
+---
+
+## Silent geospatial failures
+
+The dangerous bugs in spatial code are the ones that **do not crash**.
+
+. . .
+
+::: {.incremental}
+* A spatial join silently drops 5 zones.
+* Distance returns 0.05 (degrees), not 5000 (metres).
+* A negative buffer produces an empty geometry.
+* A `groupby` aggregation drops `NaN` rows you wanted to count.
+:::
+
+. . .
+
+None of these raise an error. You only notice when the map looks wrong, often after the deadline.
+
+---
+
+## The missing-zones bug
+
+```python
+import geopandas as gpd
+
+# Boundaries: 100 SA2 zones
+# Census: 100 rows, but two have stale codes
+
+result = gpd.sjoin(boundaries, census, predicate="intersects")
+
+print(len(boundaries))   # 100
+print(len(result))       # 95
+```
+
+. . .
+
+Five zones quietly disappeared. No traceback. The choropleth still renders.
+
+. . .
+
+A two-line test catches this every time.
+
+```python
+def test_join_keeps_all_zones():
+    result = validate_join(boundaries, census, key="SA2_code")
+    assert len(result) == len(boundaries)
+```
+
+---
+
+## The wrong-CRS bug
+
+```python
+gdf_4326 = boundaries.to_crs("EPSG:4326")     # geographic
+distance = gdf_4326.geometry[0].distance(
+    gdf_4326.geometry[1]
+)
+print(distance)   # 0.05  (degrees, not metres)
+```
+
+. . .
+
+Your map looks fine. Every distance calculation downstream is wrong by five orders of magnitude.
+
+. . .
+
+```python
+def test_distance_in_metres():
+    d = compute_distance(gdf_a, gdf_b)
+    assert 100 < d < 100_000   # plausible metre range
+```
+
+# Part 2: pytest in three commands
+
+---
+
+## All you need to write a test
+
+Three things.
+
+::: {.incremental}
+1. A file under `tests/` whose name starts with `test_`.
+2. A function inside it whose name starts with `test_`.
+3. An `assert` line that says what should be true.
+:::
+
+. . .
+
+```python
+# tests/test_basics.py
+def test_two_plus_two():
+    assert 2 + 2 == 4
+```
+
+. . .
+
+That is a complete, runnable test.
+
+---
+
+## Three commands
+
+```bash
+# Install pytest as a dev dependency
+uv add --dev pytest
+
+# Run every test in the project
+uv run pytest
+
+# Verbose output so you see each test name
+uv run pytest -v
+```
+
+. . .
+
+```
+============================= test session starts ==============================
+collected 1 item
+
+tests/test_basics.py .                                                   [100%]
+
+============================== 1 passed in 0.05s ===============================
+```
+
+A dot means pass. An `F` means fail, with a clear explanation underneath.
+
+---
+
+## A test for `geohello`
+
+```python
+# tests/test_geohello.py
+from geohello_yourname import hello
+
+
+def test_hello_default():
+    result = hello()
+    assert "Auckland" in result
+
+
+def test_hello_custom_place():
+    assert hello("Tokyo") == "Hello from Tokyo!"
+
+
+def test_hello_returns_string():
+    assert isinstance(hello(), str)
+```
+
+. . .
+
+Three tests, three dots, three seconds.
+
+---
+
+## A note on test design
+
+::: {.incremental}
+* **One assertion per test, by default.** Failures should pinpoint exactly what is wrong.
+* **Names describe the behaviour, not the function.** `test_hello_default` beats `test_function_1`.
+* **Keep tests tiny.** A test that takes 2 minutes will not get run.
+:::
+
+# Part 3: Three patterns you will actually use
+
+---
+
+## Pattern 1: a CRS guard
+
+For most A3 briefs, your spatial maths needs to be in **EPSG:2193** (NZTM, metres). One test catches the most common mistake.
+
+```python
+def test_output_has_correct_crs():
+    result = function_one(...)
+    assert result.crs.to_string() == "EPSG:2193"
+```
+
+. . .
+
+If `function_one` ever forgets to reproject, the test fails. You see it in seconds, not weeks.
+
+---
+
+## Pattern 2: a fixture
+
+A **fixture** is reusable test data, set up once and shared across tests.
+
+```python
+import pytest
+import geopandas as gpd
+from shapely.geometry import Point
+
+
+@pytest.fixture
+def small_sample():
+    return gpd.GeoDataFrame(
+        {"id": [1, 2]},
+        geometry=[Point(174.76, -36.85), Point(174.78, -36.86)],
+        crs="EPSG:4326",
+    )
+
+
+def test_function_with_fixture(small_sample):
+    result = function_two(small_sample)
+    assert len(result) == len(small_sample)
+```
+
+---
+
+## Pattern 3: parametrize
+
+Run the **same test** with several inputs.
+
+```python
+@pytest.mark.parametrize("place,expected", [
+    ("Auckland", "Hello from Auckland!"),
+    ("Tokyo", "Hello from Tokyo!"),
+    ("Wellington", "Hello from Wellington!"),
+])
+def test_hello_for_many_places(place, expected):
+    assert hello(place) == expected
+```
+
+. . .
+
+One test definition, three test runs. Very useful for "this should work for any of these CRS / years / sensor IDs".
+
+---
+
+## Hands-on (10 min): one test for your A3 function {.smaller}
+
+With your A3 partner, do the following.
+
+::: {.incremental}
+1. Open the function you implemented in the Week 9 lab.
+2. Write **one** test that uses one of the three patterns above:
+   * a CRS guard (if your function returns a GeoDataFrame), or
+   * a fixture (if your function takes a GeoDataFrame), or
+   * a `parametrize` over two or three inputs.
+3. Run `uv run pytest -v` until it passes.
+4. Push the test to GitHub.
+:::
+
+. . .
+
+Demonstrators will help. If you finish early, write a second test using a different pattern.
+
+# Part 4: A real package tour, `akl-ped-counts`
+
+---
+
+## What is `akl-ped-counts`?
+
+A small package the instructor maintains. It ships hourly Heart of the City pedestrian counts (21 sensors, 2019 to 2025).
+
+. . .
+
+```bash
+pip install akl-ped-counts
+```
+
+```python
+from akl_ped_counts import load_hourly, list_sensors
+
+print(len(list_sensors()))   # 21
+print(load_hourly().shape)    # (61367, 24)
+```
+
+. . .
+
+This is the **size and scope** your A3 package should aim for. Three functions, one short README, one PyPI release.
+
+---
+
+## Repo layout
+
+```
+akl-ped-counts/
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── CONTRIBUTING.md
+├── examples/
+│   └── march_trajectories.png
+└── src/akl_ped_counts/
+    ├── __init__.py            # re-exports the public API
+    ├── loader.py              # the actual functions
+    ├── polars_loader.py       # optional Polars backend
+    └── data/                  # bundled CSV files (~8 MB)
+```
+
+. . .
+
+The patterns from Lecture 9 are all there. `src/` layout, thin `__init__.py`, hatchling backend, optional dependencies.
+
+---
+
+## Optional dependencies, an idea worth copying {.smaller}
+
+```toml
+[project]
+dependencies = ["pandas>=1.5.0"]   # the core install stays small
+
+[project.optional-dependencies]
+polars = ["polars>=0.20.0"]
+plot = ["matplotlib>=3.5.0", "seaborn>=0.12.0"]
+geo = ["folium>=0.14.0"]
+all = ["polars>=0.20.0", "matplotlib>=3.5.0",
+       "seaborn>=0.12.0", "folium>=0.14.0"]
+```
+
+. . .
+
+::: {.incremental}
+* Data-only user, `pip install akl-ped-counts`
+* Plot user, `pip install "akl-ped-counts[plot]"`
+* Map user, `pip install "akl-ped-counts[geo]"`
+* Power user, `pip install "akl-ped-counts[all]"`
+:::
+
+. . .
+
+**Most A3 briefs benefit from this.** Keep the core install lightweight.
+
+---
+
+## A look at one function
+
+```python
+def list_sensors() -> list[str]:
+    """Return the canonical list of all 21 sensor location names.
+
+    Returns
+    -------
+    list of str
+        Sensor location names in geographic order
+        (north to south).
+    """
+    return SENSORS.copy()
+```
+
+. . .
+
+The function does almost nothing. What makes it good is the surrounding work.
+
+::: {.incremental}
+* `SENSORS` is curated and corrected ("59 High Stret" was fixed to "59 High Street").
+* Order is meaningful (north to south).
+* Type hint, docstring, return type clear.
+* `.copy()` prevents callers from mutating the constant.
+:::
+
+# Part 5: TestPyPI rehearsal
+
+---
+
+## Why TestPyPI first
+
+::: {.incremental}
+* Practice the publication workflow safely.
+* Catch missing files and broken metadata early.
+* Test the install in a clean environment.
+* Packages are deleted after 6 months, so mistakes do not haunt you.
+:::
+
+. . .
+
+Do this **this week**, before the real PyPI publish in Week 12.
+
+---
+
+## The four steps
+
+```bash
+# 1. Bump the version (TestPyPI rejects duplicates)
+# Edit pyproject.toml: version = "0.1.1"
+
+# 2. Build
+uv build
+
+# 3. Publish (you will be prompted for the token)
+uv publish --publish-url https://test.pypi.org/legacy/
+
+# 4. Install in a clean venv to confirm
+uv venv /tmp/test-install
+source /tmp/test-install/bin/activate
+
+uv pip install \
+    --index-url https://test.pypi.org/simple/ \
+    --extra-index-url https://pypi.org/simple/ \
+    your-package-name
+```
+
+. . .
+
+The `--extra-index-url` is needed because `pandas`, `geopandas`, and friends only live on real PyPI.
+
+---
+
+## API token, the part everyone gets stuck on
+
+::: {.incremental}
+1. Register at https://test.pypi.org/account/register/.
+2. Verify your email.
+3. Account Settings, then API Tokens.
+4. "Add API token", scope "Entire account".
+5. Copy the token (starts with `pypi-`). Save it now, it is shown once.
+:::
+
+. . .
+
+Authenticate with username `__token__` and the token as the password. Or set `UV_PUBLISH_TOKEN` as an environment variable.
+
+---
+
+## Errors you will hit and how to fix them
+
+::: {.incremental}
+* **The name is already taken.** Rename in `pyproject.toml`, add initials.
+* **File already exists.** Bump `version` (`0.1.0` becomes `0.1.1`).
+* **Invalid or expired token.** Generate a new token.
+* **Could not find a version that satisfies the requirement pandas.** Add `--extra-index-url https://pypi.org/simple/` to the install command.
+:::
+
+. . .
+
+These are not rare bugs. Every cohort sees all four. Knowing the fix in advance saves you 30 minutes each.
+
+# Part 6: Poster design
+
+---
+
+## The poster showcase
+
+::: {.incremental}
+* **When**, Tuesday 25 May.
+* **Where**, B301-G10.
+* **What**, A1 portrait poster, printed.
+* **Format**, two-minute pitch from each pair, then circulating Q&A.
+:::
+
+. . .
+
+Today you draft the layout on paper. Polish happens next week.
+
+---
+
+## A1 size, in plain language
+
+A1 is **594 mm by 841 mm**. Read from two metres away.
+
+. . .
+
+::: {.incremental}
+* Title text, **72 pt or larger**.
+* Body text, **24 pt or larger**.
+* One dominant figure, not five small ones.
+* Plenty of white space.
+* Most weak posters have **too much text**.
+:::
+
+---
+
+## The seven-box rule {.smaller}
+
+Take an A4 sheet. Divide into seven labelled regions.
+
+| Box | Content |
+|-----|---------|
+| 1. Title | Package name, both authors |
+| 2. The problem | Two sentences, no jargon |
+| 3. The solution | One sentence stating what the package does |
+| 4. Code example | Six lines showing the simplest use |
+| 5. Figure | Map, chart, or table from the demo notebook |
+| 6. Design choices | Three bullets (CRS choice, data choice, scope) |
+| 7. Links | TestPyPI URL, GitHub URL, contact |
+
+. . .
+
+If you cannot fill a box, you do not yet know what goes there. That is the point.
+
+---
+
+## A common failure mode
+
+Posters that try to **explain everything** look like dense walls of text. Nobody reads them.
+
+. . .
+
+A working poster answers three questions in 30 seconds.
+
+::: {.incremental}
+1. What problem does this solve?
+2. What does the package look like in practice?
+3. Where can I find it?
+:::
+
+. . .
+
+Everything else is for the conversation, not the poster.
+
+# Part 7: Fit interview preview
+
+---
+
+## What the fit interview is
+
+In the **Week 12 lab**, each pair member sits a 5 to 10 minute individual interview.
+
+. . .
+
+::: {.incremental}
+* "Walk me through one function you wrote, line by line."
+* "Why did you choose this CRS / this default / this optional dependency?"
+* "What would happen if I passed an empty GeoDataFrame to this function?"
+:::
+
+. . .
+
+Bring your laptop with the package open. The interview is not about memorising. It is about confirming you understand the code your name is on.
+
+---
+
+## Rehearsal in the lab
+
+In today's lab (after this lecture), you will pair up with another team and run a short rehearsal.
+
+. . .
+
+::: {.incremental}
+* One person sits, one person observes, one person asks the three questions.
+* Swap roles so all four people get a turn.
+* The observer flags one thing the answer did well, one thing that was unclear.
+:::
+
+. . .
+
+It is much less awkward in rehearsal than on the real day. Take it.
+
+---
+
+## What we are listening for
+
+::: {.incremental}
+* Can you describe what the function returns and why?
+* Can you defend one design choice instead of just listing what you did?
+* When you do not know, can you say "I do not know, but I would check..."?
+:::
+
+. . .
+
+Hesitating, looking at your screen, or saying "let me check the docstring" are all fine. Saying "my partner wrote that bit" is not.
+
+# Wrap-up
+
+---
+
+## What to do this week
+
+::: {.incremental}
+* **In today's lab**: write four meaningful tests, publish to TestPyPI, draft your poster, rehearse the interview.
+* **By Friday**: confirm a clean install of your TestPyPI release works in a throwaway venv.
+* **Before next lecture**: each partner writes a 150 to 200 word reflection on (a) the hardest test to write, (b) the TestPyPI error that taught you the most, (c) the weakest part of the package right now.
+:::
+
+---
+
+## Wrap-up checklist
+
+::: {.incremental}
+- [ ] You have at least four tests passing locally.
+- [ ] You can run `uv build` without errors.
+- [ ] You know your TestPyPI username and have an API token.
+- [ ] You have a paper sketch of your poster.
+- [ ] You have rehearsed the fit interview at least once.
+- [ ] You know the showcase is on Tuesday 25 May (B301-G10).
+:::
+
+---
+
+## Further reading
+
+::: {style="font-size: 90%;"}
+* Textbook 4.2, **Testing and code quality**
+* Textbook 4.3, **A real geospatial package: `akl-ped-counts`**
+* Textbook 4.5, **Assignment 3 briefs**
+* `akl-ped-counts` `CONTRIBUTING.md`, https://github.com/dataandcrowd/akl-ped-counts/blob/main/CONTRIBUTING.md
+* pytest documentation, https://docs.pytest.org/
+* `uv publish` guide, https://docs.astral.sh/uv/guides/publish/
+* TestPyPI, https://test.pypi.org/
+:::
+
+---
+
+## See you in the lab
+
+Bring your laptop, your partner, and your TestPyPI account.
+
+. . .
+
+The Week 10 lab walks you through tests, the publish step, the poster sketch, and the fit interview rehearsal. Everything we just talked about, hands on the keyboard.
+
+. . .
+
+Next week, **poster showcase week**. Tuesday 25 May, B301-G10.
