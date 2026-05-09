@@ -26,7 +26,7 @@ format:
 jupyter: python3
 ---
 
-## Today's plan (90 min)
+## Today's plan
 
 1. Recap of Part 3 and welcome to Part 4
 2. Why we package code (the copy-paste problem)
@@ -34,8 +34,11 @@ jupyter: python3
 4. Live demo: build `geohello` in four steps
 5. **Hands-on**: build `geohello-yourname` (in pairs)
 6. A real package tour: `akl-ped-counts`
-7. **Assignment 3**: the five package briefs
-8. **Pair formation and topic raffle**
+7. **Bundling GIS data inside your package**
+8. **Fetching data from the Stats NZ API**
+9. **Hands-on**: download SA2 boundaries with Stats NZ
+10. **Assignment 3**: the five package briefs
+11. **Pair formation and topic raffle**
 
 ---
 
@@ -374,6 +377,300 @@ A user who only wants the data installs `pip install akl-ped-counts`. A user who
 
 ---
 
+# Part 7: Where does the data live?
+
+---
+
+## Two patterns
+
+Your A3 package needs **data**. Real Auckland data, not synthetic toys. Two patterns to choose from.
+
+. . .
+
+::: {.incremental}
+* **Bundle it.** Ship a small file inside the package itself. Good for lookup tables, schemas, sensor lists, anything under about 10 MB.
+* **Fetch it.** Download from an API on first use, then cache locally. Good for large or frequently updated data such as Stats NZ census and LINZ boundaries.
+:::
+
+. . .
+
+`akl-ped-counts` uses the first pattern (8 MB of CSVs ship with the package). Most A3 briefs will use the second.
+
+# Pattern 1: Bundling GIS data
+
+---
+
+## Where to put the file
+
+The convention is a `data/` folder **inside the package**, not at the top level.
+
+```
+your-package/
+├── pyproject.toml
+├── README.md
+└── src/
+    └── your_package/
+        ├── __init__.py
+        ├── loader.py
+        └── data/                # <-- here
+            ├── sensors.csv
+            └── zones.geojson
+```
+
+. . .
+
+This is what `akl-ped-counts` does with `hourly_counts.csv` and `locations.csv`. Same idea, same place.
+
+---
+
+## Finding the file at runtime
+
+Do **not** hard-code paths like `"/Users/me/Desktop/sensors.csv"`. The file moves when the package is installed.
+
+. . .
+
+Use `importlib.resources` instead.
+
+```python
+from importlib import resources
+import geopandas as gpd
+import pandas as pd
+
+
+def _data_path(filename: str) -> str:
+    """Resolve a path to a bundled data file."""
+    ref = resources.files("your_package") / "data" / filename
+    return str(ref)
+
+
+def load_sensors():
+    return pd.read_csv(_data_path("sensors.csv"))
+
+
+def load_zones():
+    return gpd.read_file(_data_path("zones.geojson"))
+```
+
+. . .
+
+This works whether the package is installed from PyPI, from a wheel, or in editable mode.
+
+---
+
+## Telling the build tool to include the file
+
+Bundled data does **not** ship by default. You must tell hatchling to include it.
+
+```toml
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/your_package/**",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/your_package"]
+```
+
+. . .
+
+The `**` glob picks up everything under `src/your_package/`, including the `data/` folder. Without this, your CSVs are missing from the wheel and `pip install` looks fine but breaks at runtime.
+
+. . .
+
+Always sanity-check by unzipping the `.whl` after `uv build`. The `data/` folder should be inside.
+
+---
+
+## When to bundle vs not
+
+::: {.incremental}
+* **Yes, bundle.** Sensor metadata (a few KB). Schema files. Static reference tables. NZDep2018 score table (a few hundred KB).
+* **Maybe bundle.** A small CSV under 10 MB that does not change between releases.
+* **No, do not bundle.** Anything over 10 MB. SA2 boundary GeoPackages (often 100+ MB). LINZ canopy layers. Census shapefiles.
+:::
+
+. . .
+
+For the heavy stuff, fetch from an API.
+
+# Pattern 2: Fetching from the Stats NZ API
+
+---
+
+## Why fetch instead of bundle
+
+::: {.incremental}
+* The data is too large to ship in a wheel.
+* The data updates every few months and you do not want to release a new version each time.
+* Stats NZ already hosts it. Stop re-hosting public data.
+:::
+
+. . .
+
+The cost is one API call on first use. The benefit is a tiny package and always-fresh data.
+
+---
+
+## Stats NZ Datafinder, in plain language
+
+Stats NZ runs a Koordinates-based portal at https://datafinder.stats.govt.nz/.
+
+Two ways to download programmatically.
+
+::: {.incremental}
+* **WFS** (Web Feature Service). Standard OGC protocol. Returns GeoJSON. Best for vector layers and small bounding boxes.
+* **Koordinates Export API.** Asynchronous job, you request an export and poll until it finishes. Best for large or full-country pulls.
+:::
+
+. . .
+
+We will use WFS in the example because it is one HTTP call.
+
+---
+
+## Step 1, get an API key
+
+::: {.incremental}
+1. Sign up at https://datafinder.stats.govt.nz/.
+2. Go to your profile, then "API keys".
+3. Create a key and copy it. It looks like `4f1a...`.
+4. Save it somewhere safe.
+:::
+
+. . .
+
+You can do this during today's hands-on. The free tier is plenty for any A3 package.
+
+---
+
+## Step 2, never hard-code the key
+
+```python
+import os
+
+
+def _get_api_key():
+    key = os.getenv("STATS_NZ_API_KEY")
+    if key is None:
+        raise EnvironmentError(
+            "Set STATS_NZ_API_KEY in your environment "
+            "or .env file before calling this function."
+        )
+    return key
+```
+
+. . .
+
+Then run with the key in the environment.
+
+```bash
+export STATS_NZ_API_KEY=4f1a...
+uv run python -c "from your_package import load_sa2; load_sa2()"
+```
+
+. . .
+
+Or add the key to a `.env` file (and add `.env` to `.gitignore`).
+
+---
+
+## Step 3, the WFS download
+
+```python
+import requests
+import geopandas as gpd
+from io import BytesIO
+
+WFS_URL = (
+    "https://datafinder.stats.govt.nz/services;"
+    "key={key}/wfs"
+)
+
+
+def load_sa2_auckland(api_key=None):
+    """Download Auckland SA2 boundaries from Stats NZ."""
+    api_key = api_key or _get_api_key()
+    params = {
+        "service": "WFS",
+        "version": "2.0.0",
+        "request": "GetFeature",
+        "typeNames": "layer-111228",       # SA2 2023 generalised
+        "outputFormat": "json",
+        "srsName": "EPSG:2193",
+        "bbox": "1740000,5900000,1790000,5950000,EPSG:2193",
+    }
+    r = requests.get(WFS_URL.format(key=api_key),
+                     params=params, timeout=30)
+    r.raise_for_status()
+    return gpd.read_file(BytesIO(r.content))
+```
+
+---
+
+## Step 4, cache so you only download once
+
+```python
+from pathlib import Path
+import geopandas as gpd
+
+CACHE_DIR = Path.home() / ".cache" / "your_package"
+
+
+def load_sa2_cached(api_key=None):
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cache_file = CACHE_DIR / "sa2_auckland.gpkg"
+
+    if cache_file.exists():
+        return gpd.read_file(cache_file)
+
+    gdf = load_sa2_auckland(api_key)
+    gdf.to_file(cache_file, driver="GPKG")
+    return gdf
+```
+
+. . .
+
+First call hits the API. Every later call reads the local file. Your demo notebook stays fast.
+
+---
+
+## Hands-on (10 min): try it once {.smaller}
+
+With your partner, do the following.
+
+::: {.incremental}
+1. Sign up at https://datafinder.stats.govt.nz/ and copy your API key.
+2. In your `geohello-yourname` package, add a function `load_sa2_auckland(api_key)` based on the slide above.
+3. Set the key in your shell, `export STATS_NZ_API_KEY=...`.
+4. Run `uv run python -c "from geohello_yourname import load_sa2_auckland; print(load_sa2_auckland().shape)"`.
+5. Confirm you get a GeoDataFrame with a sensible row count (around 60 SA2 zones for the Auckland CBD bounding box).
+:::
+
+. . .
+
+Demonstrators will help with the API key step. If it fails, check the key, the bbox, and that you are using `https`, not `http`.
+
+---
+
+## A note for the briefs
+
+Each A3 brief tells you which pattern fits.
+
+::: {.incremental}
+* `equitransport` benefits from **bundling** NZDep2018 (a few hundred KB).
+* `treecrown-nz` and `escooter-akl` will **fetch** large LINZ or Stats NZ layers.
+* `pedestrian-exposure` will likely **fetch** OSMnx routes and **bundle** sample inputs for tests.
+* `pavescore` ships images via the Mapillary API, so it is mostly **fetch** plus a small fixture image **bundled** for tests.
+:::
+
+. . .
+
+Pick the lightest option that works. A package that ships 200 MB of shapefiles is a package nobody installs.
+
+---
+
 # Assignment 3, the briefs
 
 ---
@@ -525,6 +822,9 @@ The five briefs are written on slips of paper. Each pair draws once, in the orde
 - Textbook 4.5, **Assignment 3 briefs in full**
 - Python Packaging Guide, https://packaging.python.org/
 - uv documentation, https://docs.astral.sh/uv/
+- `importlib.resources`, https://docs.python.org/3/library/importlib.resources.html
+- Stats NZ Datafinder, https://datafinder.stats.govt.nz/
+- LINZ Data Service, https://data.linz.govt.nz/
 - `akl-ped-counts` on GitHub, https://github.com/dataandcrowd/akl-ped-counts
 
 ---
