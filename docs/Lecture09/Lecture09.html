@@ -214,8 +214,8 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 
   <p class="date">May 11, 2026</p>
 </section>
-<section id="todays-plan-90-min" class="slide level2">
-<h2>Today’s plan (90 min)</h2>
+<section id="todays-plan" class="slide level2">
+<h2>Today’s plan</h2>
 <ol type="1">
 <li>Recap of Part 3 and welcome to Part 4</li>
 <li>Why we package code (the copy-paste problem)</li>
@@ -223,6 +223,9 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>Live demo: build <code>geohello</code> in four steps</li>
 <li><strong>Hands-on</strong>: build <code>geohello-yourname</code> (in pairs)</li>
 <li>A real package tour: <code>akl-ped-counts</code></li>
+<li><strong>Bundling GIS data inside your package</strong></li>
+<li><strong>Fetching data from the Stats NZ API</strong></li>
+<li><strong>Hands-on</strong>: download SA2 boundaries with Stats NZ</li>
 <li><strong>Assignment 3</strong>: the five package briefs</li>
 <li><strong>Pair formation and topic raffle</strong></li>
 </ol>
@@ -285,8 +288,8 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </tr>
 <tr class="even">
 <td>10</td>
-<td>Tests, docs, TestPyPI rehearsal</td>
-<td>TestPyPI release of A3 package</td>
+<td>Tests, TestPyPI, <strong>short fit interview</strong></td>
+<td>TestPyPI release + interview done</td>
 </tr>
 <tr class="odd">
 <td>11</td>
@@ -295,7 +298,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </tr>
 <tr class="even">
 <td>12</td>
-<td>PyPI deploy + fit interview</td>
+<td>PyPI deploy</td>
 <td>Production PyPI release</td>
 </tr>
 </tbody>
@@ -563,6 +566,246 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 
 </section>
 <section>
+<section id="part-7-where-does-the-data-live" class="title-slide slide level1 center">
+<h1>Part 7: Where does the data live?</h1>
+
+</section>
+<section id="two-patterns" class="slide level2">
+<h2>Two patterns</h2>
+<p>Your A3 package needs <strong>data</strong>. Real Auckland data, not synthetic toys. Two patterns to choose from.</p>
+<div class="fragment">
+<ul>
+<li class="fragment"><strong>Bundle it.</strong> Ship a small file inside the package itself. Good for lookup tables, schemas, sensor lists, anything under about 10 MB.</li>
+<li class="fragment"><strong>Fetch it.</strong> Download from an API on first use, then cache locally. Good for large or frequently updated data such as Stats NZ census and LINZ boundaries.</li>
+</ul>
+</div>
+<div class="fragment">
+<p><code>akl-ped-counts</code> uses the first pattern (8 MB of CSVs ship with the package). Most A3 briefs will use the second.</p>
+</div>
+</section></section>
+<section>
+<section id="pattern-1-bundling-gis-data" class="title-slide slide level1 center">
+<h1>Pattern 1: Bundling GIS data</h1>
+
+</section>
+<section id="where-to-put-the-file" class="slide level2">
+<h2>Where to put the file</h2>
+<p>The convention is a <code>data/</code> folder <strong>inside the package</strong>, not at the top level.</p>
+<pre><code>your-package/
+├── pyproject.toml
+├── README.md
+└── src/
+    └── your_package/
+        ├── __init__.py
+        ├── loader.py
+        └── data/                # &lt;-- here
+            ├── sensors.csv
+            └── zones.geojson</code></pre>
+<div class="fragment">
+<p>This is what <code>akl-ped-counts</code> does with <code>hourly_counts.csv</code> and <code>locations.csv</code>. Same idea, same place.</p>
+</div>
+</section>
+<section id="finding-the-file-at-runtime" class="slide level2">
+<h2>Finding the file at runtime</h2>
+<p>Do <strong>not</strong> hard-code paths like <code>"/Users/me/Desktop/sensors.csv"</code>. The file moves when the package is installed.</p>
+<div class="fragment">
+<p>Use <code>importlib.resources</code> instead.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib <span class="im">import</span> resources</span>
+<span id="cb17-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb17-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb17-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _data_path(filename: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb17-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Resolve a path to a bundled data file."""</span></span>
+<span id="cb17-8"><a href="" aria-hidden="true" tabindex="-1"></a>    ref <span class="op">=</span> resources.files(<span class="st">"your_package"</span>) <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> filename</span>
+<span id="cb17-9"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(ref)</span>
+<span id="cb17-10"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sensors():</span>
+<span id="cb17-13"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_csv(_data_path(<span class="st">"sensors.csv"</span>))</span>
+<span id="cb17-14"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_zones():</span>
+<span id="cb17-17"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(_data_path(<span class="st">"zones.geojson"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>This works whether the package is installed from PyPI, from a wheel, or in editable mode.</p>
+</div>
+</section>
+<section id="telling-the-build-tool-to-include-the-file" class="slide level2">
+<h2>Telling the build tool to include the file</h2>
+<p>Bundled data does <strong>not</strong> ship by default. You must tell hatchling to include it.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb18-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[tool.hatch.build.targets.sdist]</span></span>
+<span id="cb18-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">include</span> <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb18-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"src/your_package/**"</span><span class="op">,</span></span>
+<span id="cb18-4"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"README.md"</span><span class="op">,</span></span>
+<span id="cb18-5"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LICENSE"</span><span class="op">,</span></span>
+<span id="cb18-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="cb18-7"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[tool.hatch.build.targets.wheel]</span></span>
+<span id="cb18-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">packages</span> <span class="op">=</span> <span class="op">[</span><span class="st">"src/your_package"</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>The <code>**</code> glob picks up everything under <code>src/your_package/</code>, including the <code>data/</code> folder. Without this, your CSVs are missing from the wheel and <code>pip install</code> looks fine but breaks at runtime.</p>
+</div>
+<div class="fragment">
+<p>Always sanity-check by unzipping the <code>.whl</code> after <code>uv build</code>. The <code>data/</code> folder should be inside.</p>
+</div>
+</section>
+<section id="when-to-bundle-vs-not" class="slide level2">
+<h2>When to bundle vs not</h2>
+<ul>
+<li class="fragment"><strong>Yes, bundle.</strong> Sensor metadata (a few KB). Schema files. Static reference tables. NZDep2018 score table (a few hundred KB).</li>
+<li class="fragment"><strong>Maybe bundle.</strong> A small CSV under 10 MB that does not change between releases.</li>
+<li class="fragment"><strong>No, do not bundle.</strong> Anything over 10 MB. SA2 boundary GeoPackages (often 100+ MB). LINZ canopy layers. Census shapefiles.</li>
+</ul>
+<div class="fragment">
+<p>For the heavy stuff, fetch from an API.</p>
+</div>
+</section></section>
+<section>
+<section id="pattern-2-fetching-from-the-stats-nz-api" class="title-slide slide level1 center">
+<h1>Pattern 2: Fetching from the Stats NZ API</h1>
+
+</section>
+<section id="why-fetch-instead-of-bundle" class="slide level2">
+<h2>Why fetch instead of bundle</h2>
+<ul>
+<li class="fragment">The data is too large to ship in a wheel.</li>
+<li class="fragment">The data updates every few months and you do not want to release a new version each time.</li>
+<li class="fragment">Stats NZ already hosts it. Stop re-hosting public data.</li>
+</ul>
+<div class="fragment">
+<p>The cost is one API call on first use. The benefit is a tiny package and always-fresh data.</p>
+</div>
+</section>
+<section id="stats-nz-datafinder-in-plain-language" class="slide level2">
+<h2>Stats NZ Datafinder, in plain language</h2>
+<p>Stats NZ runs a Koordinates-based portal at https://datafinder.stats.govt.nz/.</p>
+<p>Two ways to download programmatically.</p>
+<ul>
+<li class="fragment"><strong>WFS</strong> (Web Feature Service). Standard OGC protocol. Returns GeoJSON. Best for vector layers and small bounding boxes.</li>
+<li class="fragment"><strong>Koordinates Export API.</strong> Asynchronous job, you request an export and poll until it finishes. Best for large or full-country pulls.</li>
+</ul>
+<div class="fragment">
+<p>We will use WFS in the example because it is one HTTP call.</p>
+</div>
+</section>
+<section id="step-1-get-an-api-key" class="slide level2">
+<h2>Step 1, get an API key</h2>
+<ol type="1">
+<li class="fragment">Sign up at https://datafinder.stats.govt.nz/.</li>
+<li class="fragment">Go to your profile, then “API keys”.</li>
+<li class="fragment">Create a key and copy it. It looks like <code>4f1a...</code>.</li>
+<li class="fragment">Save it somewhere safe.</li>
+</ol>
+<div class="fragment">
+<p>You can do this during today’s hands-on. The free tier is plenty for any A3 package.</p>
+</div>
+</section>
+<section id="step-2-never-hard-code-the-key" class="slide level2">
+<h2>Step 2, never hard-code the key</h2>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb19-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _get_api_key():</span>
+<span id="cb19-5"><a href="" aria-hidden="true" tabindex="-1"></a>    key <span class="op">=</span> os.getenv(<span class="st">"STATS_NZ_API_KEY"</span>)</span>
+<span id="cb19-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> key <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb19-7"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">EnvironmentError</span>(</span>
+<span id="cb19-8"><a href="" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Set STATS_NZ_API_KEY in your environment "</span></span>
+<span id="cb19-9"><a href="" aria-hidden="true" tabindex="-1"></a>            <span class="st">"or .env file before calling this function."</span></span>
+<span id="cb19-10"><a href="" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb19-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> key</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Then run with the key in the environment.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">STATS_NZ_API_KEY</span><span class="op">=</span>4f1a...</span>
+<span id="cb20-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from your_package import load_sa2; load_sa2()"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Or add the key to a <code>.env</code> file (and add <code>.env</code> to <code>.gitignore</code>).</p>
+</div>
+</section>
+<section id="step-3-the-wfs-download" class="slide level2">
+<h2>Step 3, the WFS download</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb21-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb21-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> BytesIO</span>
+<span id="cb21-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="" aria-hidden="true" tabindex="-1"></a>WFS_URL <span class="op">=</span> (</span>
+<span id="cb21-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://datafinder.stats.govt.nz/services;"</span></span>
+<span id="cb21-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"key=</span><span class="sc">{key}</span><span class="st">/wfs"</span></span>
+<span id="cb21-8"><a href="" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sa2_auckland(api_key<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb21-12"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Download Auckland SA2 boundaries from Stats NZ."""</span></span>
+<span id="cb21-13"><a href="" aria-hidden="true" tabindex="-1"></a>    api_key <span class="op">=</span> api_key <span class="kw">or</span> _get_api_key()</span>
+<span id="cb21-14"><a href="" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> {</span>
+<span id="cb21-15"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"service"</span>: <span class="st">"WFS"</span>,</span>
+<span id="cb21-16"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"version"</span>: <span class="st">"2.0.0"</span>,</span>
+<span id="cb21-17"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"request"</span>: <span class="st">"GetFeature"</span>,</span>
+<span id="cb21-18"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"typeNames"</span>: <span class="st">"layer-111228"</span>,       <span class="co"># SA2 2023 generalised</span></span>
+<span id="cb21-19"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"outputFormat"</span>: <span class="st">"json"</span>,</span>
+<span id="cb21-20"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"srsName"</span>: <span class="st">"EPSG:2193"</span>,</span>
+<span id="cb21-21"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bbox"</span>: <span class="st">"1740000,5900000,1790000,5950000,EPSG:2193"</span>,</span>
+<span id="cb21-22"><a href="" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb21-23"><a href="" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(WFS_URL.<span class="bu">format</span>(key<span class="op">=</span>api_key),</span>
+<span id="cb21-24"><a href="" aria-hidden="true" tabindex="-1"></a>                     params<span class="op">=</span>params, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb21-25"><a href="" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
+<span id="cb21-26"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(BytesIO(r.content))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-4-cache-so-you-only-download-once" class="slide level2">
+<h2>Step 4, cache so you only download once</h2>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb22-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb22-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="" aria-hidden="true" tabindex="-1"></a>CACHE_DIR <span class="op">=</span> Path.home() <span class="op">/</span> <span class="st">".cache"</span> <span class="op">/</span> <span class="st">"your_package"</span></span>
+<span id="cb22-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sa2_cached(api_key<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb22-8"><a href="" aria-hidden="true" tabindex="-1"></a>    CACHE_DIR.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-9"><a href="" aria-hidden="true" tabindex="-1"></a>    cache_file <span class="op">=</span> CACHE_DIR <span class="op">/</span> <span class="st">"sa2_auckland.gpkg"</span></span>
+<span id="cb22-10"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> cache_file.exists():</span>
+<span id="cb22-12"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> gpd.read_file(cache_file)</span>
+<span id="cb22-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="" aria-hidden="true" tabindex="-1"></a>    gdf <span class="op">=</span> load_sa2_auckland(api_key)</span>
+<span id="cb22-15"><a href="" aria-hidden="true" tabindex="-1"></a>    gdf.to_file(cache_file, driver<span class="op">=</span><span class="st">"GPKG"</span>)</span>
+<span id="cb22-16"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>First call hits the API. Every later call reads the local file. Your demo notebook stays fast.</p>
+</div>
+</section>
+<section id="hands-on-10-min-try-it-once" class="slide level2 smaller">
+<h2>Hands-on (10 min): try it once</h2>
+<p>With your partner, do the following.</p>
+<ol type="1">
+<li class="fragment">Sign up at https://datafinder.stats.govt.nz/ and copy your API key.</li>
+<li class="fragment">In your <code>geohello-yourname</code> package, add a function <code>load_sa2_auckland(api_key)</code> based on the slide above.</li>
+<li class="fragment">Set the key in your shell, <code>export STATS_NZ_API_KEY=...</code>.</li>
+<li class="fragment">Run <code>uv run python -c "from geohello_yourname import load_sa2_auckland; print(load_sa2_auckland().shape)"</code>.</li>
+<li class="fragment">Confirm you get a GeoDataFrame with a sensible row count (around 60 SA2 zones for the Auckland CBD bounding box).</li>
+</ol>
+<div class="fragment">
+<p>Demonstrators will help with the API key step. If it fails, check the key, the bbox, and that you are using <code>https</code>, not <code>http</code>.</p>
+</div>
+</section>
+<section id="a-note-for-the-briefs" class="slide level2">
+<h2>A note for the briefs</h2>
+<p>Each A3 brief tells you which pattern fits.</p>
+<ul>
+<li class="fragment"><code>equitransport</code> benefits from <strong>bundling</strong> NZDep2018 (a few hundred KB).</li>
+<li class="fragment"><code>treecrown-nz</code> and <code>escooter-akl</code> will <strong>fetch</strong> large LINZ or Stats NZ layers.</li>
+<li class="fragment"><code>pedestrian-exposure</code> will likely <strong>fetch</strong> OSMnx routes and <strong>bundle</strong> sample inputs for tests.</li>
+<li class="fragment"><code>pavescore</code> ships images via the Mapillary API, so it is mostly <strong>fetch</strong> plus a small fixture image <strong>bundled</strong> for tests.</li>
+</ul>
+<div class="fragment">
+<p>Pick the lightest option that works. A package that ships 200 MB of shapefiles is a package nobody installs.</p>
+</div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
 <section id="assignment-3-the-briefs" class="title-slide slide level1 center">
 <h1>Assignment 3, the briefs</h1>
 
@@ -576,21 +819,21 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li class="fragment">One demonstration notebook with a map or chart.</li>
 <li class="fragment">TestPyPI in Week 10, PyPI in Week 12.</li>
 <li class="fragment">A1 poster on <strong>Tuesday 25 May (B301-G10)</strong>.</li>
-<li class="fragment">Short <strong>fit interview</strong> in the Week 12 lab (5 to 10 min per person).</li>
+<li class="fragment">Short <strong>fit interview</strong> in the <strong>Week 10 lab</strong> (3 to 5 min per person).</li>
 </ul>
 <div class="fragment">
 <p>Read the full brief in the textbook chapter 4.5.</p>
 </div>
 </section>
-<section id="brief-1-pedestrian-exposure" class="slide level2">
+<section id="brief-1-pedestrian-exposure" class="slide level2 smaller">
 <h2>Brief 1: <code>pedestrian-exposure</code></h2>
-<p><strong>Cumulative exposure along a walking route.</strong></p>
+<p><strong>Cumulative pedestrian exposure to noise, air pollution, and green space along a walking route.</strong></p>
 <ul>
-<li class="fragment"><code>load_route(origin, destination, place)</code> from OSMnx</li>
-<li class="fragment"><code>add_exposure_layer(route_gdf, layer_gdf, column)</code> joins an environmental layer to route edges</li>
-<li class="fragment"><code>summarise_exposure(route_gdf)</code> returns per-edge and route-level scores</li>
-<li class="fragment"><strong>Demo</strong>: hotcity.co.nz route + Sentinel-2 NDVI greenery layer</li>
-<li class="fragment"><strong>Difficulty</strong>: intermediate (CRS alignment is the trick)</li>
+<li class="fragment"><code>load_route(origin, destination, place)</code> from OSMnx, returns edges in EPSG:2193</li>
+<li class="fragment"><code>add_exposure(route_gdf, layer, kind)</code> where <code>kind</code> is <code>"noise"</code>, <code>"air_quality"</code>, or <code>"green"</code></li>
+<li class="fragment"><code>summarise_exposure(route_gdf, weights=None)</code> returns per-edge values for all three plus a length-weighted summary</li>
+<li class="fragment"><strong>Demo</strong>: a CBD walking route + OSM-based noise proxy + LAWA air quality + Sentinel-2 NDVI</li>
+<li class="fragment"><strong>Difficulty</strong>: intermediate to ambitious (three small pipelines, kept consistent)</li>
 </ul>
 </section>
 <section id="brief-2-equitransport" class="slide level2">
@@ -640,31 +883,16 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li class="fragment"><strong>Difficulty</strong>: intermediate (messy data, loud failure beats silent failure)</li>
 </ul>
 </section>
-<section id="pair-formation-3-min" class="slide level2">
-<h2>Pair formation (3 min)</h2>
+<section id="pair-topic-formation" class="slide level2">
+<h2>Pair &amp; topic formation</h2>
 <ul>
-<li class="fragment">Find a partner you can meet <strong>outside lectures and labs</strong>. Time-zone overlap matters.</li>
-<li class="fragment">Confirm both of you have GitHub accounts.</li>
-<li class="fragment">Write your two names on the pair sheet at the front of the room.</li>
-<li class="fragment">If you cannot find a partner, raise a hand and we will pair you up.</li>
+<li>random shuffle</li>
 </ul>
-</section>
-<section id="the-raffle-5-min" class="slide level2">
-<h2>The raffle (5 min)</h2>
-<p>The five briefs are written on slips of paper. Each pair draws once, in the order you appear on the pair sheet.</p>
-<div class="fragment">
-<ul>
-<li class="fragment">No swaps after the draw.</li>
-<li class="fragment">Two pairs <strong>may</strong> end up with the same brief, that is fine. You will not share code, but you will see how two teams interpret the same problem.</li>
-<li class="fragment">Once you have your brief, write it next to your names on the pair sheet.</li>
-</ul>
-</div>
 </section>
 <section id="what-to-do-this-week" class="slide level2">
 <h2>What to do this week</h2>
 <ul>
-<li class="fragment"><strong>Today, after the lecture</strong>: read your brief end to end.</li>
-<li class="fragment"><strong>In the Week 9 lab</strong>: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.</li>
+<li class="fragment"><strong>Tomorrow Week 9 lab</strong>: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.</li>
 <li class="fragment"><strong>Before next lecture</strong>: each partner writes a 100 to 150 word reflection on (a) what is unclear, (b) which function you will own, (c) what you do not yet understand.</li>
 </ul>
 </section>
@@ -687,6 +915,9 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li>Textbook 4.5, <strong>Assignment 3 briefs in full</strong></li>
 <li>Python Packaging Guide, https://packaging.python.org/</li>
 <li>uv documentation, https://docs.astral.sh/uv/</li>
+<li><code>importlib.resources</code>, https://docs.python.org/3/library/importlib.resources.html</li>
+<li>Stats NZ Datafinder, https://datafinder.stats.govt.nz/</li>
+<li>LINZ Data Service, https://data.linz.govt.nz/</li>
 <li><code>akl-ped-counts</code> on GitHub, https://github.com/dataandcrowd/akl-ped-counts</li>
 </ul>
 </section>

@@ -36,7 +36,7 @@ jupyter: python3
 6. A real package tour: how `akl-ped-counts` is built and shipped
 7. TestPyPI rehearsal, end to end
 8. Poster outline, the seven-box rule
-9. Fit interview, what to expect
+9. **Fit interview, today in the lab**
 
 ---
 
@@ -64,9 +64,9 @@ This week we go from "one test that passes" to "a TestPyPI release that someone 
 | Week | What happens | Your output |
 |------|--------------|-------------|
 | 9 | Build skeleton, first function | Repo + one passing test |
-| **10** | **Tests, docs, TestPyPI** | **TestPyPI release** |
+| **10** | **Tests, TestPyPI, short fit interview** | **TestPyPI release + interview done** |
 | 11 | Polish + poster showcase (Tue 25 May) | A1 poster on the wall |
-| 12 | Production PyPI + fit interview | Published package |
+| 12 | Production PyPI | Published package |
 
 . . .
 
@@ -575,43 +575,44 @@ A working poster answers three questions in 30 seconds.
 
 Everything else is for the conversation, not the poster.
 
-# Part 7: Fit interview preview
+# Part 7: Fit interview, today in the lab
 
 ---
 
 ## What the fit interview is
 
-In the **Week 12 lab**, each pair member sits a 5 to 10 minute individual interview.
+In **today's lab**, each pair member sits a short individual interview, **3 to 5 minutes per person**.
 
 . . .
 
 ::: {.incremental}
-* "Walk me through one function you wrote, line by line."
-* "Why did you choose this CRS / this default / this optional dependency?"
+* "Walk me through one function you (personally) wrote. What does it return?"
+* "Why did you choose this CRS, this default, or this optional dependency?"
 * "What would happen if I passed an empty GeoDataFrame to this function?"
 :::
 
 . . .
 
-Bring your laptop with the package open. The interview is not about memorising. It is about confirming you understand the code your name is on.
+Bring your laptop with the package open. The interview is not a memory test and it is not a final exam. It is a quick check that both partners are contributing and that you understand the code your name is on.
 
 ---
 
-## Rehearsal in the lab
+## How it runs in the lab
 
-In today's lab (after this lecture), you will pair up with another team and run a short rehearsal.
+Pairs cluster into groups of four. Each pair interviews the other pair, one person at a time, while a demonstrator floats between groups to listen in.
 
 . . .
 
 ::: {.incremental}
-* One person sits, one person observes, one person asks the three questions.
-* Swap roles so all four people get a turn.
-* The observer flags one thing the answer did well, one thing that was unclear.
+* One person sits, one person from the other pair asks the three questions.
+* Three to five minutes per person, four people total per group, around 20 minutes.
+* The demonstrator sits in on at least one interview per group.
+* Swap so all four people get a turn.
 :::
 
 . . .
 
-It is much less awkward in rehearsal than on the real day. Take it.
+Why now, in Week 10? So uneven contribution can be caught and corrected before Week 11 polish and Week 12 PyPI release.
 
 ---
 
@@ -625,7 +626,7 @@ It is much less awkward in rehearsal than on the real day. Take it.
 
 . . .
 
-Hesitating, looking at your screen, or saying "let me check the docstring" are all fine. Saying "my partner wrote that bit" is not.
+Hesitating, looking at your screen, or saying "let me check the docstring" are all fine. Saying "my partner wrote that bit and I am not sure how it works" is what we are listening to catch early.
 
 # Wrap-up
 
@@ -634,7 +635,7 @@ Hesitating, looking at your screen, or saying "let me check the docstring" are a
 ## What to do this week
 
 ::: {.incremental}
-* **In today's lab**: write four meaningful tests, publish to TestPyPI, draft your poster, rehearse the interview.
+* **In today's lab**: write four meaningful tests, publish to TestPyPI, draft your poster, **sit the short fit interview**.
 * **By Friday**: confirm a clean install of your TestPyPI release works in a throwaway venv.
 * **Before next lecture**: each partner writes a 150 to 200 word reflection on (a) the hardest test to write, (b) the TestPyPI error that taught you the most, (c) the weakest part of the package right now.
 :::
@@ -648,7 +649,7 @@ Hesitating, looking at your screen, or saying "let me check the docstring" are a
 - [ ] You can run `uv build` without errors.
 - [ ] You know your TestPyPI username and have an API token.
 - [ ] You have a paper sketch of your poster.
-- [ ] You have rehearsed the fit interview at least once.
+- [ ] **Both partners have completed the fit interview today.**
 - [ ] You know the showcase is on Tuesday 25 May (B301-G10).
 :::
 
@@ -674,7 +675,7 @@ Bring your laptop, your partner, and your TestPyPI account.
 
 . . .
 
-The Week 10 lab walks you through tests, the publish step, the poster sketch, and the fit interview rehearsal. Everything we just talked about, hands on the keyboard.
+The Week 10 lab walks you through tests, the publish step, the poster sketch, and the short fit interview itself. Everything we just talked about, hands on the keyboard.
 
 . . .
 

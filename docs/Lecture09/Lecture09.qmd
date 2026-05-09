@@ -60,14 +60,14 @@ In Part 4 we go one step further. You will turn analysis code into a **Python pa
 
 ---
 
-## The four-week arc
+## The four-week arc {.smaller}
 
 | Week | Focus | Deliverable |
 |------|-------|-------------|
 | **9** | Package fundamentals (today + lab) | `geohello-yourname` builds locally |
-| 10 | Tests, docs, TestPyPI rehearsal | TestPyPI release of A3 package |
+| 10 | Tests, TestPyPI, **short fit interview** | TestPyPI release + interview done |
 | 11 | Polish + **poster showcase** | A1 poster, 25 May, B301-G10 |
-| 12 | PyPI deploy + fit interview | Production PyPI release |
+| 12 | PyPI deploy | Production PyPI release |
 
 . . .
 
@@ -684,7 +684,7 @@ Pick the lightest option that works. A package that ships 200 MB of shapefiles i
 * One demonstration notebook with a map or chart.
 * TestPyPI in Week 10, PyPI in Week 12.
 * A1 poster on **Tuesday 25 May (B301-G10)**.
-* Short **fit interview** in the Week 12 lab (5 to 10 min per person).
+* Short **fit interview** in the **Week 10 lab** (3 to 5 min per person).
 :::
 
 . . .
@@ -693,16 +693,16 @@ Read the full brief in the textbook chapter 4.5.
 
 ---
 
-## Brief 1: `pedestrian-exposure`
+## Brief 1: `pedestrian-exposure` {.smaller}
 
-**Cumulative exposure along a walking route.**
+**Cumulative pedestrian exposure to noise, air pollution, and green space along a walking route.**
 
 ::: {.incremental}
-* `load_route(origin, destination, place)` from OSMnx
-* `add_exposure_layer(route_gdf, layer_gdf, column)` joins an environmental layer to route edges
-* `summarise_exposure(route_gdf)` returns per-edge and route-level scores
-* **Demo**: hotcity.co.nz route + Sentinel-2 NDVI greenery layer
-* **Difficulty**: intermediate (CRS alignment is the trick)
+* `load_route(origin, destination, place)` from OSMnx, returns edges in EPSG:2193
+* `add_exposure(route_gdf, layer, kind)` where `kind` is `"noise"`, `"air_quality"`, or `"green"`
+* `summarise_exposure(route_gdf, weights=None)` returns per-edge values for all three plus a length-weighted summary
+* **Demo**: a CBD walking route + OSM-based noise proxy + LAWA air quality + Sentinel-2 NDVI
+* **Difficulty**: intermediate to ambitious (three small pipelines, kept consistent)
 :::
 
 ---
@@ -767,36 +767,19 @@ A simple texture-based scorer that works beats an ambitious classifier that brea
 
 ---
 
-## Pair formation (3 min)
+## Pair & topic formation
 
-::: {.incremental}
-* Find a partner you can meet **outside lectures and labs**. Time-zone overlap matters.
-* Confirm both of you have GitHub accounts.
-* Write your two names on the pair sheet at the front of the room.
-* If you cannot find a partner, raise a hand and we will pair you up.
-:::
+* random shuffle
 
----
 
-## The raffle (5 min)
 
-The five briefs are written on slips of paper. Each pair draws once, in the order you appear on the pair sheet.
-
-. . .
-
-::: {.incremental}
-* No swaps after the draw.
-* Two pairs **may** end up with the same brief, that is fine. You will not share code, but you will see how two teams interpret the same problem.
-* Once you have your brief, write it next to your names on the pair sheet.
-:::
 
 ---
 
 ## What to do this week
 
 ::: {.incremental}
-* **Today, after the lecture**: read your brief end to end.
-* **In the Week 9 lab**: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.
+* **Tomorrow Week 9 lab**: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.
 * **Before next lecture**: each partner writes a 100 to 150 word reflection on (a) what is unclear, (b) which function you will own, (c) what you do not yet understand.
 :::
 
