@@ -6,9 +6,8 @@
 <script src="Lecture09_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="Lecture09_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="Lecture09_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="Lecture09_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="Lecture09_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.553">
+<link href="Lecture09_files/libs/quarto-html/quarto-syntax-highlighting-234273d1456647dabc34a594ac50e507.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
 
   <meta name="author" content="Hyesop Shin">
   <meta name="dcterms.date" content="2026-05-11">
@@ -31,8 +30,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -96,210 +96,12 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="Lecture09_files/libs/revealjs/dist/theme/quarto.css">
+  <link rel="stylesheet" href="Lecture09_files/libs/revealjs/dist/theme/quarto-bdc00e421f0f67bb1c8a574e443af4bf.css">
   <link rel="stylesheet" href="Figs/logo.css">
   <link href="Lecture09_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="Lecture09_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="Lecture09_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
   <link href="Lecture09_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
-  <style type="text/css">
-
-  .callout {
-    margin-top: 1em;
-    margin-bottom: 1em;  
-    border-radius: .25rem;
-  }
-
-  .callout.callout-style-simple { 
-    padding: 0em 0.5em;
-    border-left: solid #acacac .3rem;
-    border-right: solid 1px silver;
-    border-top: solid 1px silver;
-    border-bottom: solid 1px silver;
-    display: flex;
-  }
-
-  .callout.callout-style-default {
-    border-left: solid #acacac .3rem;
-    border-right: solid 1px silver;
-    border-top: solid 1px silver;
-    border-bottom: solid 1px silver;
-  }
-
-  .callout .callout-body-container {
-    flex-grow: 1;
-  }
-
-  .callout.callout-style-simple .callout-body {
-    font-size: 1rem;
-    font-weight: 400;
-  }
-
-  .callout.callout-style-default .callout-body {
-    font-size: 0.9rem;
-    font-weight: 400;
-  }
-
-  .callout.callout-titled.callout-style-simple .callout-body {
-    margin-top: 0.2em;
-  }
-
-  .callout:not(.callout-titled) .callout-body {
-      display: flex;
-  }
-
-  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
-    padding-left: 1.6em;
-  }
-
-  .callout.callout-titled .callout-header {
-    padding-top: 0.2em;
-    margin-bottom: -0.2em;
-  }
-
-  .callout.callout-titled .callout-title  p {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-  }
-    
-  .callout.callout-titled.callout-style-simple .callout-content  p {
-    margin-top: 0;
-  }
-
-  .callout.callout-titled.callout-style-default .callout-content  p {
-    margin-top: 0.7em;
-  }
-
-  .callout.callout-style-simple div.callout-title {
-    border-bottom: none;
-    font-size: .9rem;
-    font-weight: 600;
-    opacity: 75%;
-  }
-
-  .callout.callout-style-default  div.callout-title {
-    border-bottom: none;
-    font-weight: 600;
-    opacity: 85%;
-    font-size: 0.9rem;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-  }
-
-  .callout.callout-style-default div.callout-content {
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-  }
-
-  .callout.callout-style-simple .callout-icon::before {
-    height: 1rem;
-    width: 1rem;
-    display: inline-block;
-    content: "";
-    background-repeat: no-repeat;
-    background-size: 1rem 1rem;
-  }
-
-  .callout.callout-style-default .callout-icon::before {
-    height: 0.9rem;
-    width: 0.9rem;
-    display: inline-block;
-    content: "";
-    background-repeat: no-repeat;
-    background-size: 0.9rem 0.9rem;
-  }
-
-  .callout-title {
-    display: flex
-  }
-    
-  .callout-icon::before {
-    margin-top: 1rem;
-    padding-right: .5rem;
-  }
-
-  .callout.no-icon::before {
-    display: none !important;
-  }
-
-  .callout.callout-titled .callout-body > .callout-content > :last-child {
-    padding-bottom: 0.5rem;
-    margin-bottom: 0;
-  }
-
-  .callout.callout-titled .callout-icon::before {
-    margin-top: .5rem;
-    padding-right: .5rem;
-  }
-
-  .callout:not(.callout-titled) .callout-icon::before {
-    margin-top: 1rem;
-    padding-right: .5rem;
-  }
-
-  /* Callout Types */
-
-  div.callout-note {
-    border-left-color: #4582ec !important;
-  }
-
-  div.callout-note .callout-icon::before {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
-  }
-
-  div.callout-note.callout-style-default .callout-title {
-    background-color: #dae6fb
-  }
-
-  div.callout-important {
-    border-left-color: #d9534f !important;
-  }
-
-  div.callout-important .callout-icon::before {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
-  }
-
-  div.callout-important.callout-style-default .callout-title {
-    background-color: #f7dddc
-  }
-
-  div.callout-warning {
-    border-left-color: #f0ad4e !important;
-  }
-
-  div.callout-warning .callout-icon::before {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
-  }
-
-  div.callout-warning.callout-style-default .callout-title {
-    background-color: #fcefdc
-  }
-
-  div.callout-tip {
-    border-left-color: #02b875 !important;
-  }
-
-  div.callout-tip .callout-icon::before {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
-  }
-
-  div.callout-tip.callout-style-default .callout-title {
-    background-color: #ccf1e3
-  }
-
-  div.callout-caution {
-    border-left-color: #fd7e14 !important;
-  }
-
-  div.callout-caution .callout-icon::before {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
-  }
-
-  div.callout-caution.callout-style-default .callout-title {
-    background-color: #ffe5d0
-  }
-
-  </style>
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -435,7 +237,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <p>In Part 4 we go one step further. You will turn analysis code into a <strong>Python package</strong> and publish it so anyone with <code>pip</code> can install it.</p>
 </div>
 <div class="fragment">
-<table>
+<table class="caption-top">
 <colgroup>
 <col style="width: 50%">
 <col style="width: 50%">
@@ -465,7 +267,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="the-four-week-arc" class="slide level2 smaller">
 <h2>The four-week arc</h2>
-<table>
+<table class="caption-top">
 <colgroup>
 <col style="width: 23%">
 <col style="width: 26%">
@@ -536,7 +338,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </ul>
 </section>
 <section id="real-world-example-of-encapsulation" class="slide level2">
-<h2>Real-World Example of Encapsulation:</h2>
+<h2>Real-World Example of <del>Encapsulation</del>:</h2>
 <div style="font-size: 50%;">
 <ul>
 <li>Imagine you’re building software for a coffee shop. You might have a class that represents a coffee machine.</li>
@@ -548,14 +350,12 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <img data-src="https://www.tasteofhome.com/wp-content/uploads/2020/02/Types-of-Coffee-Drinks_1200X1200.jpg" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="what-is-a-python-package-really" class="slide level2">
 <h2>What is a Python package, really?</h2>
-<div>
 <ul>
 <li class="fragment">A <strong>module</strong> is a single <code>.py</code> file.</li>
 <li class="fragment">A <strong>package</strong> is a folder of modules with an <code>__init__.py</code>.</li>
 <li class="fragment">A <strong>distribution</strong> is the <code>.whl</code> or <code>.tar.gz</code> file you install.</li>
 <li class="fragment">A <strong>PyPI release</strong> is a distribution uploaded to https://pypi.org so <code>pip install</code> can find it.</li>
 </ul>
-</div>
 <div class="fragment">
 <p>Today we go: file → folder → distribution. Publishing to PyPI is Week 12.</p>
 </div>
@@ -599,53 +399,67 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="live-demo-four-steps-to-a-working-package" class="slide level2">
 <h2>Live demo: four steps to a working package</h2>
-<p>We will build <code>geohello</code> together. Same commands you will run in pairs in 10 minutes.</p>
+<p>We will build <code>geohello</code> together. Same commands you will run in 10 minutes.</p>
 <div class="fragment">
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: scaffold</span></span>
-<span id="cb5-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--lib</span> geohello</span>
-<span id="cb5-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> geohello</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: scaffold IN your current folder (not in a subfolder)</span></span>
+<span id="cb5-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> geohello <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> geohello</span>
+<span id="cb5-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--lib</span> <span class="at">--name</span> geohello . <span class="co"># the 'period `.` ' is important!</span></span>
 <span id="cb5-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: edit src/geohello/__init__.py (one function)</span></span>
 <span id="cb5-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: build</span></span>
 <span id="cb5-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span>
 <span id="cb5-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: try it</span></span>
+<span id="cb5-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: try it (uv creates and manages .venv automatically)</span></span>
 <span id="cb5-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello import hello; print(hello())"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><code>uv</code> handles the virtual environment for you — no manual setup needed.</p>
+<ol type="1">
+<li><strong><code>uv init</code></strong> — scaffolds the project (creates <code>pyproject.toml</code>, <code>src/</code>, etc.)</li>
+<li><strong><code>uv add &lt;package&gt;</code></strong> — installs dependencies and updates <code>pyproject.toml</code></li>
+</ol>
+<p><code>uv</code> automatically creates <code>.venv/</code> on the first <code>uv run</code> or <code>uv sync</code>.</p>
 </div>
 </section>
 <section id="step-1-scaffold-with-uv" class="slide level2">
 <h2>Step 1: scaffold with uv</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--lib</span> geohello</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This creates the whole folder for you.</p>
-<pre><code>geohello/
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> geohello <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> geohello <span class="co"># only if you haven't</span></span>
+<span id="cb6-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--lib</span> <span class="at">--name</span> geohello .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The trailing <code>.</code> tells <code>uv</code> to scaffold <strong>in the current directory</strong>, not in a new subfolder. After this you have:</p>
+<pre><code>geohello/                       # &lt;-- you are here
 ├── src/geohello/__init__.py
 ├── tests/
 ├── pyproject.toml
 ├── README.md
+├── .python-version
 └── .gitignore</code></pre>
-<div class="fragment">
-<p><code>uv</code> already filled in a working <code>pyproject.toml</code> and made the <code>src/</code> layout correctly. <strong>You did not have to remember any of it.</strong></p>
-</div>
+<p><code>uv</code> filled in a working <code>pyproject.toml</code>, made the <code>src/</code> layout, and will create <code>.venv/</code> on the first <code>uv run</code> or <code>uv sync</code>. <strong>You did not have to remember any of it.</strong></p>
+</section>
+<section id="in-your-pyproject.toml-preventing-from-pypi-submission" class="slide level2">
+<h2>In your <code>pyproject.toml</code> (preventing from PyPi submission)</h2>
+<p>Open your <code>pyproject.toml</code></p>
+<pre><code>[project]
+classifiers = ["Private :: Do Not Upload"]</code></pre>
 </section>
 <section id="step-2-write-one-function" class="slide level2">
 <h2>Step 2: write one function</h2>
 <p>Open <code>src/geohello/__init__.py</code> and replace the contents:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co">"""A simple geospatial greeting package."""</span></span>
-<span id="cb8-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="" aria-hidden="true" tabindex="-1"></a>__version__ <span class="op">=</span> <span class="st">"0.1.0"</span></span>
-<span id="cb8-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello(place<span class="op">=</span><span class="st">"Auckland"</span>):</span>
-<span id="cb8-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return a greeting for a place."""</span></span>
-<span id="cb8-8"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Hello from </span><span class="sc">{</span>place<span class="sc">}</span><span class="ss">!"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co">"""A simple geospatial greeting package."""</span></span>
+<span id="cb9-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="" aria-hidden="true" tabindex="-1"></a>__version__ <span class="op">=</span> <span class="st">"0.1.0"</span></span>
+<span id="cb9-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello(place<span class="op">=</span><span class="st">"Auckland"</span>):</span>
+<span id="cb9-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return a greeting for a place."""</span></span>
+<span id="cb9-8"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Hello from </span><span class="sc">{</span>place<span class="sc">}</span><span class="ss">!"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>That is the entire package. One function, one docstring, one version.</p>
 </div>
 </section>
 <section id="step-3-build-the-distributions" class="slide level2">
 <h2>Step 3: build the distributions</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This creates a <code>dist/</code> folder.</p>
 <pre><code>dist/
 ├── geohello-0.1.0-py3-none-any.whl    # the wheel
@@ -656,23 +470,23 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="step-4-try-it" class="slide level2">
 <h2>Step 4: try it</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the function in one line</span></span>
-<span id="cb11-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello import hello; print(hello())"</span></span>
-<span id="cb11-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Hello from Auckland!</span></span>
-<span id="cb11-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Or open Python interactively</span></span>
-<span id="cb11-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python</span>
-<span id="cb11-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> from <span class="ex">geohello</span> import hello</span>
-<span id="cb11-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hello<span class="kw">(</span><span class="st">"Tokyo"</span><span class="kw">)</span></span>
-<span id="cb11-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="st">'Hello from Tokyo!'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the function in one line</span></span>
+<span id="cb12-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello import hello; print(hello())"</span></span>
+<span id="cb12-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Hello from Auckland!</span></span>
+<span id="cb12-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Or open Python interactively</span></span>
+<span id="cb12-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python</span>
+<span id="cb12-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> from <span class="ex">geohello</span> import hello</span>
+<span id="cb12-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hello<span class="kw">(</span><span class="st">"Mexico City"</span><span class="kw">)</span></span>
+<span id="cb12-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="st">'Hello from Mexico City!'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>That is what “building a package” feels like. Four commands.</p>
 </div>
 </section>
-<section id="your-turn-25-min-build-geohello-yourname" class="slide level2 smaller">
-<h2>Your turn (25 min): build <code>geohello-yourname</code></h2>
-<p>Pair up. <strong>Both partners commit code.</strong> This is also your A3 partner from this week onwards.</p>
-<table>
+<section id="package-build-geohello-summary" class="slide level2 smaller">
+<h2>Package build <code>geohello</code> summary</h2>
+<p>This is also your A3 partner from this week onwards.</p>
+<table class="caption-top">
 <colgroup>
 <col style="width: 19%">
 <col style="width: 61%">
@@ -688,61 +502,102 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td><code>uv init --lib geohello-yourname</code></td>
+<td><code>mkdir geohello-yourname &amp;&amp; cd geohello-yourname</code></td>
 <td style="text-align: center;">☐</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>Edit <code>src/geohello_yourname/__init__.py</code>, add <code>hello()</code></td>
+<td><code>uv init --lib --name geohello-yourname .</code> (note the trailing <code>.</code>)</td>
 <td style="text-align: center;">☐</td>
 </tr>
 <tr class="odd">
 <td>3</td>
-<td>Update <code>name</code>, <code>description</code>, both <code>authors</code> in <code>pyproject.toml</code></td>
+<td>Edit <code>src/geohello_yourname/__init__.py</code>, add <code>hello()</code></td>
 <td style="text-align: center;">☐</td>
 </tr>
 <tr class="even">
 <td>4</td>
-<td><code>uv build</code> produces <code>dist/*.whl</code> and <code>dist/*.tar.gz</code></td>
+<td>Update <code>name</code>, <code>description</code>, both <code>authors</code> in <code>pyproject.toml</code></td>
 <td style="text-align: center;">☐</td>
 </tr>
 <tr class="odd">
 <td>5</td>
-<td><code>uv run python -c "from geohello_yourname import hello; print(hello())"</code></td>
+<td><code>uv build</code> produces <code>dist/*.whl</code> and <code>dist/*.tar.gz</code></td>
 <td style="text-align: center;">☐</td>
 </tr>
 <tr class="even">
 <td>6</td>
+<td><code>uv run python -c "from geohello_yourname import hello; print(hello())"</code></td>
+<td style="text-align: center;">☐</td>
+</tr>
+<tr class="odd">
+<td>7</td>
 <td>Push to a shared GitHub repo</td>
 <td style="text-align: center;">☐</td>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<p>Demonstrators will circulate. Wave a hand if <code>uv build</code> complains.</p>
-</div>
 </section>
 <section id="common-errors-and-fixes" class="slide level2">
 <h2>Common errors and fixes</h2>
-<div>
 <ul>
 <li class="fragment"><strong><code>ImportError: No module named geohello_yourname</code></strong>. Check the folder under <code>src/</code> exists and uses underscores.</li>
 <li class="fragment"><strong><code>name 'geohello' is already taken</code></strong> (later, on TestPyPI). Add your initials to the <code>name</code> field.</li>
 <li class="fragment"><strong>Build fails on the first line of <code>pyproject.toml</code></strong>. Usually a TOML syntax typo. Read the first error message carefully.</li>
 <li class="fragment"><strong>The function works in <code>uv run python</code> but not in plain <code>python</code></strong>. You are not in the project’s virtual environment. Use <code>uv run</code> or <code>source .venv/bin/activate</code>.</li>
 </ul>
+</section>
+<section id="versioning-conventions" class="slide level2">
+<h2>Versioning conventions</h2>
+<p>Python packages use three numbers separated by dots:</p>
+<pre><code>MAJOR.MINOR.PATCH     e.g.  1.4.2</code></pre>
+<div class="fragment">
+<table class="caption-top">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 51%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Bump</th>
+<th>What happened?</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>PATCH</strong> (1.4.2 → 1.4.3)</td>
+<td>Fixed a bug. Nothing new.</td>
+<td>Fixed a typo in an error message</td>
+</tr>
+<tr class="even">
+<td><strong>MINOR</strong> (1.4.2 → 1.5.0)</td>
+<td>Added something new. Old code still works.</td>
+<td>Added a new <code>load_weekly()</code> function</td>
+</tr>
+<tr class="odd">
+<td><strong>MAJOR</strong> (1.4.2 → 2.0.0)</td>
+<td>Changed something existing. Old code might break.</td>
+<td>Renamed <code>load_hourly()</code> to <code>fetch_hourly()</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fragment">
+<p>Your first release will be <strong>0.1.0</strong>. When the major number is <strong>0</strong>, it means “still experimenting — expect changes.”</p>
 </div>
 </section>
 <section id="a-real-package-akl-ped-counts" class="slide level2 smaller">
 <h2>A real package: <code>akl-ped-counts</code></h2>
 <p><a href="https://github.com/dataandcrowd/akl-ped-counts">github.com/dataandcrowd/akl-ped-counts</a></p>
 <p>A small package on PyPI that ships hourly Heart of the City pedestrian counts (21 sensors, 2019 to 2025).</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="" aria-hidden="true" tabindex="-1"></a>pip install akl<span class="op">-</span>ped<span class="op">-</span>counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> akl_ped_counts <span class="im">import</span> load_hourly, load_locations, list_sensors</span>
-<span id="cb13-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(list_sensors()))   <span class="co"># 21</span></span>
-<span id="cb13-4"><a href="" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> load_hourly()</span>
-<span id="cb13-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(counts.shape)          <span class="co"># (61367, 24)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="" aria-hidden="true" tabindex="-1"></a>pip install akl<span class="op">-</span>ped<span class="op">-</span>counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> akl_ped_counts <span class="im">import</span> load_hourly, load_locations, list_sensors</span>
+<span id="cb15-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(list_sensors()))   <span class="co"># 21</span></span>
+<span id="cb15-4"><a href="" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> load_hourly()</span>
+<span id="cb15-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(counts.shape)          <span class="co"># (61367, 24)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>Three functions, one short README, one PyPI release. <strong>This is the size and shape your A3 should aim for.</strong></p>
 </div>
@@ -767,15 +622,15 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="optional-dependencies-an-idea-worth-copying" class="slide level2">
 <h2>Optional dependencies, an idea worth copying</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb15-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project]</span></span>
-<span id="cb15-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">dependencies</span> <span class="op">=</span> <span class="op">[</span><span class="st">"pandas&gt;=1.5.0"</span><span class="op">]</span>   <span class="co"># core only</span></span>
-<span id="cb15-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project.optional-dependencies]</span></span>
-<span id="cb15-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">polars</span> <span class="op">=</span> <span class="op">[</span><span class="st">"polars&gt;=0.20.0"</span><span class="op">]</span></span>
-<span id="cb15-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">plot</span> <span class="op">=</span> <span class="op">[</span><span class="st">"matplotlib&gt;=3.5.0"</span><span class="op">,</span> <span class="st">"seaborn&gt;=0.12.0"</span><span class="op">]</span></span>
-<span id="cb15-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">geo</span> <span class="op">=</span> <span class="op">[</span><span class="st">"folium&gt;=0.14.0"</span><span class="op">]</span></span>
-<span id="cb15-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">all</span> <span class="op">=</span> <span class="op">[</span><span class="st">"polars&gt;=0.20.0"</span><span class="op">,</span> <span class="st">"matplotlib&gt;=3.5.0"</span><span class="op">,</span></span>
-<span id="cb15-9"><a href="" aria-hidden="true" tabindex="-1"></a>       <span class="st">"seaborn&gt;=0.12.0"</span><span class="op">,</span> <span class="st">"folium&gt;=0.14.0"</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb17-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project]</span></span>
+<span id="cb17-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">dependencies</span> <span class="op">=</span> <span class="op">[</span><span class="st">"pandas&gt;=1.5.0"</span><span class="op">]</span>   <span class="co"># core only</span></span>
+<span id="cb17-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[project.optional-dependencies]</span></span>
+<span id="cb17-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">polars</span> <span class="op">=</span> <span class="op">[</span><span class="st">"polars&gt;=0.20.0"</span><span class="op">]</span></span>
+<span id="cb17-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">plot</span> <span class="op">=</span> <span class="op">[</span><span class="st">"matplotlib&gt;=3.5.0"</span><span class="op">,</span> <span class="st">"seaborn&gt;=0.12.0"</span><span class="op">]</span></span>
+<span id="cb17-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">geo</span> <span class="op">=</span> <span class="op">[</span><span class="st">"folium&gt;=0.14.0"</span><span class="op">]</span></span>
+<span id="cb17-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">all</span> <span class="op">=</span> <span class="op">[</span><span class="st">"polars&gt;=0.20.0"</span><span class="op">,</span> <span class="st">"matplotlib&gt;=3.5.0"</span><span class="op">,</span></span>
+<span id="cb17-9"><a href="" aria-hidden="true" tabindex="-1"></a>       <span class="st">"seaborn&gt;=0.12.0"</span><span class="op">,</span> <span class="st">"folium&gt;=0.14.0"</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>A user who only wants the data installs <code>pip install akl-ped-counts</code>. A user who wants plotting installs <code>pip install "akl-ped-counts[plot]"</code>. The core install stays small.</p>
 </div>
@@ -792,15 +647,13 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <h2>Two patterns</h2>
 <p>Your A3 package needs <strong>data</strong>. Real Auckland data, not synthetic toys. Two patterns to choose from.</p>
 <div class="fragment">
-<div>
 <ul>
 <li class="fragment"><strong>Bundle it.</strong> Ship a small file inside the package itself. Good for lookup tables, schemas, sensor lists, anything under about 10 MB.</li>
 <li class="fragment"><strong>Fetch it.</strong> Download from an API on first use, then cache locally. Good for large or frequently updated data such as Stats NZ census and LINZ boundaries.</li>
 </ul>
 </div>
-</div>
 <div class="fragment">
-<p><code>akl-ped-counts</code> uses the first pattern (8 MB of CSVs ship with the package). Most A3 briefs will use the second.</p>
+<p><code>akl-ped-counts</code> uses the first pattern (8 MB of CSVs ship with the package).</p>
 </div>
 </section></section>
 <section>
@@ -825,45 +678,86 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <p>This is what <code>akl-ped-counts</code> does with <code>hourly_counts.csv</code> and <code>locations.csv</code>. Same idea, same place.</p>
 </div>
 </section>
-<section id="finding-the-file-at-runtime" class="slide level2">
-<h2>Finding the file at runtime</h2>
-<p>Do <strong>not</strong> hard-code paths like <code>"/Users/me/Desktop/sensors.csv"</code>. The file moves when the package is installed.</p>
+<section id="finding-the-file-at-runtime-the-problem" class="slide level2">
+<h2>Finding the file at runtime: the problem</h2>
+<p>Your laptop knows where <code>sensors.csv</code> lives. Someone who runs <code>pip install your-package</code> does not.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 🚫 Works on your laptop, breaks for everyone else</span></span>
+<span id="cb19-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sensors():</span>
+<span id="cb19-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_csv(<span class="st">"/Users/hyesop/projects/data/sensors.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p>Use <code>importlib.resources</code> instead.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib <span class="im">import</span> resources</span>
-<span id="cb17-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb17-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb17-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _data_path(filename: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb17-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Resolve a path to a bundled data file."""</span></span>
-<span id="cb17-8"><a href="" aria-hidden="true" tabindex="-1"></a>    ref <span class="op">=</span> resources.files(<span class="st">"your_package"</span>) <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> filename</span>
-<span id="cb17-9"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(ref)</span>
-<span id="cb17-10"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-12"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sensors():</span>
-<span id="cb17-13"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_csv(_data_path(<span class="st">"sensors.csv"</span>))</span>
-<span id="cb17-14"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-15"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-16"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_zones():</span>
-<span id="cb17-17"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(_data_path(<span class="st">"zones.geojson"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After <code>pip install</code>, the file lives somewhere inside their Python’s <code>site-packages/...</code> folder — a path you cannot predict.</p>
+</div>
+</section>
+<section id="finding-the-file-at-runtime-the-fix" class="slide level2">
+<h2>Finding the file at runtime: the fix</h2>
+<p>Let Python find the package for you.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib.resources <span class="im">import</span> files</span>
+<span id="cb20-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb20-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sensors():</span>
+<span id="cb20-5"><a href="" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> files(<span class="st">"your_package"</span>) <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"sensors.csv"</span></span>
+<span id="cb20-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_csv(path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Read it as a sentence:</p>
+<blockquote>
+<p><em>“Find the package <code>your_package</code>, go into its <code>data/</code> folder, grab <code>sensors.csv</code>.”</em></p>
+</blockquote>
+<p>The <code>/</code> here is the same idea as <code>pathlib.Path</code> — it joins folder names. No hard-coded <code>/Users/...</code> anywhere.</p>
 </div>
 <div class="fragment">
-<p>This works whether the package is installed from PyPI, from a wheel, or in editable mode.</p>
+<p>Same package works on your laptop, on a classmate’s laptop, on PyPI — Python figures out the real location.</p>
+</div>
+</section>
+<section id="try-it-loading-auckland-pedestrian-data" class="slide level2">
+<h2>Try it: loading Auckland pedestrian data</h2>
+<p>In <code>src/geohello/__init__.py</code>, add a loader next to <code>hello()</code>:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib.resources <span class="im">import</span> files</span>
+<span id="cb21-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb21-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb21-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Hello from geohello!"</span></span>
+<span id="cb21-7"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data():</span>
+<span id="cb21-10"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Load the 2024 Auckland pedestrian counts."""</span></span>
+<span id="cb21-11"><a href="" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> files(<span class="st">"geohello"</span>) <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"akl_ped-2024.csv"</span></span>
+<span id="cb21-12"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_csv(path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello import load_data; print(load_data().shape)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you see the shape printed, the CSV is bundled and loading correctly.</p>
+</div>
+</section>
+<section id="once-you-have-more-than-one-file" class="slide level2 smaller">
+<h2>Once you have more than one file</h2>
+<p>Repeating <code>files("your_package") / "data" / ...</code> gets noisy. Wrap it in a tiny helper.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> importlib.resources <span class="im">import</span> files</span>
+<span id="cb23-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb23-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb23-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> files(<span class="st">"your_package"</span>) <span class="op">/</span> <span class="st">"data"</span>   <span class="co"># computed once at import time</span></span>
+<span id="cb23-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sensors():</span>
+<span id="cb23-8"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_csv(DATA <span class="op">/</span> <span class="st">"sensors.csv"</span>)</span>
+<span id="cb23-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_zones():</span>
+<span id="cb23-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(DATA <span class="op">/</span> <span class="st">"zones.geojson"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>That is the pattern <code>akl-ped-counts</code> uses. Two loaders, one <code>DATA</code> constant, no path strings to maintain.</p>
 </div>
 </section>
 <section id="telling-the-build-tool-to-include-the-file" class="slide level2">
 <h2>Telling the build tool to include the file</h2>
 <p>Bundled data does <strong>not</strong> ship by default. You must tell hatchling to include it.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb18-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[tool.hatch.build.targets.sdist]</span></span>
-<span id="cb18-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">include</span> <span class="op">=</span> <span class="op">[</span></span>
-<span id="cb18-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"src/your_package/**"</span><span class="op">,</span></span>
-<span id="cb18-4"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"README.md"</span><span class="op">,</span></span>
-<span id="cb18-5"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LICENSE"</span><span class="op">,</span></span>
-<span id="cb18-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
-<span id="cb18-7"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[tool.hatch.build.targets.wheel]</span></span>
-<span id="cb18-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">packages</span> <span class="op">=</span> <span class="op">[</span><span class="st">"src/your_package"</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb24-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[tool.hatch.build.targets.sdist]</span></span>
+<span id="cb24-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">include</span> <span class="op">=</span> <span class="op">[</span></span>
+<span id="cb24-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"src/your_package/**"</span><span class="op">,</span></span>
+<span id="cb24-4"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"README.md"</span><span class="op">,</span></span>
+<span id="cb24-5"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LICENSE"</span><span class="op">,</span></span>
+<span id="cb24-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="cb24-7"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">[tool.hatch.build.targets.wheel]</span></span>
+<span id="cb24-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="dt">packages</span> <span class="op">=</span> <span class="op">[</span><span class="st">"src/your_package"</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>The <code>**</code> glob picks up everything under <code>src/your_package/</code>, including the <code>data/</code> folder. Without this, your CSVs are missing from the wheel and <code>pip install</code> looks fine but breaks at runtime.</p>
 </div>
@@ -873,13 +767,11 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="when-to-bundle-vs-not" class="slide level2">
 <h2>When to bundle vs not</h2>
-<div>
 <ul>
-<li class="fragment"><strong>Yes, bundle.</strong> Sensor metadata (a few KB). Schema files. Static reference tables. NZDep2018 score table (a few hundred KB).</li>
+<li class="fragment"><strong>Yes, bundle.</strong> Sensor metadata (a few KB). Schema files. Static reference tables. NZDep2023 score table (a few hundred KB).</li>
 <li class="fragment"><strong>Maybe bundle.</strong> A small CSV under 10 MB that does not change between releases.</li>
 <li class="fragment"><strong>No, do not bundle.</strong> Anything over 10 MB. SA2 boundary GeoPackages (often 100+ MB). LINZ canopy layers. Census shapefiles.</li>
 </ul>
-</div>
 <div class="fragment">
 <p>For the heavy stuff, fetch from an API.</p>
 </div>
@@ -891,13 +783,11 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="why-fetch-instead-of-bundle" class="slide level2">
 <h2>Why fetch instead of bundle</h2>
-<div>
 <ul>
 <li class="fragment">The data is too large to ship in a wheel.</li>
 <li class="fragment">The data updates every few months and you do not want to release a new version each time.</li>
 <li class="fragment">Stats NZ already hosts it. Stop re-hosting public data.</li>
 </ul>
-</div>
 <div class="fragment">
 <p>The cost is one API call on first use. The benefit is a tiny package and always-fresh data.</p>
 </div>
@@ -906,136 +796,148 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <h2>Stats NZ Datafinder, in plain language</h2>
 <p>Stats NZ runs a Koordinates-based portal at https://datafinder.stats.govt.nz/.</p>
 <p>Two ways to download programmatically.</p>
-<div>
 <ul>
 <li class="fragment"><strong>WFS</strong> (Web Feature Service). Standard OGC protocol. Returns GeoJSON. Best for vector layers and small bounding boxes.</li>
 <li class="fragment"><strong>Koordinates Export API.</strong> Asynchronous job, you request an export and poll until it finishes. Best for large or full-country pulls.</li>
 </ul>
-</div>
 <div class="fragment">
 <p>We will use WFS in the example because it is one HTTP call.</p>
 </div>
 </section>
 <section id="step-1-get-an-api-key" class="slide level2">
 <h2>Step 1, get an API key</h2>
-<div>
 <ol type="1">
 <li class="fragment">Sign up at https://datafinder.stats.govt.nz/.</li>
 <li class="fragment">Go to your profile, then “API keys”.</li>
-<li class="fragment">Create a key and copy it. It looks like <code>4f1a...</code>.</li>
+<li class="fragment">Create a key and copy it. It looks like <code>E5b...</code>.</li>
 <li class="fragment">Save it somewhere safe.</li>
 </ol>
-</div>
 <div class="fragment">
 <p>You can do this during today’s hands-on. The free tier is plenty for any A3 package.</p>
 </div>
 </section>
 <section id="step-2-never-hard-code-the-key" class="slide level2">
 <h2>Step 2, never hard-code the key</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb19-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _get_api_key():</span>
-<span id="cb19-5"><a href="" aria-hidden="true" tabindex="-1"></a>    key <span class="op">=</span> os.getenv(<span class="st">"STATS_NZ_API_KEY"</span>)</span>
-<span id="cb19-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> key <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb19-7"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">EnvironmentError</span>(</span>
-<span id="cb19-8"><a href="" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Set STATS_NZ_API_KEY in your environment "</span></span>
-<span id="cb19-9"><a href="" aria-hidden="true" tabindex="-1"></a>            <span class="st">"or .env file before calling this function."</span></span>
-<span id="cb19-10"><a href="" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb19-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> key</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Same pattern as the <strong>Week 4 lab</strong>: keep the key in a <code>config.py</code> next to your code, and add <code>config.py</code> to <code>.gitignore</code>.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># config.py  --  NEVER commit this file</span></span>
+<span id="cb25-2"><a href="" aria-hidden="true" tabindex="-1"></a>API_KEY <span class="op">=</span> <span class="st">"E5b..."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># loader.py</span></span>
+<span id="cb26-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> config <span class="im">import</span> API_KEY</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p>Then run with the key in the environment.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">STATS_NZ_API_KEY</span><span class="op">=</span>4f1a...</span>
-<span id="cb20-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from your_package import load_sa2; load_sa2()"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="fragment">
-<p>Or add the key to a <code>.env</code> file (and add <code>.env</code> to <code>.gitignore</code>).</p>
+<p>Why a separate file? It is the simplest pattern that keeps your key out of the repo. Environment variables work too, but <code>config.py</code> is what you already used in Week 4 — stick with what is familiar.</p>
 </div>
 </section>
-<section id="step-3-the-wfs-download" class="slide level2">
-<h2>Step 3, the WFS download</h2>
-<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb21-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb21-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> BytesIO</span>
-<span id="cb21-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="" aria-hidden="true" tabindex="-1"></a>WFS_URL <span class="op">=</span> (</span>
-<span id="cb21-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://datafinder.stats.govt.nz/services;"</span></span>
-<span id="cb21-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="st">"key=</span><span class="sc">{key}</span><span class="st">/wfs"</span></span>
-<span id="cb21-8"><a href="" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sa2_auckland(api_key<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb21-12"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Download Auckland SA2 boundaries from Stats NZ."""</span></span>
-<span id="cb21-13"><a href="" aria-hidden="true" tabindex="-1"></a>    api_key <span class="op">=</span> api_key <span class="kw">or</span> _get_api_key()</span>
-<span id="cb21-14"><a href="" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> {</span>
-<span id="cb21-15"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"service"</span>: <span class="st">"WFS"</span>,</span>
-<span id="cb21-16"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"version"</span>: <span class="st">"2.0.0"</span>,</span>
-<span id="cb21-17"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"request"</span>: <span class="st">"GetFeature"</span>,</span>
-<span id="cb21-18"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"typeNames"</span>: <span class="st">"layer-111228"</span>,       <span class="co"># SA2 2023 generalised</span></span>
-<span id="cb21-19"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"outputFormat"</span>: <span class="st">"json"</span>,</span>
-<span id="cb21-20"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"srsName"</span>: <span class="st">"EPSG:2193"</span>,</span>
-<span id="cb21-21"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bbox"</span>: <span class="st">"1740000,5900000,1790000,5950000,EPSG:2193"</span>,</span>
-<span id="cb21-22"><a href="" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb21-23"><a href="" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(WFS_URL.<span class="bu">format</span>(key<span class="op">=</span>api_key),</span>
-<span id="cb21-24"><a href="" aria-hidden="true" tabindex="-1"></a>                     params<span class="op">=</span>params, timeout<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb21-25"><a href="" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
-<span id="cb21-26"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(BytesIO(r.content))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="step-4-cache-so-you-only-download-once" class="slide level2">
-<h2>Step 4, cache so you only download once</h2>
-<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb22-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb22-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="" aria-hidden="true" tabindex="-1"></a>CACHE_DIR <span class="op">=</span> Path.home() <span class="op">/</span> <span class="st">".cache"</span> <span class="op">/</span> <span class="st">"your_package"</span></span>
-<span id="cb22-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_sa2_cached(api_key<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb22-8"><a href="" aria-hidden="true" tabindex="-1"></a>    CACHE_DIR.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb22-9"><a href="" aria-hidden="true" tabindex="-1"></a>    cache_file <span class="op">=</span> CACHE_DIR <span class="op">/</span> <span class="st">"sa2_auckland.gpkg"</span></span>
-<span id="cb22-10"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> cache_file.exists():</span>
-<span id="cb22-12"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> gpd.read_file(cache_file)</span>
-<span id="cb22-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-14"><a href="" aria-hidden="true" tabindex="-1"></a>    gdf <span class="op">=</span> load_sa2_auckland(api_key)</span>
-<span id="cb22-15"><a href="" aria-hidden="true" tabindex="-1"></a>    gdf.to_file(cache_file, driver<span class="op">=</span><span class="st">"GPKG"</span>)</span>
-<span id="cb22-16"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gdf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="step-3-download-all-nz-regions" class="slide level2 smaller">
+<h2>Step 3, download all NZ regions</h2>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb27-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> config <span class="im">import</span> API_KEY</span>
+<span id="cb27-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="" aria-hidden="true" tabindex="-1"></a>LAYER_ID <span class="op">=</span> <span class="dv">120945</span>                          <span class="co"># Regional Council 2025 Clipped</span></span>
+<span id="cb27-5"><a href="" aria-hidden="true" tabindex="-1"></a>WFS_URL <span class="op">=</span> <span class="ss">f"https://datafinder.stats.govt.nz/services;key=</span><span class="sc">{</span>API_KEY<span class="sc">}</span><span class="ss">/wfs/"</span></span>
+<span id="cb27-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_regions():</span>
+<span id="cb27-9"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Download all 16 NZ regional council polygons."""</span></span>
+<span id="cb27-10"><a href="" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> (</span>
+<span id="cb27-11"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"service=WFS&amp;version=2.0.0&amp;request=GetFeature"</span></span>
+<span id="cb27-12"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"&amp;typeNames=layer-</span><span class="sc">{</span>LAYER_ID<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb27-13"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"&amp;outputFormat=application/json"</span></span>
+<span id="cb27-14"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"&amp;srsName=EPSG:2193"</span></span>
+<span id="cb27-15"><a href="" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-16"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(<span class="ss">f"</span><span class="sc">{</span>WFS_URL<span class="sc">}</span><span class="ss">?</span><span class="sc">{</span>params<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p>First call hits the API. Every later call reads the local file. Your demo notebook stays fast.</p>
+<p><code>gpd.read_file</code> accepts a URL directly — no <code>requests</code> boilerplate needed. The returned <code>GeoDataFrame</code> has 16 rows, one per region.</p>
+<p>To try it interactively, open a Python shell with <code>uv run python</code>, then:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geohello.loader <span class="im">import</span> load_regions</span>
+<span id="cb28-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> load_regions()</span>
+<span id="cb28-4"><a href="" aria-hidden="true" tabindex="-1"></a>gdf.shape</span>
+<span id="cb28-5"><a href="" aria-hidden="true" tabindex="-1"></a>gdf.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-4a-inspect-the-schema-first" class="slide level2 smaller">
+<h2>Step 4a, inspect the schema first</h2>
+<p>Before writing a filter, look at what <code>load_regions()</code> actually returned. <strong>Never assume column names</strong> — Stats NZ schemas change every few years.</p>
+<p><strong>Option A — one-liner from the terminal:</strong></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-c</span> <span class="st">"from geohello.loader import load_regions; gdf = load_regions(); print(gdf.columns.tolist())"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Option B — interactive Python shell:</strong></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geohello.loader <span class="im">import</span> load_regions</span>
+<span id="cb31-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> load_regions()</span>
+<span id="cb31-4"><a href="" aria-hidden="true" tabindex="-1"></a>gdf.columns.tolist()</span>
+<span id="cb31-5"><a href="" aria-hidden="true" tabindex="-1"></a>gdf.iloc[<span class="dv">0</span>]</span>
+<span id="cb31-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(gdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Find the column that holds the region <strong>name</strong> (something like <code>REGC2025_V1_00_NAME</code>). Whatever it is on your machine, use that exact string in the next slide.</p>
+</div>
+</section>
+<section id="step-4b-a-function-to-filter-auckland" class="slide level2 smaller">
+<h2>Step 4b, a function to filter Auckland</h2>
+<p>Now slice out just Auckland with an <strong>attribute filter</strong>.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="" aria-hidden="true" tabindex="-1"></a>NAME_COL <span class="op">=</span> <span class="st">"REGC2025_V1_00_NAME"</span>          <span class="co"># ← from Step 4a, edit if different</span></span>
+<span id="cb32-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> filter_auckland(gdf):</span>
+<span id="cb32-5"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return rows whose region name contains 'Auckland'."""</span></span>
+<span id="cb32-6"><a href="" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> gdf[NAME_COL].<span class="bu">str</span>.contains(<span class="st">"Auckland"</span>, na<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb32-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gdf[mask].copy()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p><code>str.contains</code> is forgiving — it matches whether Stats NZ stores the value as <code>"Auckland"</code> or <code>"Auckland Region"</code>. If unsure, peek: <code>print(gdf[NAME_COL].unique())</code>.</p>
+</div>
+<div class="fragment">
+<p>Compose the two functions for a one-liner public API:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_auckland():</span>
+<span id="cb33-2"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Convenience: fetch + filter in one call."""</span></span>
+<span id="cb33-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> filter_auckland(load_regions())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><strong>Why separate the filter from the download?</strong> Tests can call <code>filter_auckland</code> on a tiny fixture <code>GeoDataFrame</code> without ever hitting the network. Smaller, faster, offline-friendly tests.</p>
+</div>
+</section>
+<section id="optional-server-side-bbox-faster-for-auckland-only" class="slide level2">
+<h2>Optional: server-side bbox (faster for Auckland-only)</h2>
+<p>If you only ever need Auckland, ask the server to clip during download.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="" aria-hidden="true" tabindex="-1"></a>AUCKLAND_BBOX <span class="op">=</span> <span class="st">"1730000,5900000,1820000,5990000"</span>   <span class="co"># EPSG:2193</span></span>
+<span id="cb34-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_auckland_bbox():</span>
+<span id="cb34-5"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Download only features inside the Auckland bounding box."""</span></span>
+<span id="cb34-6"><a href="" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> (</span>
+<span id="cb34-7"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"service=WFS&amp;version=2.0.0&amp;request=GetFeature"</span></span>
+<span id="cb34-8"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"&amp;typeNames=layer-</span><span class="sc">{</span>LAYER_ID<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb34-9"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"&amp;outputFormat=application/json"</span></span>
+<span id="cb34-10"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"&amp;srsName=EPSG:2193"</span></span>
+<span id="cb34-11"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"&amp;bbox=</span><span class="sc">{</span>AUCKLAND_BBOX<span class="sc">}</span><span class="ss">,EPSG:2193"</span></span>
+<span id="cb34-12"><a href="" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb34-13"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.read_file(<span class="ss">f"</span><span class="sc">{</span>WFS_URL<span class="sc">}</span><span class="ss">?</span><span class="sc">{</span>params<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Trade-off: bbox is faster and uses less bandwidth, but you lose the testable <code>filter_auckland</code> step. For A3 demos, prefer <strong><code>load_regions</code> + <code>filter_auckland</code></strong> — clearer to grade, easier to test.</p>
 </div>
 </section>
 <section id="hands-on-10-min-try-it-once" class="slide level2 smaller">
 <h2>Hands-on (10 min): try it once</h2>
 <p>With your partner, do the following.</p>
-<div>
 <ol type="1">
 <li class="fragment">Sign up at https://datafinder.stats.govt.nz/ and copy your API key.</li>
-<li class="fragment">In your <code>geohello-yourname</code> package, add a function <code>load_sa2_auckland(api_key)</code> based on the slide above.</li>
-<li class="fragment">Set the key in your shell, <code>export STATS_NZ_API_KEY=...</code>.</li>
-<li class="fragment">Run <code>uv run python -c "from geohello_yourname import load_sa2_auckland; print(load_sa2_auckland().shape)"</code>.</li>
-<li class="fragment">Confirm you get a GeoDataFrame with a sensible row count (around 60 SA2 zones for the Auckland CBD bounding box).</li>
+<li class="fragment">In your package, create <code>config.py</code> with <code>API_KEY = "..."</code> and add <code>config.py</code> to <code>.gitignore</code>.</li>
+<li class="fragment">Add <code>load_regions()</code> from the slide.</li>
+<li class="fragment"><strong>First, inspect</strong>: <code>print(gdf.columns.tolist())</code> — copy the actual name column into <code>NAME_COL</code>.</li>
+<li class="fragment">Add <code>filter_auckland()</code> using your <code>NAME_COL</code>.</li>
+<li class="fragment">Run <code>uv run python -c "from geohello_yourname import load_regions, filter_auckland; print(filter_auckland(load_regions()).shape)"</code>.</li>
+<li class="fragment">Confirm you get a <code>GeoDataFrame</code> with <strong>1 row</strong> and a <code>geometry</code> column.</li>
 </ol>
-</div>
-<div class="fragment">
-<p>Demonstrators will help with the API key step. If it fails, check the key, the bbox, and that you are using <code>https</code>, not <code>http</code>.</p>
-</div>
+<p>If it fails, check: (a) <code>config.py</code> sits next to the module that imports it, (b) <code>NAME_COL</code> matches what <code>gdf.columns</code> actually shows, (c) you are using <code>https</code>, not <code>http</code>.</p>
 </section>
 <section id="a-note-for-the-briefs" class="slide level2">
 <h2>A note for the briefs</h2>
 <p>Each A3 brief tells you which pattern fits.</p>
-<div>
 <ul>
-<li class="fragment"><code>equitransport</code> benefits from <strong>bundling</strong> NZDep2018 (a few hundred KB).</li>
-<li class="fragment"><code>treecrown-nz</code> and <code>escooter-akl</code> will <strong>fetch</strong> large LINZ or Stats NZ layers.</li>
-<li class="fragment"><code>pedestrian-exposure</code> will likely <strong>fetch</strong> OSMnx routes and <strong>bundle</strong> sample inputs for tests.</li>
-<li class="fragment"><code>pavescore</code> ships images via the Mapillary API, so it is mostly <strong>fetch</strong> plus a small fixture image <strong>bundled</strong> for tests.</li>
+<li><code>equitransport</code> benefits from <strong>bundling</strong> NZDep2023 (a few hundred KB).</li>
+<li><code>treecrown-nz</code> and <code>escooter-akl</code> will <strong>fetch</strong> large LINZ or Stats NZ layers.</li>
+<li><code>pedestrian-exposure</code> will likely <strong>fetch</strong> OSMnx routes and <strong>bundle</strong> sample inputs for tests.</li>
+<li><code>pavescore</code> ships images via the Mapillary API, so it is mostly <strong>fetch</strong> plus a small fixture image <strong>bundled</strong> for tests.</li>
 </ul>
-</div>
-<div class="fragment">
-<p>Pick the lightest option that works. A package that ships 200 MB of shapefiles is a package nobody installs.</p>
-</div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="assignment-3-the-briefs" class="title-slide slide level1 center">
@@ -1044,88 +946,78 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="assignment-3-in-one-slide" class="slide level2 smaller">
 <h2>Assignment 3 in one slide</h2>
-<div>
 <ul>
 <li class="fragment"><strong>Pairs</strong> (announced today by raffle).</li>
 <li class="fragment">Pick <strong>one of five package briefs</strong>.</li>
 <li class="fragment">Three required functions per brief.</li>
 <li class="fragment">One demonstration notebook with a map or chart.</li>
-<li class="fragment">TestPyPI in Week 10, PyPI in Week 12.</li>
-<li class="fragment">A1 poster on <strong>Tuesday 25 May (B301-G10)</strong>.</li>
-<li class="fragment">Short <strong>fit interview</strong> in the <strong>Week 10 lab</strong> (3 to 5 min per person).</li>
+<li class="fragment">TestPyPI in Week 10, final version of the package in Week 12 (either TestPyPI, or PyPI).</li>
+<li class="fragment">A1 poster on <strong>Monday 25 May (B301-G10)</strong>.</li>
+<li class="fragment">Short <strong>fit interview</strong> in the <strong>Week 10 lab</strong> (&lt;15 min per pair).</li>
 </ul>
-</div>
-<div class="fragment">
 <p>Read the full brief in the textbook chapter 4.5.</p>
-</div>
 </section>
 <section id="brief-1-pedestrian-exposure" class="slide level2 smaller">
 <h2>Brief 1: <code>pedestrian-exposure</code></h2>
-<p><strong>Cumulative pedestrian exposure to noise, air pollution, and green space along a walking route.</strong></p>
-<div>
+<p><strong>Answer this question for a walker in Auckland: which route is healthier, and why?</strong></p>
 <ul>
-<li class="fragment"><code>load_route(origin, destination, place)</code> from OSMnx, returns edges in EPSG:2193</li>
-<li class="fragment"><code>add_exposure(route_gdf, layer, kind)</code> where <code>kind</code> is <code>"noise"</code>, <code>"air_quality"</code>, or <code>"green"</code></li>
-<li class="fragment"><code>summarise_exposure(route_gdf, weights=None)</code> returns per-edge values for all three plus a length-weighted summary</li>
-<li class="fragment"><strong>Demo</strong>: a CBD walking route + OSM-based noise proxy + LAWA air quality + Sentinel-2 NDVI</li>
-<li class="fragment"><strong>Difficulty</strong>: intermediate to ambitious (three small pipelines, kept consistent)</li>
+<li><strong>What we expect to see</strong>: a CBD walking route scored on <strong>three</strong> environmental factors (noise, air pollution, green space), mapped together so the trade-offs are obvious.</li>
+<li><strong>The deliverable</strong>: a map of the route with each edge coloured by total exposure, a small bar chart breaking out the three components, and a one-line summary score.</li>
+<li><strong>The insight</strong>: which streets are quietest? Which are the most polluted? Where does greenery actually offset the others?</li>
+<li><strong>Key functions</strong>: <code>add_exposure(route_gdf, layer, kind)</code> and <code>summarise_exposure(route_gdf)</code>.</li>
+<li><strong>Demo dataset</strong>: a route via OSMnx + OSM-based noise proxy + LAWA air quality + Sentinel-2 NDVI.</li>
+<li><strong>Difficulty</strong>: intermediate to ambitious (three small pipelines, kept consistent).</li>
 </ul>
-</div>
 </section>
-<section id="brief-2-equitransport" class="slide level2">
+<section id="brief-2-equitransport" class="slide level2 smaller">
 <h2>Brief 2: <code>equitransport</code></h2>
-<p><strong>Transport accessibility by deprivation quintile.</strong></p>
-<div>
+<p><strong>Answer this question: does Auckland’s public transport access reach the most deprived neighbourhoods?</strong></p>
 <ul>
-<li class="fragment"><code>load_nzdep(sa2_gdf)</code> joins NZDep2018 scores by SA2</li>
-<li class="fragment"><code>compute_access(gdf, metric_col)</code> calculates the metric per polygon</li>
-<li class="fragment"><code>equity_summary(gdf)</code> returns quintile means + Gini coefficient</li>
-<li class="fragment"><strong>Demo</strong>: Auckland SA2s + AT GTFS PT-stop counts, choropleth by deprivation</li>
-<li class="fragment"><strong>Difficulty</strong>: intermediate (meshblock-to-SA2 aggregation)</li>
+<li><strong>What we expect to see</strong>: a single number (Gini coefficient) plus a five-row quintile table that turns an equity argument into evidence.</li>
+<li><strong>The deliverable</strong>: a choropleth of Auckland SA2s coloured by NZDep quintile and a parallel map of PT access (stops within 400 m walk).</li>
+<li><strong>The insight</strong>: do the most deprived quintiles get fewer stops per capita? By how much? Where are the worst gaps?</li>
+<li><strong>Key functions</strong>: <code>load_nzdep(sa2_gdf)</code> and <code>equity_summary(gdf)</code>.</li>
+<li><strong>Demo dataset</strong>: Stats NZ SA2 boundaries + AT GTFS PT-stop counts + NZDep2018 scores from the University of Otago.</li>
+<li><strong>Difficulty</strong>: intermediate (meshblock-to-SA2 aggregation is the tricky bit).</li>
 </ul>
-</div>
 </section>
-<section id="brief-3-treecrown-nz" class="slide level2">
+<section id="brief-3-treecrown-nz" class="slide level2 smaller">
 <h2>Brief 3: <code>treecrown-nz</code></h2>
-<p><strong>Urban tree canopy coverage and route shade.</strong></p>
-<div>
+<p><strong>Answer this question: which Auckland neighbourhoods are tree-rich, and how shaded is a typical walk?</strong></p>
 <ul>
-<li class="fragment"><code>load_canopy(bbox)</code> fetches LINZ canopy polygons</li>
-<li class="fragment"><code>canopy_coverage(area_gdf)</code> percentage cover per polygon</li>
-<li class="fragment"><code>route_shade(route_gdf, buffer_m)</code> canopy fraction along a route</li>
-<li class="fragment"><strong>Demo</strong>: three Auckland suburbs + shade along one walking route</li>
-<li class="fragment"><strong>Difficulty</strong>: intermediate to ambitious (LINZ API quirks)</li>
+<li><strong>What we expect to see</strong>: a coverage number (% canopy) for each of three Auckland suburbs, and a route map coloured by overhead canopy fraction.</li>
+<li><strong>The deliverable</strong>: a side-by-side comparison plot for the three suburbs + a “shaded walk” map for one chosen route.</li>
+<li><strong>The insight</strong>: which suburbs have invested in canopy? Which routes stay shaded on a summer afternoon? Where is the canopy gap worst?</li>
+<li><strong>Key functions</strong>: <code>canopy_coverage(area_gdf)</code> and <code>route_shade(route_gdf, buffer_m)</code>.</li>
+<li><strong>Demo dataset</strong>: Auckland Council LiDAR-derived canopy from the LINZ Data Service.</li>
+<li><strong>Difficulty</strong>: intermediate to ambitious (the LINZ API has a learning curve).</li>
 </ul>
-</div>
 </section>
-<section id="brief-4-pavescore" class="slide level2">
+<section id="brief-4-pavescore" class="slide level2 smaller">
 <h2>Brief 4: <code>pavescore</code></h2>
-<p><strong>Pavement condition score from a photo.</strong></p>
-<div>
+<p><strong>Answer this question: can a phone photo tell us which Auckland pavements need fixing?</strong></p>
 <ul>
-<li class="fragment"><code>score_image(path_or_url)</code> returns a <code>PavementResult</code> dataclass</li>
-<li class="fragment"><code>score_batch(image_list)</code> returns a summary DataFrame</li>
-<li class="fragment"><code>to_geodataframe(results, coords)</code> returns a mappable GeoDataFrame</li>
-<li class="fragment"><strong>Demo</strong>: Mapillary images along Dominion Road or Queen Street</li>
-<li class="fragment"><strong>Difficulty</strong>: ambitious, the most open-ended brief</li>
+<li><strong>What we expect to see</strong>: every input image scored on a 0-to-100 condition scale with binary flags for cracking, surface degradation, and obstruction.</li>
+<li><strong>The deliverable</strong>: a map of scored photo locations along Dominion Road or Queen Street, coloured good / fair / poor, with a small table of the worst spots.</li>
+<li><strong>The insight</strong>: how does pavement quality vary along one street? Which segments are worst? Could a council prioritise repairs from this map?</li>
+<li><strong>Key functions</strong>: <code>score_image(path_or_url)</code> and <code>to_geodataframe(results, coords)</code>.</li>
+<li><strong>Demo dataset</strong>: Mapillary street-level images.</li>
 </ul>
-</div>
 <div class="fragment">
-<p>A simple texture-based scorer that works beats an ambitious classifier that breaks.</p>
+<p><strong>Difficulty</strong>: ambitious, the most open-ended brief. A simple texture-based scorer that works beats an ambitious classifier that breaks.</p>
 </div>
 </section>
-<section id="brief-5-escooter-akl" class="slide level2">
+<section id="brief-5-escooter-akl" class="slide level2 smaller">
 <h2>Brief 5: <code>escooter-akl</code></h2>
-<p><strong>Clean OD flows and geofence violations from raw e-scooter trips.</strong></p>
-<div>
+<p><strong>Answer this question: how do e-scooters (Flamingo) move around the CBD, and where are operators failing to enforce parking rules?</strong></p>
 <ul>
-<li class="fragment"><code>load_trips(path)</code> reads CSV, returns trip GeoDataFrame in EPSG:2193</li>
-<li class="fragment"><code>od_flows(trips_gdf, zones_gdf)</code> returns origin-destination matrix by zone</li>
-<li class="fragment"><code>geofence_violations(trips_gdf, no_park_gdf)</code> flags trips ending in no-park zones</li>
-<li class="fragment"><strong>Demo</strong>: sample of Auckland CBD trips + SA2 zones + CBD pedestrianised polygons</li>
-<li class="fragment"><strong>Difficulty</strong>: intermediate (messy data, loud failure beats silent failure)</li>
+<li><strong>What we expect to see</strong>: a clean origin-destination flow map plus a count of trips that ended inside no-parking zones.</li>
+<li><strong>The deliverable</strong>: an OD chord diagram or arrow map between SA2 zones + a marker map of geofence violations with zone labels for reporting.</li>
+<li><strong>The insight</strong>: which CBD zones are origin-heavy vs destination-heavy? Where are violations concentrated? What story would you tell Auckland Council?</li>
+<li><strong>Key functions</strong>: <code>od_flows(trips_gdf, zones_gdf)</code> and <code>geofence_violations(trips_gdf, no_park_gdf)</code>.</li>
+<li><strong>Demo dataset</strong>: a sample CSV of Auckland CBD e-scooter trips + Stats NZ SA2 zones + Auckland Council pedestrianised polygons.</li>
+<li><strong>Difficulty</strong>: intermediate (messy data; loud failure beats silent failure).</li>
 </ul>
-</div>
 </section>
 <section id="pair-topic-formation" class="slide level2">
 <h2>Pair &amp; topic formation</h2>
@@ -1135,16 +1027,16 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="what-to-do-this-week" class="slide level2">
 <h2>What to do this week</h2>
-<div>
 <ul>
-<li class="fragment"><strong>Tomorrow Week 9 lab</strong>: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.</li>
-<li class="fragment"><strong>Before next lecture</strong>: each partner writes a 100 to 150 word reflection on (a) what is unclear, (b) which function you will own, (c) what you do not yet understand.</li>
+<li><strong>Tomorrow Week 9 lab</strong>: scaffold the package skeleton with your partner, sketch the public API, and submit the design report by the end of the week.</li>
+<li>Open a GitHub account and add your partner (keep it public)</li>
+<li>Be careful with the pull and pushes when using git</li>
+<li>Use branches if you agree to do that</li>
+<li>Practise locally first and then deploy once you are confident</li>
 </ul>
-</div>
 </section>
 <section id="wrap-up-checklist" class="slide level2">
 <h2>Wrap-up checklist</h2>
-<div>
 <ul class="task-list">
 <li class="fragment"><label><input type="checkbox">You and your partner can run <code>uv build</code> on <code>geohello-yourname</code> without errors.</label></li>
 <li class="fragment"><label><input type="checkbox">Your shared GitHub repo exists and you can both push.</label></li>
@@ -1152,7 +1044,6 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <li class="fragment"><label><input type="checkbox">You have read your brief at least once.</label></li>
 <li class="fragment"><label><input type="checkbox">You know the date of the poster showcase (Tuesday 25 May).</label></li>
 </ul>
-</div>
 </section>
 <section id="further-reading" class="slide level2">
 <h2>Further reading</h2>
@@ -1173,15 +1064,15 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <h2>See you in the lab</h2>
 <p>Bring your laptop, your partner, and your brief.</p>
 <p>The Week 9 lab is the <strong>first hands-on session of A3</strong>. By the end of the lab your pair will have a package skeleton on GitHub.</p>
-<div class="quarto-auto-generated-content">
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
 <p><img src="Figs/uoa-logo.png" class="slide-logo"></p>
 <div class="footer footer-default">
 <p>GISCI 343 | Week 9 | From Scripts to Packages</p>
 </div>
-</div>
-</section></section>
-    </div>
-  </div>
+</div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
   <script src="Lecture09_files/libs/revealjs/dist/reveal.js"></script>
@@ -1210,7 +1101,8 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
-'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -1364,7 +1256,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
         margin: 0.1,
 
         math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -1391,181 +1283,172 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
       });
     </script>
     <script id="quarto-html-after-body" type="application/javascript">
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-      const toggleBodyColorMode = (bsSheetEl) => {
-        const mode = bsSheetEl.getAttribute("data-mode");
-        const bodyEl = window.document.querySelector("body");
-        if (mode === "dark") {
-          bodyEl.classList.add("quarto-dark");
-          bodyEl.classList.remove("quarto-light");
-        } else {
-          bodyEl.classList.add("quarto-light");
-          bodyEl.classList.remove("quarto-dark");
-        }
-      }
-      const toggleBodyColorPrimary = () => {
-        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-        if (bsSheetEl) {
-          toggleBodyColorMode(bsSheetEl);
-        }
-      }
-      toggleBodyColorPrimary();  
-      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-      tabsets.forEach(function(tabset) {
-        const tabby = new Tabby('#' + tabset.id);
-      });
-      const isCodeAnnotation = (el) => {
-        for (const clz of el.classList) {
-          if (clz.startsWith('code-annotation-')) {                     
-            return true;
-          }
-        }
-        return false;
-      }
-      const clipboard = new window.ClipboardJS('.code-copy-button', {
-        text: function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
-            }
-          }
-          return codeEl.innerText;
-        }
-      });
-      clipboard.on('success', function(e) {
-        // button target
-        const button = e.trigger;
-        // don't keep focus
-        button.blur();
-        // flash "checked"
-        button.classList.add('code-copy-button-checked');
-        var currentTitle = button.getAttribute("title");
-        button.setAttribute("title", "Copied!");
-        let tooltip;
-        if (window.bootstrap) {
-          button.setAttribute("data-bs-toggle", "tooltip");
-          button.setAttribute("data-bs-placement", "left");
-          button.setAttribute("data-bs-title", "Copied!");
-          tooltip = new bootstrap.Tooltip(button, 
-            { trigger: "manual", 
-              customClass: "code-copy-button-tooltip",
-              offset: [0, -8]});
-          tooltip.show();    
-        }
-        setTimeout(function() {
-          if (tooltip) {
-            tooltip.hide();
-            button.removeAttribute("data-bs-title");
-            button.removeAttribute("data-bs-toggle");
-            button.removeAttribute("data-bs-placement");
-          }
-          button.setAttribute("title", currentTitle);
-          button.classList.remove('code-copy-button-checked');
-        }, 1000);
-        // clear code selection
-        e.clearSelection();
-      });
-        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-        var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
-        var isInternal = (href) => {
-            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-        }
-        // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-        for (var i=0; i<links.length; i++) {
-          const link = links[i];
-          if (!isInternal(link.href)) {
-            // undo the damage that might have been done by quarto-nav.js in the case of
-            // links that we want to consider external
-            if (link.dataset.originalHref !== undefined) {
-              link.href = link.dataset.originalHref;
-            }
-          }
-        }
-      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-        const config = {
-          allowHTML: true,
-          maxWidth: 500,
-          delay: 100,
-          arrow: false,
-          appendTo: function(el) {
-              return el.closest('section.slide') || el.parentElement;
-          },
-          interactive: true,
-          interactiveBorder: 10,
-          theme: 'light-border',
-          placement: 'bottom-start',
-        };
-        if (contentFn) {
-          config.content = contentFn;
-        }
-        if (onTriggerFn) {
-          config.onTrigger = onTriggerFn;
-        }
-        if (onUntriggerFn) {
-          config.onUntrigger = onUntriggerFn;
-        }
-          config['offset'] = [0,0];
-          config['maxWidth'] = 700;
-        window.tippy(el, config); 
-      }
-      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-      for (var i=0; i<noterefs.length; i++) {
-        const ref = noterefs[i];
-        tippyHover(ref, function() {
-          // use id or data attribute instead here
-          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-          try { href = new URL(href).hash; } catch {}
-          const id = href.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note) {
-            return note.innerHTML;
-          } else {
-            return "";
-          }
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
         });
-      }
-      const findCites = (el) => {
-        const parentEl = el.parentElement;
-        if (parentEl) {
-          const cites = parentEl.dataset.cites;
-          if (cites) {
-            return {
-              el,
-              cites: cites.split(' ')
-            };
-          } else {
-            return findCites(el.parentElement)
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
           }
-        } else {
-          return undefined;
+          return false;
         }
-      };
-      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-      for (var i=0; i<bibliorefs.length; i++) {
-        const ref = bibliorefs[i];
-        const citeInfo = findCites(ref);
-        if (citeInfo) {
-          tippyHover(citeInfo.el, function() {
-            var popup = window.document.createElement('div');
-            citeInfo.cites.forEach(function(cite) {
-              var citeDiv = window.document.createElement('div');
-              citeDiv.classList.add('hanging-indent');
-              citeDiv.classList.add('csl-entry');
-              var biblioDiv = window.document.getElementById('ref-' + cite);
-              if (biblioDiv) {
-                citeDiv.innerHTML = biblioDiv.innerHTML;
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
               }
-              popup.appendChild(citeDiv);
-            });
-            return popup.innerHTML;
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
           });
         }
-      }
-    });
-    </script>
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
     
 
 </body></html>

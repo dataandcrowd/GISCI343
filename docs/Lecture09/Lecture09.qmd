@@ -200,7 +200,7 @@ We will build `geohello` together. Same commands you will run in 10 minutes.
 ```bash
 # Step 1: scaffold IN your current folder (not in a subfolder)
 mkdir geohello && cd geohello
-uv init --lib --name geohello .
+uv init --lib --name geohello . # the 'period `.` ' is important!
 
 # Step 2: edit src/geohello/__init__.py (one function)
 
@@ -213,12 +213,13 @@ uv run python -c "from geohello import hello; print(hello())"
 
 . . .
 
-**Heads-up.** Do *not* `python -m venv .venv` first. `uv` manages the
-virtual environment for you. If you pre-create a venv and then run
-`uv init --lib geohello` (without `.`), you get a nested project with
-two confused venvs.
+`uv` handles the virtual environment for you — no manual setup needed.
 
----
+1. **`uv init`** — scaffolds the project (creates `pyproject.toml`, `src/`, etc.)
+2. **`uv add <package>`** — installs dependencies and updates `pyproject.toml`
+
+`uv` automatically creates `.venv/` on the first `uv run` or `uv sync`.
+
 
 ## Step 1: scaffold with uv
 
@@ -239,13 +240,20 @@ geohello/                       # <-- you are here
 └── .gitignore
 ```
 
-. . .
-
 `uv` filled in a working `pyproject.toml`, made the `src/` layout, and
 will create `.venv/` on the first `uv run` or `uv sync`.
 **You did not have to remember any of it.**
 
----
+
+## In your `pyproject.toml` (preventing from PyPi submission)
+
+Open your `pyproject.toml`
+
+```
+[project]
+classifiers = ["Private :: Do Not Upload"]
+```
+
 
 ## Step 2: write one function
 
@@ -308,9 +316,9 @@ That is what "building a package" feels like. Four commands.
 
 ---
 
-## Package build `geohello-yourname` {.smaller}
+## Package build `geohello` summary {.smaller}
 
-Pair up. **Both partners commit code.** This is also your A3 partner from this week onwards.
+This is also your A3 partner from this week onwards.
 
 | Step | Command or action | Tick |
 |------|-------------------|:----:|
@@ -333,6 +341,26 @@ Pair up. **Both partners commit code.** This is also your A3 partner from this w
 * **The function works in `uv run python` but not in plain `python`**. You are not in the project's virtual environment. Use `uv run` or `source .venv/bin/activate`.
 
 :::
+
+## Versioning conventions
+
+Python packages use three numbers separated by dots:
+
+```
+MAJOR.MINOR.PATCH     e.g.  1.4.2
+```
+
+. . .
+
+| Bump | What happened? | Example |
+|------|----------------|---------|
+| **PATCH** (1.4.2 → 1.4.3) | Fixed a bug. Nothing new. | Fixed a typo in an error message |
+| **MINOR** (1.4.2 → 1.5.0) | Added something new. Old code still works. | Added a new `load_weekly()` function |
+| **MAJOR** (1.4.2 → 2.0.0) | Changed something existing. Old code might break. | Renamed `load_hourly()` to `fetch_hourly()` |
+
+. . .
+
+Your first release will be **0.1.0**. When the major number is **0**, it means "still experimenting — expect changes."
 
 ---
 
@@ -495,6 +523,35 @@ Same package works on your laptop, on a classmate's laptop, on PyPI — Python f
 
 ---
 
+## Try it: loading Auckland pedestrian data
+
+In `src/geohello/__init__.py`, add a loader next to `hello()`:
+
+```python
+from importlib.resources import files
+import pandas as pd
+
+
+def hello() -> str:
+    return "Hello from geohello!"
+
+
+def load_data():
+    """Load the 2024 Auckland pedestrian counts."""
+    path = files("geohello") / "data" / "akl_ped-2024.csv"
+    return pd.read_csv(path)
+```
+
+. . .
+
+```bash
+uv run python -c "from geohello import load_data; print(load_data().shape)"
+```
+
+If you see the shape printed, the CSV is bundled and loading correctly.
+
+---
+
 ## Once you have more than one file {.smaller}
 
 Repeating `files("your_package") / "data" / ...` gets noisy. Wrap it in a tiny helper.
@@ -627,7 +684,7 @@ Why a separate file? It is the simplest pattern that keeps your key out of the r
 
 ---
 
-## Step 3, download all NZ regions
+## Step 3, download all NZ regions {.smaller}
 
 ```python
 import geopandas as gpd
@@ -652,18 +709,41 @@ def load_regions():
 
 `gpd.read_file` accepts a URL directly — no `requests` boilerplate needed. The returned `GeoDataFrame` has 16 rows, one per region.
 
+To try it interactively, open a Python shell with `uv run python`, then:
+
+```python
+from geohello.loader import load_regions
+
+gdf = load_regions()
+gdf.shape
+gdf.head()
+```
+
 ---
 
-## Step 4a, inspect the schema first
+## Step 4a, inspect the schema first {.smaller}
 
 Before writing a filter, look at what `load_regions()` actually returned. **Never assume column names** — Stats NZ schemas change every few years.
 
-```python
-gdf = load_regions()
+**Option A — one-liner from the terminal:**
 
-print(gdf.columns.tolist())     # see all column names
-print(gdf.iloc[0])              # peek at the first row
-print(len(gdf))                 # expect 16 regions
+```bash
+uv run python -c "from geohello.loader import load_regions; gdf = load_regions(); print(gdf.columns.tolist())"
+```
+
+**Option B — interactive Python shell:**
+
+```bash
+uv run python
+```
+
+```python
+from geohello.loader import load_regions
+
+gdf = load_regions()
+gdf.columns.tolist()
+gdf.iloc[0]
+len(gdf)
 ```
 
 . . .
@@ -672,7 +752,7 @@ Find the column that holds the region **name** (something like `REGC2025_V1_00_N
 
 ---
 
-## Step 4b, a function to filter Auckland
+## Step 4b, a function to filter Auckland {.smaller}
 
 Now slice out just Auckland with an **attribute filter**.
 
@@ -732,32 +812,6 @@ Trade-off: bbox is faster and uses less bandwidth, but you lose the testable `fi
 
 ---
 
-## Step 5, cache so you only download once
-
-```python
-from pathlib import Path
-
-CACHE_DIR = Path.home() / ".cache" / "your_package"
-
-
-def load_auckland_cached():
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / "auckland.gpkg"
-
-    if cache_file.exists():
-        return gpd.read_file(cache_file)
-
-    gdf = load_auckland()
-    gdf.to_file(cache_file, driver="GPKG")
-    return gdf
-```
-
-. . .
-
-First call hits the API. Every later call reads the local file. Your demo notebook stays fast.
-
----
-
 ## Hands-on (10 min): try it once {.smaller}
 
 With your partner, do the following.
@@ -770,11 +824,17 @@ With your partner, do the following.
 5. Add `filter_auckland()` using your `NAME_COL`.
 6. Run `uv run python -c "from geohello_yourname import load_regions, filter_auckland; print(filter_auckland(load_regions()).shape)"`.
 7. Confirm you get a `GeoDataFrame` with **1 row** and a `geometry` column.
+8. Upload a screenshot of your file tree to Canvas.
 :::
 
-. . .
+Quiz: To print your file tree:
 
-Demonstrators will help with the API key step. If it fails, check: (a) `config.py` sits next to the module that imports it, (b) `NAME_COL` matches what `gdf.columns` actually shows, (c) you are using `https`, not `http`.
+- **Windows (PowerShell):** `tree /F /A`
+- **Mac:** `brew install tree` then `tree -I '.venv|__pycache__|.git'`
+
+
+
+If it fails, check: (a) `config.py` sits next to the module that imports it, (b) `NAME_COL` matches what `gdf.columns` actually shows, (c) you are using `https`, not `http`.
 
 ---
 
@@ -782,18 +842,12 @@ Demonstrators will help with the API key step. If it fails, check: (a) `config.p
 
 Each A3 brief tells you which pattern fits.
 
-::: {.incremental}
-* `equitransport` benefits from **bundling** NZDep2018 (a few hundred KB).
+
+* `equitransport` benefits from **bundling** NZDep2023 (a few hundred KB).
 * `treecrown-nz` and `escooter-akl` will **fetch** large LINZ or Stats NZ layers.
 * `pedestrian-exposure` will likely **fetch** OSMnx routes and **bundle** sample inputs for tests.
 * `pavescore` ships images via the Mapillary API, so it is mostly **fetch** plus a small fixture image **bundled** for tests.
-:::
 
-. . .
-
-Pick the lightest option that works. A package that ships 200 MB of shapefiles is a package nobody installs.
-
----
 
 # Assignment 3, the briefs
 
@@ -806,12 +860,10 @@ Pick the lightest option that works. A package that ships 200 MB of shapefiles i
 * Pick **one of five package briefs**.
 * Three required functions per brief.
 * One demonstration notebook with a map or chart.
-* TestPyPI in Week 10, PyPI in Week 12.
-* A1 poster on **Tuesday 25 May (B301-G10)**.
-* Short **fit interview** in the **Week 10 lab** (3 to 5 min per person).
+* TestPyPI in Week 10, final version of the package in Week 12 (either TestPyPI, or PyPI).
+* A1 poster on **Monday 25 May (B301-G10)**.
+* Short **fit interview** in the **Week 10 lab** (<15 min per pair).
 :::
-
-. . .
 
 Read the full brief in the textbook chapter 4.5.
 
@@ -819,75 +871,69 @@ Read the full brief in the textbook chapter 4.5.
 
 ## Brief 1: `pedestrian-exposure` {.smaller}
 
-**Cumulative pedestrian exposure to noise, air pollution, and green space along a walking route.**
+**Answer this question for a walker in Auckland: which route is healthier, and why?**
 
-::: {.incremental}
-* `load_route(origin, destination, place)` from OSMnx, returns edges in EPSG:2193
-* `add_exposure(route_gdf, layer, kind)` where `kind` is `"noise"`, `"air_quality"`, or `"green"`
-* `summarise_exposure(route_gdf, weights=None)` returns per-edge values for all three plus a length-weighted summary
-* **Demo**: a CBD walking route + OSM-based noise proxy + LAWA air quality + Sentinel-2 NDVI
-* **Difficulty**: intermediate to ambitious (three small pipelines, kept consistent)
-:::
-
----
-
-## Brief 2: `equitransport`
-
-**Transport accessibility by deprivation quintile.**
-
-::: {.incremental}
-* `load_nzdep(sa2_gdf)` joins NZDep2018 scores by SA2
-* `compute_access(gdf, metric_col)` calculates the metric per polygon
-* `equity_summary(gdf)` returns quintile means + Gini coefficient
-* **Demo**: Auckland SA2s + AT GTFS PT-stop counts, choropleth by deprivation
-* **Difficulty**: intermediate (meshblock-to-SA2 aggregation)
-:::
+* **What we expect to see**: a CBD walking route scored on **three** environmental factors (noise, air pollution, green space), mapped together so the trade-offs are obvious.
+* **The deliverable**: a map of the route with each edge coloured by total exposure, a small bar chart breaking out the three components, and a one-line summary score.
+* **The insight**: which streets are quietest? Which are the most polluted? Where does greenery actually offset the others?
+* **Key functions**: `add_exposure(route_gdf, layer, kind)` and `summarise_exposure(route_gdf)`.
+* **Demo dataset**: a route via OSMnx + OSM-based noise proxy + LAWA air quality + Sentinel-2 NDVI.
+* **Difficulty**: intermediate to ambitious (three small pipelines, kept consistent).
 
 ---
 
-## Brief 3: `treecrown-nz`
+## Brief 2: `equitransport` {.smaller}
 
-**Urban tree canopy coverage and route shade.**
+**Answer this question: does Auckland's public transport access reach the most deprived neighbourhoods?**
 
-::: {.incremental}
-* `load_canopy(bbox)` fetches LINZ canopy polygons
-* `canopy_coverage(area_gdf)` percentage cover per polygon
-* `route_shade(route_gdf, buffer_m)` canopy fraction along a route
-* **Demo**: three Auckland suburbs + shade along one walking route
-* **Difficulty**: intermediate to ambitious (LINZ API quirks)
-:::
+* **What we expect to see**: a single number (Gini coefficient) plus a five-row quintile table that turns an equity argument into evidence.
+* **The deliverable**: a choropleth of Auckland SA2s coloured by NZDep quintile and a parallel map of PT access (stops within 400 m walk).
+* **The insight**: do the most deprived quintiles get fewer stops per capita? By how much? Where are the worst gaps?
+* **Key functions**: `load_nzdep(sa2_gdf)` and `equity_summary(gdf)`.
+* **Demo dataset**: Stats NZ SA2 boundaries + AT GTFS PT-stop counts + NZDep2018 scores from the University of Otago.
+* **Difficulty**: intermediate (meshblock-to-SA2 aggregation is the tricky bit).
 
 ---
 
-## Brief 4: `pavescore`
+## Brief 3: `treecrown-nz` {.smaller}
 
-**Pavement condition score from a photo.**
+**Answer this question: which Auckland neighbourhoods are tree-rich, and how shaded is a typical walk?**
 
-::: {.incremental}
-* `score_image(path_or_url)` returns a `PavementResult` dataclass
-* `score_batch(image_list)` returns a summary DataFrame
-* `to_geodataframe(results, coords)` returns a mappable GeoDataFrame
-* **Demo**: Mapillary images along Dominion Road or Queen Street
-* **Difficulty**: ambitious, the most open-ended brief
-:::
+* **What we expect to see**: a coverage number (% canopy) for each of three Auckland suburbs, and a route map coloured by overhead canopy fraction.
+* **The deliverable**: a side-by-side comparison plot for the three suburbs + a "shaded walk" map for one chosen route.
+* **The insight**: which suburbs have invested in canopy? Which routes stay shaded on a summer afternoon? Where is the canopy gap worst?
+* **Key functions**: `canopy_coverage(area_gdf)` and `route_shade(route_gdf, buffer_m)`.
+* **Demo dataset**: Auckland Council LiDAR-derived canopy from the LINZ Data Service.
+* **Difficulty**: intermediate to ambitious (the LINZ API has a learning curve).
+
+---
+
+## Brief 4: `pavescore` {.smaller}
+
+**Answer this question: can a phone photo tell us which Auckland pavements need fixing?**
+
+* **What we expect to see**: every input image scored on a 0-to-100 condition scale with binary flags for cracking, surface degradation, and obstruction.
+* **The deliverable**: a map of scored photo locations along Dominion Road or Queen Street, coloured good / fair / poor, with a small table of the worst spots.
+* **The insight**: how does pavement quality vary along one street? Which segments are worst? Could a council prioritise repairs from this map?
+* **Key functions**: `score_image(path_or_url)` and `to_geodataframe(results, coords)`.
+* **Demo dataset**: Mapillary street-level images.
 
 . . .
 
-A simple texture-based scorer that works beats an ambitious classifier that breaks.
+**Difficulty**: ambitious, the most open-ended brief. A simple texture-based scorer that works beats an ambitious classifier that breaks.
 
 ---
 
-## Brief 5: `escooter-akl`
+## Brief 5: `escooter-akl` {.smaller}
 
-**Clean OD flows and geofence violations from raw e-scooter trips.**
+**Answer this question: how do e-scooters (Flamingo) move around the CBD, and where are operators failing to enforce parking rules?**
 
-::: {.incremental}
-* `load_trips(path)` reads CSV, returns trip GeoDataFrame in EPSG:2193
-* `od_flows(trips_gdf, zones_gdf)` returns origin-destination matrix by zone
-* `geofence_violations(trips_gdf, no_park_gdf)` flags trips ending in no-park zones
-* **Demo**: sample of Auckland CBD trips + SA2 zones + CBD pedestrianised polygons
-* **Difficulty**: intermediate (messy data, loud failure beats silent failure)
-:::
+* **What we expect to see**: a clean origin-destination flow map plus a count of trips that ended inside no-parking zones.
+* **The deliverable**: an OD chord diagram or arrow map between SA2 zones + a marker map of geofence violations with zone labels for reporting.
+* **The insight**: which CBD zones are origin-heavy vs destination-heavy? Where are violations concentrated? What story would you tell Auckland Council?
+* **Key functions**: `od_flows(trips_gdf, zones_gdf)` and `geofence_violations(trips_gdf, no_park_gdf)`.
+* **Demo dataset**: a sample CSV of Flamingo Auckland CBD trips + Stats NZ SA2 zones + Auckland Council pedestrianised polygons.
+* **Difficulty**: intermediate (messy data; loud failure beats silent failure).
 
 ---
 
@@ -895,17 +941,18 @@ A simple texture-based scorer that works beats an ambitious classifier that brea
 
 * random shuffle
 
-
-
-
 ---
 
 ## What to do this week
 
-::: {.incremental}
-* **Tomorrow Week 9 lab**: scaffold the package skeleton with your partner, sketch the public API, implement one function, push to GitHub.
-* **Before next lecture**: each partner writes a 100 to 150 word reflection on (a) what is unclear, (b) which function you will own, (c) what you do not yet understand.
-:::
+
+* **Tomorrow Week 9 lab**: scaffold the package skeleton with your partner, sketch the public API, and submit the design report by the end of the week.
+* Open a GitHub account and add your partner (keep it public)
+* Be careful with the pull and pushes when using git
+* Use branches if you agree to do that
+* Practise locally first and then deploy once you are confident
+
+
 
 ---
 
