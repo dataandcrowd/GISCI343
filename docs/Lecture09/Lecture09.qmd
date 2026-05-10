@@ -26,7 +26,7 @@ format:
 jupyter: python3
 ---
 
-## Today's plan
+## Today's plan {.smaller}
 
 1. Recap of Part 3 and welcome to Part 4
 2. Why we package code (the copy-paste problem)
@@ -92,7 +92,7 @@ Six months later, Project B needs the same function. What do you do?
 
 Most people copy-paste. Then they fix a bug in Project A and forget Project B. Now there are two versions of "the same" function and neither matches.
 
----
+
 
 ## Packaging in one slide
 
@@ -106,11 +106,28 @@ from my_urban_toolkit import calculate_walkability
 result = calculate_walkability(streets, amenities)
 ```
 
-. . .
 
-One source of truth. One install command. Every project (and every collaborator) gets the same function.
+One source, and one install command. 
+Every project (and every collaborator) gets the same function.
 
----
+
+## I used to teach OOP in a hard way...
+
+* ~~Encapsulation is the process of making data private by wrapping data and its methods in a ‘capsule’ or unit~~
+* ~~It can not be accessed or modified outside of that unit~~
+
+
+
+## Real-World Example of ~~Encapsulation~~:
+::: {style="font-size: 50%;"}
+* Imagine you’re building software for a coffee shop. You might have a class that represents a coffee machine. 
+* The coffee machine has many internal components, like water levels, temperature settings, and a coffee bean grinder.
+* `water_level`, `temp`, `set_grind_for_espresso()`
+:::
+
+![](https://www.tasteofhome.com/wp-content/uploads/2020/02/Types-of-Coffee-Drinks_1200X1200.jpg){fig-align="center"}
+
+
 
 ## What is a Python package, really?
 
@@ -176,46 +193,57 @@ Two sections. `[build-system]` says how to build. `[project]` says what the pack
 
 ## Live demo: four steps to a working package
 
-We will build `geohello` together. Same commands you will run in pairs in 10 minutes.
+We will build `geohello` together. Same commands you will run in 10 minutes.
 
 . . .
 
 ```bash
-# Step 1: scaffold
-uv init --lib geohello
-cd geohello
+# Step 1: scaffold IN your current folder (not in a subfolder)
+mkdir geohello && cd geohello
+uv init --lib --name geohello .
 
 # Step 2: edit src/geohello/__init__.py (one function)
 
 # Step 3: build
 uv build
 
-# Step 4: try it
+# Step 4: try it (uv creates and manages .venv automatically)
 uv run python -c "from geohello import hello; print(hello())"
 ```
+
+. . .
+
+**Heads-up.** Do *not* `python -m venv .venv` first. `uv` manages the
+virtual environment for you. If you pre-create a venv and then run
+`uv init --lib geohello` (without `.`), you get a nested project with
+two confused venvs.
 
 ---
 
 ## Step 1: scaffold with uv
 
 ```bash
-uv init --lib geohello
+mkdir geohello && cd geohello # only if you haven't
+uv init --lib --name geohello .
 ```
 
-This creates the whole folder for you.
+The trailing `.` tells `uv` to scaffold **in the current directory**, not in a new subfolder. After this you have:
 
 ```
-geohello/
+geohello/                       # <-- you are here
 ├── src/geohello/__init__.py
 ├── tests/
 ├── pyproject.toml
 ├── README.md
+├── .python-version
 └── .gitignore
 ```
 
 . . .
 
-`uv` already filled in a working `pyproject.toml` and made the `src/` layout correctly. **You did not have to remember any of it.**
+`uv` filled in a working `pyproject.toml`, made the `src/` layout, and
+will create `.venv/` on the first `uv run` or `uv sync`.
+**You did not have to remember any of it.**
 
 ---
 
@@ -270,8 +298,8 @@ uv run python -c "from geohello import hello; print(hello())"
 # Or open Python interactively
 uv run python
 >>> from geohello import hello
->>> hello("Tokyo")
-'Hello from Tokyo!'
+>>> hello("Mexico City")
+'Hello from Mexico City!'
 ```
 
 . . .
@@ -280,24 +308,21 @@ That is what "building a package" feels like. Four commands.
 
 ---
 
-## Your turn (25 min): build `geohello-yourname` {.smaller}
+## Package build `geohello-yourname` {.smaller}
 
 Pair up. **Both partners commit code.** This is also your A3 partner from this week onwards.
 
 | Step | Command or action | Tick |
 |------|-------------------|:----:|
-| 1 | `uv init --lib geohello-yourname` | ☐ |
-| 2 | Edit `src/geohello_yourname/__init__.py`, add `hello()` | ☐ |
-| 3 | Update `name`, `description`, both `authors` in `pyproject.toml` | ☐ |
-| 4 | `uv build` produces `dist/*.whl` and `dist/*.tar.gz` | ☐ |
-| 5 | `uv run python -c "from geohello_yourname import hello; print(hello())"` | ☐ |
-| 6 | Push to a shared GitHub repo | ☐ |
+| 1 | `mkdir geohello-yourname && cd geohello-yourname` | ☐ |
+| 2 | `uv init --lib --name geohello-yourname .` (note the trailing `.`) | ☐ |
+| 3 | Edit `src/geohello_yourname/__init__.py`, add `hello()` | ☐ |
+| 4 | Update `name`, `description`, both `authors` in `pyproject.toml` | ☐ |
+| 5 | `uv build` produces `dist/*.whl` and `dist/*.tar.gz` | ☐ |
+| 6 | `uv run python -c "from geohello_yourname import hello; print(hello())"` | ☐ |
+| 7 | Push to a shared GitHub repo | ☐ |
 
-. . .
 
-Demonstrators will circulate. Wave a hand if `uv build` complains.
-
----
 
 ## Common errors and fixes
 
@@ -306,6 +331,7 @@ Demonstrators will circulate. Wave a hand if `uv build` complains.
 * **`name 'geohello' is already taken`** (later, on TestPyPI). Add your initials to the `name` field.
 * **Build fails on the first line of `pyproject.toml`**. Usually a TOML syntax typo. Read the first error message carefully.
 * **The function works in `uv run python` but not in plain `python`**. You are not in the project's virtual environment. Use `uv run` or `source .venv/bin/activate`.
+
 :::
 
 ---
@@ -390,11 +416,14 @@ Your A3 package needs **data**. Real Auckland data, not synthetic toys. Two patt
 ::: {.incremental}
 * **Bundle it.** Ship a small file inside the package itself. Good for lookup tables, schemas, sensor lists, anything under about 10 MB.
 * **Fetch it.** Download from an API on first use, then cache locally. Good for large or frequently updated data such as Stats NZ census and LINZ boundaries.
+
 :::
 
 . . .
 
-`akl-ped-counts` uses the first pattern (8 MB of CSVs ship with the package). Most A3 briefs will use the second.
+`akl-ped-counts` uses the first pattern (8 MB of CSVs ship with the package). 
+
+
 
 # Pattern 1: Bundling GIS data
 
@@ -423,37 +452,70 @@ This is what `akl-ped-counts` does with `hourly_counts.csv` and `locations.csv`.
 
 ---
 
-## Finding the file at runtime
+## Finding the file at runtime: the problem
 
-Do **not** hard-code paths like `"/Users/me/Desktop/sensors.csv"`. The file moves when the package is installed.
-
-. . .
-
-Use `importlib.resources` instead.
+Your laptop knows where `sensors.csv` lives. Someone who runs `pip install your-package` does not.
 
 ```python
-from importlib import resources
-import geopandas as gpd
-import pandas as pd
-
-
-def _data_path(filename: str) -> str:
-    """Resolve a path to a bundled data file."""
-    ref = resources.files("your_package") / "data" / filename
-    return str(ref)
-
-
+# 🚫 Works on your laptop, breaks for everyone else
 def load_sensors():
-    return pd.read_csv(_data_path("sensors.csv"))
-
-
-def load_zones():
-    return gpd.read_file(_data_path("zones.geojson"))
+    return pd.read_csv("/Users/hyesop/projects/data/sensors.csv")
 ```
 
 . . .
 
-This works whether the package is installed from PyPI, from a wheel, or in editable mode.
+After `pip install`, the file lives somewhere inside their Python's `site-packages/...` folder — a path you cannot predict.
+
+---
+
+## Finding the file at runtime: the fix
+
+Let Python find the package for you.
+
+```python
+from importlib.resources import files
+import pandas as pd
+
+def load_sensors():
+    path = files("your_package") / "data" / "sensors.csv"
+    return pd.read_csv(path)
+```
+
+. . .
+
+Read it as a sentence:
+
+> *"Find the package `your_package`, go into its `data/` folder, grab `sensors.csv`."*
+
+The `/` here is the same idea as `pathlib.Path` — it joins folder names. No hard-coded `/Users/...` anywhere.
+
+. . .
+
+Same package works on your laptop, on a classmate's laptop, on PyPI — Python figures out the real location.
+
+---
+
+## Once you have more than one file {.smaller}
+
+Repeating `files("your_package") / "data" / ...` gets noisy. Wrap it in a tiny helper.
+
+```python
+from importlib.resources import files
+import geopandas as gpd
+import pandas as pd
+
+DATA = files("your_package") / "data"   # computed once at import time
+
+def load_sensors():
+    return pd.read_csv(DATA / "sensors.csv")
+
+def load_zones():
+    return gpd.read_file(DATA / "zones.geojson")
+```
+
+. . .
+
+That is the pattern `akl-ped-counts` uses. Two loaders, one `DATA` constant, no path strings to maintain.
 
 ---
 
@@ -486,7 +548,7 @@ Always sanity-check by unzipping the `.whl` after `uv build`. The `data/` folder
 ## When to bundle vs not
 
 ::: {.incremental}
-* **Yes, bundle.** Sensor metadata (a few KB). Schema files. Static reference tables. NZDep2018 score table (a few hundred KB).
+* **Yes, bundle.** Sensor metadata (a few KB). Schema files. Static reference tables. NZDep2023 score table (a few hundred KB).
 * **Maybe bundle.** A small CSV under 10 MB that does not change between releases.
 * **No, do not bundle.** Anything over 10 MB. SA2 boundary GeoPackages (often 100+ MB). LINZ canopy layers. Census shapefiles.
 :::
@@ -535,7 +597,7 @@ We will use WFS in the example because it is one HTTP call.
 ::: {.incremental}
 1. Sign up at https://datafinder.stats.govt.nz/.
 2. Go to your profile, then "API keys".
-3. Create a key and copy it. It looks like `4f1a...`.
+3. Create a key and copy it. It looks like `E5b...`.
 4. Save it somewhere safe.
 :::
 
@@ -547,85 +609,145 @@ You can do this during today's hands-on. The free tier is plenty for any A3 pack
 
 ## Step 2, never hard-code the key
 
+Same pattern as the **Week 4 lab**: keep the key in a `config.py` next to your code, and add `config.py` to `.gitignore`.
+
 ```python
-import os
+# config.py  --  NEVER commit this file
+API_KEY = "E5b..."
+```
 
-
-def _get_api_key():
-    key = os.getenv("STATS_NZ_API_KEY")
-    if key is None:
-        raise EnvironmentError(
-            "Set STATS_NZ_API_KEY in your environment "
-            "or .env file before calling this function."
-        )
-    return key
+```python
+# loader.py
+from config import API_KEY
 ```
 
 . . .
 
-Then run with the key in the environment.
-
-```bash
-export STATS_NZ_API_KEY=4f1a...
-uv run python -c "from your_package import load_sa2; load_sa2()"
-```
-
-. . .
-
-Or add the key to a `.env` file (and add `.env` to `.gitignore`).
+Why a separate file? It is the simplest pattern that keeps your key out of the repo. Environment variables work too, but `config.py` is what you already used in Week 4 — stick with what is familiar.
 
 ---
 
-## Step 3, the WFS download
+## Step 3, download all NZ regions
 
 ```python
-import requests
 import geopandas as gpd
-from io import BytesIO
+from config import API_KEY
 
-WFS_URL = (
-    "https://datafinder.stats.govt.nz/services;"
-    "key={key}/wfs"
-)
+LAYER_ID = 120945                          # Regional Council 2025 Clipped
+WFS_URL = f"https://datafinder.stats.govt.nz/services;key={API_KEY}/wfs/"
 
 
-def load_sa2_auckland(api_key=None):
-    """Download Auckland SA2 boundaries from Stats NZ."""
-    api_key = api_key or _get_api_key()
-    params = {
-        "service": "WFS",
-        "version": "2.0.0",
-        "request": "GetFeature",
-        "typeNames": "layer-111228",       # SA2 2023 generalised
-        "outputFormat": "json",
-        "srsName": "EPSG:2193",
-        "bbox": "1740000,5900000,1790000,5950000,EPSG:2193",
-    }
-    r = requests.get(WFS_URL.format(key=api_key),
-                     params=params, timeout=30)
-    r.raise_for_status()
-    return gpd.read_file(BytesIO(r.content))
+def load_regions():
+    """Download all 16 NZ regional council polygons."""
+    params = (
+        "service=WFS&version=2.0.0&request=GetFeature"
+        f"&typeNames=layer-{LAYER_ID}"
+        "&outputFormat=application/json"
+        "&srsName=EPSG:2193"
+    )
+    return gpd.read_file(f"{WFS_URL}?{params}")
 ```
+
+. . .
+
+`gpd.read_file` accepts a URL directly — no `requests` boilerplate needed. The returned `GeoDataFrame` has 16 rows, one per region.
 
 ---
 
-## Step 4, cache so you only download once
+## Step 4a, inspect the schema first
+
+Before writing a filter, look at what `load_regions()` actually returned. **Never assume column names** — Stats NZ schemas change every few years.
+
+```python
+gdf = load_regions()
+
+print(gdf.columns.tolist())     # see all column names
+print(gdf.iloc[0])              # peek at the first row
+print(len(gdf))                 # expect 16 regions
+```
+
+. . .
+
+Find the column that holds the region **name** (something like `REGC2025_V1_00_NAME`). Whatever it is on your machine, use that exact string in the next slide.
+
+---
+
+## Step 4b, a function to filter Auckland
+
+Now slice out just Auckland with an **attribute filter**.
+
+```python
+NAME_COL = "REGC2025_V1_00_NAME"          # ← from Step 4a, edit if different
+
+
+def filter_auckland(gdf):
+    """Return rows whose region name contains 'Auckland'."""
+    mask = gdf[NAME_COL].str.contains("Auckland", na=False)
+    return gdf[mask].copy()
+```
+
+. . .
+
+`str.contains` is forgiving — it matches whether Stats NZ stores the value as `"Auckland"` or `"Auckland Region"`. If unsure, peek: `print(gdf[NAME_COL].unique())`.
+
+. . .
+
+Compose the two functions for a one-liner public API:
+
+```python
+def load_auckland():
+    """Convenience: fetch + filter in one call."""
+    return filter_auckland(load_regions())
+```
+
+. . .
+
+**Why separate the filter from the download?** Tests can call `filter_auckland` on a tiny fixture `GeoDataFrame` without ever hitting the network. Smaller, faster, offline-friendly tests.
+
+---
+
+## Optional: server-side bbox (faster for Auckland-only)
+
+If you only ever need Auckland, ask the server to clip during download.
+
+```python
+AUCKLAND_BBOX = "1730000,5900000,1820000,5990000"   # EPSG:2193
+
+
+def load_auckland_bbox():
+    """Download only features inside the Auckland bounding box."""
+    params = (
+        "service=WFS&version=2.0.0&request=GetFeature"
+        f"&typeNames=layer-{LAYER_ID}"
+        "&outputFormat=application/json"
+        "&srsName=EPSG:2193"
+        f"&bbox={AUCKLAND_BBOX},EPSG:2193"
+    )
+    return gpd.read_file(f"{WFS_URL}?{params}")
+```
+
+. . .
+
+Trade-off: bbox is faster and uses less bandwidth, but you lose the testable `filter_auckland` step. For A3 demos, prefer **`load_regions` + `filter_auckland`** — clearer to grade, easier to test.
+
+---
+
+## Step 5, cache so you only download once
 
 ```python
 from pathlib import Path
-import geopandas as gpd
 
 CACHE_DIR = Path.home() / ".cache" / "your_package"
 
 
-def load_sa2_cached(api_key=None):
+def load_auckland_cached():
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / "sa2_auckland.gpkg"
+    cache_file = CACHE_DIR / "auckland.gpkg"
 
     if cache_file.exists():
         return gpd.read_file(cache_file)
 
-    gdf = load_sa2_auckland(api_key)
+    gdf = load_auckland()
     gdf.to_file(cache_file, driver="GPKG")
     return gdf
 ```
@@ -642,15 +764,17 @@ With your partner, do the following.
 
 ::: {.incremental}
 1. Sign up at https://datafinder.stats.govt.nz/ and copy your API key.
-2. In your `geohello-yourname` package, add a function `load_sa2_auckland(api_key)` based on the slide above.
-3. Set the key in your shell, `export STATS_NZ_API_KEY=...`.
-4. Run `uv run python -c "from geohello_yourname import load_sa2_auckland; print(load_sa2_auckland().shape)"`.
-5. Confirm you get a GeoDataFrame with a sensible row count (around 60 SA2 zones for the Auckland CBD bounding box).
+2. In your package, create `config.py` with `API_KEY = "..."` and add `config.py` to `.gitignore`.
+3. Add `load_regions()` from the slide.
+4. **First, inspect**: `print(gdf.columns.tolist())` — copy the actual name column into `NAME_COL`.
+5. Add `filter_auckland()` using your `NAME_COL`.
+6. Run `uv run python -c "from geohello_yourname import load_regions, filter_auckland; print(filter_auckland(load_regions()).shape)"`.
+7. Confirm you get a `GeoDataFrame` with **1 row** and a `geometry` column.
 :::
 
 . . .
 
-Demonstrators will help with the API key step. If it fails, check the key, the bbox, and that you are using `https`, not `http`.
+Demonstrators will help with the API key step. If it fails, check: (a) `config.py` sits next to the module that imports it, (b) `NAME_COL` matches what `gdf.columns` actually shows, (c) you are using `https`, not `http`.
 
 ---
 
