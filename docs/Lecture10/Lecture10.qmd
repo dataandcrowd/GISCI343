@@ -33,10 +33,9 @@ jupyter: python3
 3. pytest in three commands
 4. Three test patterns you will actually use
 5. **Hands-on**: write one test for your A3 package
-6. A real package tour: how `akl-ped-counts` is built and shipped
-7. TestPyPI rehearsal, end to end
-8. Poster outline, the seven-box rule
-9. **Fit interview, today in the lab**
+6. TestPyPI rehearsal, end to end
+7. Poster outline, the seven-box rule
+8. **Fit interview, today in the lab**
 
 ---
 
@@ -207,7 +206,7 @@ A dot means pass. An `F` means fail, with a clear explanation underneath.
 
 ```python
 # tests/test_geohello.py
-from geohello_yourname import hello
+from geohello import hello
 
 
 def test_hello_default():
@@ -321,112 +320,7 @@ With your A3 partner, do the following.
 
 Demonstrators will help. If you finish early, write a second test using a different pattern.
 
-# Part 4: A real package tour, `akl-ped-counts`
-
----
-
-## What is `akl-ped-counts`?
-
-A small package the instructor maintains. It ships hourly Heart of the City pedestrian counts (21 sensors, 2019 to 2025).
-
-. . .
-
-```bash
-pip install akl-ped-counts
-```
-
-```python
-from akl_ped_counts import load_hourly, list_sensors
-
-print(len(list_sensors()))   # 21
-print(load_hourly().shape)    # (61367, 24)
-```
-
-. . .
-
-This is the **size and scope** your A3 package should aim for. Three functions, one short README, one PyPI release.
-
----
-
-## Repo layout
-
-```
-akl-ped-counts/
-├── pyproject.toml
-├── README.md
-├── LICENSE
-├── CONTRIBUTING.md
-├── examples/
-│   └── march_trajectories.png
-└── src/akl_ped_counts/
-    ├── __init__.py            # re-exports the public API
-    ├── loader.py              # the actual functions
-    ├── polars_loader.py       # optional Polars backend
-    └── data/                  # bundled CSV files (~8 MB)
-```
-
-. . .
-
-The patterns from Lecture 9 are all there. `src/` layout, thin `__init__.py`, hatchling backend, optional dependencies.
-
----
-
-## Optional dependencies, an idea worth copying {.smaller}
-
-```toml
-[project]
-dependencies = ["pandas>=1.5.0"]   # the core install stays small
-
-[project.optional-dependencies]
-polars = ["polars>=0.20.0"]
-plot = ["matplotlib>=3.5.0", "seaborn>=0.12.0"]
-geo = ["folium>=0.14.0"]
-all = ["polars>=0.20.0", "matplotlib>=3.5.0",
-       "seaborn>=0.12.0", "folium>=0.14.0"]
-```
-
-. . .
-
-::: {.incremental}
-* Data-only user, `pip install akl-ped-counts`
-* Plot user, `pip install "akl-ped-counts[plot]"`
-* Map user, `pip install "akl-ped-counts[geo]"`
-* Power user, `pip install "akl-ped-counts[all]"`
-:::
-
-. . .
-
-**Most A3 briefs benefit from this.** Keep the core install lightweight.
-
----
-
-## A look at one function
-
-```python
-def list_sensors() -> list[str]:
-    """Return the canonical list of all 21 sensor location names.
-
-    Returns
-    -------
-    list of str
-        Sensor location names in geographic order
-        (north to south).
-    """
-    return SENSORS.copy()
-```
-
-. . .
-
-The function does almost nothing. What makes it good is the surrounding work.
-
-::: {.incremental}
-* `SENSORS` is curated and corrected ("59 High Stret" was fixed to "59 High Street").
-* Order is meaningful (north to south).
-* Type hint, docstring, return type clear.
-* `.copy()` prevents callers from mutating the constant.
-:::
-
-# Part 5: TestPyPI rehearsal
+# Part 4: TestPyPI rehearsal
 
 ---
 
@@ -502,7 +396,7 @@ Authenticate with username `__token__` and the token as the password. Or set `UV
 
 These are not rare bugs. Every cohort sees all four. Knowing the fix in advance saves you 30 minutes each.
 
-# Part 6: Poster design
+# Part 5: Poster design
 
 ---
 
@@ -575,7 +469,7 @@ A working poster answers three questions in 30 seconds.
 
 Everything else is for the conversation, not the poster.
 
-# Part 7: Fit interview, today in the lab
+# Part 6: Fit interview, today in the lab
 
 ---
 
@@ -659,9 +553,7 @@ Hesitating, looking at your screen, or saying "let me check the docstring" are a
 
 ::: {style="font-size: 90%;"}
 * Textbook 4.2, **Testing and code quality**
-* Textbook 4.3, **A real geospatial package: `akl-ped-counts`**
 * Textbook 4.5, **Assignment 3 briefs**
-* `akl-ped-counts` `CONTRIBUTING.md`, https://github.com/dataandcrowd/akl-ped-counts/blob/main/CONTRIBUTING.md
 * pytest documentation, https://docs.pytest.org/
 * `uv publish` guide, https://docs.astral.sh/uv/guides/publish/
 * TestPyPI, https://test.pypi.org/

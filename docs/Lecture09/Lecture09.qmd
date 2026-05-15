@@ -532,8 +532,8 @@ from importlib.resources import files
 import pandas as pd
 
 
-def hello() -> str:
-    return "Hello from geohello!"
+def hello(place: str = "Auckland") -> str:
+    return f"Hello from {place}!"
 
 
 def load_data():
