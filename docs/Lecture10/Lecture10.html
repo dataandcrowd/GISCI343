@@ -218,7 +218,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <h2>Today’s plan (90 min)</h2>
 <ol type="1">
 <li>Recap of Week 9</li>
-<li>Why we test geospatial code (silent failures)</li>
+<li>A simple module to test</li>
 <li>pytest in three commands</li>
 <li>Three test patterns you will actually use</li>
 <li><strong>Hands-on</strong>: write one test for your A3 package</li>
@@ -229,15 +229,12 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </section>
 <section id="recap-of-week-9" class="slide level2">
 <h2>Recap of Week 9</h2>
-<p>Last week your pair did the following.</p>
-<div class="fragment">
 <ul>
-<li class="fragment">Drew one of the five A3 briefs in the raffle.</li>
-<li class="fragment">Built <code>geohello-yourname</code> in pairs (<code>uv init --lib</code>, edit, <code>uv build</code>).</li>
-<li class="fragment">Scaffolded your A3 package on GitHub (Week 9 lab).</li>
-<li class="fragment">Implemented one function and wrote one test that passes.</li>
+<li>Drew one of the five A3 briefs in the raffle.</li>
+<li>Built <code>geohello-yourname</code> in pairs (<code>uv init --lib</code>, edit, <code>uv build</code>).</li>
+<li><del>Scaffolded your A3 package on GitHub</del>.</li>
+<li>Implemented one function and wrote one test that passes.</li>
 </ul>
-</div>
 <div class="fragment">
 <p>This week we go from “one test that passes” to “a TestPyPI release that someone else can install”.</p>
 </div>
@@ -270,7 +267,7 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 </tr>
 <tr class="odd">
 <td>11</td>
-<td>Polish + poster showcase (Tue 25 May)</td>
+<td>Polish + poster showcase (Mon 25 May)</td>
 <td>A1 poster on the wall</td>
 </tr>
 <tr class="even">
@@ -284,67 +281,49 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <p>By Friday this week, your package should install for anyone with <code>pip install --index-url https://test.pypi.org/simple/ your-package-name</code>.</p>
 </div>
 </section>
-<section>
-<section id="part-1-why-we-test-geospatial-code" class="title-slide slide level1 center">
-<h1>Part 1: Why we test geospatial code</h1>
-
-</section>
-<section id="silent-geospatial-failures" class="slide level2">
-<h2>Silent geospatial failures</h2>
-<p>The dangerous bugs in spatial code are the ones that <strong>do not crash</strong>.</p>
-<div class="fragment">
-<ul>
-<li class="fragment">A spatial join silently drops 5 zones.</li>
-<li class="fragment">Distance returns 0.05 (degrees), not 5000 (metres).</li>
-<li class="fragment">A negative buffer produces an empty geometry.</li>
-<li class="fragment">A <code>groupby</code> aggregation drops <code>NaN</code> rows you wanted to count.</li>
-</ul>
-</div>
-<div class="fragment">
-<p>None of these raise an error. You only notice when the map looks wrong, often after the deadline.</p>
-</div>
-</section>
-<section id="the-missing-zones-bug" class="slide level2">
-<h2>The missing-zones bug</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<section id="a-simple-module-to-test" class="slide level2">
+<h2>A simple module to test</h2>
+<p>Before we write tests, we need something to test. Add this function to your <code>__init__.py</code>, below <code>hello()</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Boundaries: 100 SA2 zones</span></span>
-<span id="cb1-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Census: 100 rows, but two have stale codes</span></span>
-<span id="cb1-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> gpd.sjoin(boundaries, census, predicate<span class="op">=</span><span class="st">"intersects"</span>)</span>
-<span id="cb1-7"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(boundaries))   <span class="co"># 100</span></span>
-<span id="cb1-9"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(result))       <span class="co"># 95</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> filter_by_month(df, month: <span class="bu">int</span>):</span>
+<span id="cb1-4"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return rows for a given month (1-12)."""</span></span>
+<span id="cb1-5"><a href="" aria-hidden="true" tabindex="-1"></a>    dates <span class="op">=</span> pd.to_datetime(df[<span class="st">"Date"</span>], errors<span class="op">=</span><span class="st">"coerce"</span>)</span>
+<span id="cb1-6"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df[dates.dt.month <span class="op">==</span> month]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p>Five zones quietly disappeared. No traceback. The choropleth still renders.</p>
+<p>Create <code>demo_filter.py</code> in your project root:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># demo_filter.py</span></span>
+<span id="cb2-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geohello <span class="im">import</span> load_data, filter_by_month</span>
+<span id="cb2-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_data()</span>
+<span id="cb2-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All rows:"</span>, <span class="bu">len</span>(df))</span>
+<span id="cb2-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"March only:"</span>, <span class="bu">len</span>(filter_by_month(df, month<span class="op">=</span><span class="dv">3</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python demo_filter.py</span>
+<span id="cb3-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># All rows: 8795</span></span>
+<span id="cb3-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># March only: 744</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="fragment">
-<p>A two-line test catches this every time.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_join_keeps_all_zones():</span>
-<span id="cb2-2"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> validate_join(boundaries, census, key<span class="op">=</span><span class="st">"SA2_code"</span>)</span>
-<span id="cb2-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="bu">len</span>(boundaries)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now you have two functions worth testing: <code>hello()</code> and <code>filter_by_month()</code>.</p>
 </div>
 </section>
-<section id="the-wrong-crs-bug" class="slide level2">
-<h2>The wrong-CRS bug</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="" aria-hidden="true" tabindex="-1"></a>gdf_4326 <span class="op">=</span> boundaries.to_crs(<span class="st">"EPSG:4326"</span>)     <span class="co"># geographic</span></span>
-<span id="cb3-2"><a href="" aria-hidden="true" tabindex="-1"></a>distance <span class="op">=</span> gdf_4326.geometry[<span class="dv">0</span>].distance(</span>
-<span id="cb3-3"><a href="" aria-hidden="true" tabindex="-1"></a>    gdf_4326.geometry[<span class="dv">1</span>]</span>
-<span id="cb3-4"><a href="" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(distance)   <span class="co"># 0.05  (degrees, not metres)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="fragment">
-<p>Your map looks fine. Every distance calculation downstream is wrong by five orders of magnitude.</p>
-</div>
-<div class="fragment">
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_distance_in_metres():</span>
-<span id="cb4-2"><a href="" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> compute_distance(gdf_a, gdf_b)</span>
-<span id="cb4-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="dv">100</span> <span class="op">&lt;</span> d <span class="op">&lt;</span> <span class="dv">100_000</span>   <span class="co"># plausible metre range</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section></section>
 <section>
-<section id="part-2-pytest-in-three-commands" class="title-slide slide level1 center">
-<h1>Part 2: pytest in three commands</h1>
+<section id="part-1-pytest-in-three-commands" class="title-slide slide level1 center">
+<h1>Part 1: pytest in three commands</h1>
 
+</section>
+<section id="what-is-an-assertion-in-testing" class="slide level2">
+<h2>What is an assertion in testing?</h2>
+<p>An assertion confirms that a programme functions as intended by examining whether specific conditions are met during execution.</p>
+<div class="fragment">
+<p>Each test should have <strong>only one reason to fail or succeed</strong>.</p>
+</div>
+<div class="fragment">
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">4</span>        <span class="co"># passes — condition is True</span></span>
+<span id="cb4-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">5</span>        <span class="co"># fails  — condition is False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>If <code>assert</code> passes, nothing happens. If it fails, pytest reports exactly which line failed and what the values were.</p>
+</div>
 </section>
 <section id="all-you-need-to-write-a-test" class="slide level2">
 <h2>All you need to write a test</h2>
@@ -374,34 +353,48 @@ Hyesop Shin <a href="https://orcid.org/0000-0003-2637-7933" class="quarto-title-
 <span id="cb6-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Verbose output so you see each test name</span></span>
 <span id="cb6-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run pytest <span class="at">-v</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<pre><code>============================= test session starts ==============================
-collected 1 item
-
-tests/test_basics.py .                                                   [100%]
-
-============================== 1 passed in 0.05s ===============================</code></pre>
-<p>A dot means pass. An <code>F</code> means fail, with a clear explanation underneath.</p>
+<p><strong>Without <code>-v</code></strong> — dots only:</p>
+<pre><code>tests/test_basics.py .                                                   [100%]</code></pre>
+<p><strong>With <code>-v</code></strong> — each test name and result:</p>
+<pre><code>tests/test_basics.py::test_two_plus_two PASSED                           [100%]</code></pre>
+</div>
+<div class="fragment">
+<p><code>-v</code> stands for <strong>verbose</strong>. Use it so you can see exactly which test passed or failed.</p>
 </div>
 </section>
 <section id="a-test-for-geohello" class="slide level2">
 <h2>A test for <code>geohello</code></h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/test_geohello.py</span></span>
-<span id="cb8-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geohello <span class="im">import</span> hello</span>
-<span id="cb8-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_default():</span>
-<span id="cb8-6"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> hello()</span>
-<span id="cb8-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="st">"Auckland"</span> <span class="kw">in</span> result</span>
-<span id="cb8-8"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_custom_place():</span>
-<span id="cb8-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> hello(<span class="st">"Tokyo"</span>) <span class="op">==</span> <span class="st">"Hello from Tokyo!"</span></span>
-<span id="cb8-12"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_returns_string():</span>
-<span id="cb8-15"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(hello(), <span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/test_geohello.py</span></span>
+<span id="cb9-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geohello <span class="im">import</span> hello</span>
+<span id="cb9-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_default():</span>
+<span id="cb9-6"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> hello()</span>
+<span id="cb9-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="st">"Auckland"</span> <span class="kw">in</span> result</span>
+<span id="cb9-8"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_custom_place():</span>
+<span id="cb9-11"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> hello(<span class="st">"Tokyo"</span>) <span class="op">==</span> <span class="st">"Hello from Tokyo!"</span></span>
+<span id="cb9-12"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_returns_string():</span>
+<span id="cb9-15"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">isinstance</span>(hello(), <span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="what-happens-when-a-test-fails" class="slide level2">
+<h2>What happens when a test fails?</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_wrong_city():</span>
+<span id="cb10-2"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> hello()</span>
+<span id="cb10-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="st">"Wellington"</span> <span class="kw">in</span> result   <span class="co"># wrong on purpose</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p>Three tests, three dots, three seconds.</p>
+<pre><code>FAILED test_fail_demo.py::test_hello_wrong_city
+
+    def test_hello_wrong_city():
+        result = hello()
+&gt;       assert "Wellington" in result
+E       AssertionError: assert 'Wellington' in 'Hello from Auckland!'</code></pre>
+</div>
+<div class="fragment">
+<p>pytest shows the <strong>exact line</strong>, the <strong>expected value</strong>, and the <strong>actual value</strong>. No guessing.</p>
 </div>
 </section>
 <section id="a-note-on-test-design" class="slide level2">
@@ -413,76 +406,94 @@ tests/test_basics.py .                                                   [100%]
 </ul>
 </section></section>
 <section>
-<section id="part-3-three-patterns-you-will-actually-use" class="title-slide slide level1 center">
-<h1>Part 3: Three patterns you will actually use</h1>
+<section id="part-2-three-patterns-you-will-actually-use" class="title-slide slide level1 center">
+<h1>Part 2: Three patterns you will actually use</h1>
 
+</section>
+<section id="when-do-i-use-each-pattern" class="slide level2">
+<h2>When do I use each pattern?</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 41%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pattern</th>
+<th>When to use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>CRS guard</strong></td>
+<td>Your function loads or returns spatial data</td>
+<td>Check the output is in EPSG:2193</td>
+</tr>
+<tr class="even">
+<td><strong>Fixture</strong></td>
+<td>Multiple tests need the same input data</td>
+<td>Create a small DataFrame once, reuse in 5 tests</td>
+</tr>
+<tr class="odd">
+<td><strong>Parametrise</strong></td>
+<td>Same logic, different inputs</td>
+<td>Test <code>hello()</code> with Auckland, Tokyo, Wellington</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="pattern-1-a-crs-guard" class="slide level2">
 <h2>Pattern 1: a CRS guard</h2>
 <p>For most A3 briefs, your spatial maths needs to be in <strong>EPSG:2193</strong> (NZTM, metres). One test catches the most common mistake.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_output_has_correct_crs():</span>
-<span id="cb9-2"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> function_one(...)</span>
-<span id="cb9-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> result.crs.to_string() <span class="op">==</span> <span class="st">"EPSG:2193"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="fragment">
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_output_has_correct_crs():</span>
+<span id="cb12-2"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> function_one(...)</span>
+<span id="cb12-3"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> result.crs.to_string() <span class="op">==</span> <span class="st">"EPSG:2193"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>If <code>function_one</code> ever forgets to reproject, the test fails. You see it in seconds, not weeks.</p>
-</div>
 </section>
 <section id="pattern-2-a-fixture" class="slide level2">
 <h2>Pattern 2: a fixture</h2>
 <p>A <strong>fixture</strong> is reusable test data, set up once and shared across tests.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytest</span>
-<span id="cb10-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb10-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> Point</span>
-<span id="cb10-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="at">@pytest.fixture</span></span>
-<span id="cb10-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> small_sample():</span>
-<span id="cb10-8"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.GeoDataFrame(</span>
-<span id="cb10-9"><a href="" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>]},</span>
-<span id="cb10-10"><a href="" aria-hidden="true" tabindex="-1"></a>        geometry<span class="op">=</span>[Point(<span class="fl">174.76</span>, <span class="op">-</span><span class="fl">36.85</span>), Point(<span class="fl">174.78</span>, <span class="op">-</span><span class="fl">36.86</span>)],</span>
-<span id="cb10-11"><a href="" aria-hidden="true" tabindex="-1"></a>        crs<span class="op">=</span><span class="st">"EPSG:4326"</span>,</span>
-<span id="cb10-12"><a href="" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-15"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_function_with_fixture(small_sample):</span>
-<span id="cb10-16"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> function_two(small_sample)</span>
-<span id="cb10-17"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="bu">len</span>(small_sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytest</span>
+<span id="cb13-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb13-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> geohello <span class="im">import</span> filter_by_month</span>
+<span id="cb13-4"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="at">@pytest.fixture</span></span>
+<span id="cb13-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample_df():</span>
+<span id="cb13-8"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.DataFrame({</span>
+<span id="cb13-9"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Date"</span>: [<span class="st">"2024-01-15"</span>, <span class="st">"2024-01-20"</span>, <span class="st">"2024-03-10"</span>],</span>
+<span id="cb13-10"><a href="" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Count"</span>: [<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">150</span>],</span>
+<span id="cb13-11"><a href="" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb13-12"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_filter_returns_only_january(sample_df):</span>
+<span id="cb13-15"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> filter_by_month(sample_df, month<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-16"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb13-17"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_filter_empty_month(sample_df):</span>
+<span id="cb13-20"><a href="" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> filter_by_month(sample_df, month<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb13-21"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(result) <span class="op">==</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="pattern-3-parametrize" class="slide level2">
 <h2>Pattern 3: parametrize</h2>
 <p>Run the <strong>same test</strong> with several inputs.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="at">@pytest.mark.parametrize</span>(<span class="st">"place,expected"</span>, [</span>
-<span id="cb11-2"><a href="" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Auckland"</span>, <span class="st">"Hello from Auckland!"</span>),</span>
-<span id="cb11-3"><a href="" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Tokyo"</span>, <span class="st">"Hello from Tokyo!"</span>),</span>
-<span id="cb11-4"><a href="" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Wellington"</span>, <span class="st">"Hello from Wellington!"</span>),</span>
-<span id="cb11-5"><a href="" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb11-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_for_many_places(place, expected):</span>
-<span id="cb11-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> hello(place) <span class="op">==</span> expected</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="at">@pytest.mark.parametrize</span>(<span class="st">"place,expected"</span>, [</span>
+<span id="cb14-2"><a href="" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Auckland"</span>, <span class="st">"Hello from Auckland!"</span>),</span>
+<span id="cb14-3"><a href="" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Tokyo"</span>, <span class="st">"Hello from Tokyo!"</span>),</span>
+<span id="cb14-4"><a href="" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Wellington"</span>, <span class="st">"Hello from Wellington!"</span>),</span>
+<span id="cb14-5"><a href="" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb14-6"><a href="" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_hello_for_many_places(place, expected):</span>
+<span id="cb14-7"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> hello(place) <span class="op">==</span> expected</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>One test definition, three test runs. Very useful for “this should work for any of these CRS / years / sensor IDs”.</p>
 </div>
-</section>
-<section id="hands-on-10-min-one-test-for-your-a3-function" class="slide level2 smaller">
-<h2>Hands-on (10 min): one test for your A3 function</h2>
-<p>With your A3 partner, do the following.</p>
-<ol type="1">
-<li class="fragment">Open the function you implemented in the Week 9 lab.</li>
-<li class="fragment">Write <strong>one</strong> test that uses one of the three patterns above:
-<ul>
-<li class="fragment">a CRS guard (if your function returns a GeoDataFrame), or</li>
-<li class="fragment">a fixture (if your function takes a GeoDataFrame), or</li>
-<li class="fragment">a <code>parametrize</code> over two or three inputs.</li>
-</ul></li>
-<li class="fragment">Run <code>uv run pytest -v</code> until it passes.</li>
-<li class="fragment">Push the test to GitHub.</li>
-</ol>
-<div class="fragment">
-<p>Demonstrators will help. If you finish early, write a second test using a different pattern.</p>
-</div>
 </section></section>
 <section>
-<section id="part-4-testpypi-rehearsal" class="title-slide slide level1 center">
-<h1>Part 4: TestPyPI rehearsal</h1>
+<section id="part-3-testpypi-rehearsal" class="title-slide slide level1 center">
+<h1>Part 3: TestPyPI rehearsal</h1>
 
 </section>
 <section id="why-testpypi-first" class="slide level2">
@@ -499,38 +510,65 @@ tests/test_basics.py .                                                   [100%]
 </section>
 <section id="the-four-steps" class="slide level2">
 <h2>The four steps</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Bump the version (TestPyPI rejects duplicates)</span></span>
-<span id="cb12-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit pyproject.toml: version = "0.1.1"</span></span>
-<span id="cb12-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Build</span></span>
-<span id="cb12-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span>
-<span id="cb12-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Publish (you will be prompted for the token)</span></span>
-<span id="cb12-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> publish <span class="at">--publish-url</span> https://test.pypi.org/legacy/</span>
-<span id="cb12-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Install in a clean venv to confirm</span></span>
-<span id="cb12-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> venv /tmp/test-install</span>
-<span id="cb12-12"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> /tmp/test-install/bin/activate</span>
-<span id="cb12-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-14"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="dt">\</span></span>
-<span id="cb12-15"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="at">--index-url</span> https://test.pypi.org/simple/ <span class="dt">\</span></span>
-<span id="cb12-16"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="at">--extra-index-url</span> https://pypi.org/simple/ <span class="dt">\</span></span>
-<span id="cb12-17"><a href="" aria-hidden="true" tabindex="-1"></a>    your-package-name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Bump the version (TestPyPI rejects duplicates)</span></span>
+<span id="cb15-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit pyproject.toml: version = "0.1.1"</span></span>
+<span id="cb15-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Build</span></span>
+<span id="cb15-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span>
+<span id="cb15-6"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Publish (you will be prompted for the token)</span></span>
+<span id="cb15-8"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> publish <span class="at">--publish-url</span> https://test.pypi.org/legacy/</span>
+<span id="cb15-9"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Install in a clean venv to confirm</span></span>
+<span id="cb15-11"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> venv /tmp/test-install</span>
+<span id="cb15-12"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> /tmp/test-install/bin/activate</span>
+<span id="cb15-13"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install <span class="dt">\</span></span>
+<span id="cb15-15"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="at">--index-url</span> https://test.pypi.org/simple/ <span class="dt">\</span></span>
+<span id="cb15-16"><a href="" aria-hidden="true" tabindex="-1"></a>    <span class="at">--extra-index-url</span> https://pypi.org/simple/ <span class="dt">\</span></span>
+<span id="cb15-17"><a href="" aria-hidden="true" tabindex="-1"></a>    your-package-name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>The <code>--extra-index-url</code> is needed because <code>pandas</code>, <code>geopandas</code>, and friends only live on real PyPI.</p>
 </div>
 </section>
-<section id="api-token-the-part-everyone-gets-stuck-on" class="slide level2">
-<h2>API token, the part everyone gets stuck on</h2>
+<section id="step-1-create-a-testpypi-account" class="slide level2">
+<h2>Step 1: Create a TestPyPI account</h2>
 <ol type="1">
-<li class="fragment">Register at https://test.pypi.org/account/register/.</li>
-<li class="fragment">Verify your email.</li>
-<li class="fragment">Account Settings, then API Tokens.</li>
-<li class="fragment">“Add API token”, scope “Entire account”.</li>
-<li class="fragment">Copy the token (starts with <code>pypi-</code>). Save it now, it is shown once.</li>
+<li class="fragment">Go to https://test.pypi.org/account/register/.</li>
+<li class="fragment">Fill in username, email, password.</li>
+<li class="fragment">Verify your email (check spam).</li>
 </ol>
+</section>
+<section id="step-2-generate-an-api-token" class="slide level2">
+<h2>Step 2: Generate an API token</h2>
+<ol type="1">
+<li class="fragment">Log in to https://test.pypi.org/.</li>
+<li class="fragment">Click your username (top right) → <strong>Account settings</strong>.</li>
+<li class="fragment">Scroll down to <strong>API tokens</strong> → click <strong>“Add API token”</strong>.</li>
+<li class="fragment">Token name: <code>uv-publish</code> (or anything you like).</li>
+<li class="fragment">Scope: <strong>“Entire account”</strong> (first time; you can scope to a project later).</li>
+<li class="fragment">Click <strong>“Create token”</strong>.</li>
+<li class="fragment"><strong>Copy the token now</strong> — it starts with <code>pypi-</code> and is shown <strong>only once</strong>.</li>
+</ol>
+</section>
+<section id="step-3-publish-with-the-token" class="slide level2">
+<h2>Step 3: Publish with the token</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Build first</span></span>
+<span id="cb16-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> build</span>
+<span id="cb16-3"><a href="" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="co"># Publish — paste your token when prompted for password</span></span>
+<span id="cb16-5"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> publish <span class="at">--publish-url</span> https://test.pypi.org/legacy/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p>Authenticate with username <code>__token__</code> and the token as the password. Or set <code>UV_PUBLISH_TOKEN</code> as an environment variable.</p>
+<p>When prompted:</p>
+<ul>
+<li>Username: <code>__token__</code></li>
+<li>Password: paste the <code>pypi-...</code> token</li>
+</ul>
+</div>
+<div class="fragment">
+<p>Or skip the prompt by setting an environment variable:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">UV_PUBLISH_TOKEN</span><span class="op">=</span>pypi-YOUR_TOKEN_HERE</span>
+<span id="cb17-2"><a href="" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> publish <span class="at">--publish-url</span> https://test.pypi.org/legacy/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="errors-you-will-hit-and-how-to-fix-them" class="slide level2">
@@ -546,29 +584,29 @@ tests/test_basics.py .                                                   [100%]
 </div>
 </section></section>
 <section>
-<section id="part-5-poster-design" class="title-slide slide level1 center">
-<h1>Part 5: Poster design</h1>
+<section id="part-4-poster-design" class="title-slide slide level1 center">
+<h1>Part 4: Poster design</h1>
 
 </section>
 <section id="the-poster-showcase" class="slide level2">
 <h2>The poster showcase</h2>
 <ul>
-<li class="fragment"><strong>When</strong>, Tuesday 25 May.</li>
+<li class="fragment"><strong>When</strong>, Monday 25 May.</li>
 <li class="fragment"><strong>Where</strong>, B301-G10.</li>
-<li class="fragment"><strong>What</strong>, A1 portrait poster, printed.</li>
+<li class="fragment"><strong>What</strong>, A2 portrait poster, printed.</li>
 <li class="fragment"><strong>Format</strong>, two-minute pitch from each pair, then circulating Q&amp;A.</li>
 </ul>
 <div class="fragment">
 <p>Today you draft the layout on paper. Polish happens next week.</p>
 </div>
 </section>
-<section id="a1-size-in-plain-language" class="slide level2">
-<h2>A1 size, in plain language</h2>
-<p>A1 is <strong>594 mm by 841 mm</strong>. Read from two metres away.</p>
+<section id="a2-size-in-plain-language" class="slide level2">
+<h2>A2 size, in plain language</h2>
+<p>A2 is <strong>240 mm by 594 mm</strong>. Read from two metres away.</p>
 <div class="fragment">
 <ul>
-<li class="fragment">Title text, <strong>72 pt or larger</strong>.</li>
-<li class="fragment">Body text, <strong>24 pt or larger</strong>.</li>
+<li class="fragment">Title text, <strong>50 pt or larger</strong>.</li>
+<li class="fragment">Body text, <strong>20 pt or larger</strong>.</li>
 <li class="fragment">One dominant figure, not five small ones.</li>
 <li class="fragment">Plenty of white space.</li>
 <li class="fragment">Most weak posters have <strong>too much text</strong>.</li>
@@ -636,13 +674,13 @@ tests/test_basics.py .                                                   [100%]
 </div>
 </section></section>
 <section>
-<section id="part-6-fit-interview-today-in-the-lab" class="title-slide slide level1 center">
-<h1>Part 6: Fit interview, today in the lab</h1>
+<section id="part-5-fit-interview-tomorrow-in-the-lab" class="title-slide slide level1 center">
+<h1>Part 5: Fit interview, Tomorrow in the lab</h1>
 
 </section>
 <section id="what-the-fit-interview-is" class="slide level2">
 <h2>What the fit interview is</h2>
-<p>In <strong>today’s lab</strong>, each pair member sits a short individual interview, <strong>3 to 5 minutes per person</strong>.</p>
+<p>In <strong>today’s lab</strong>, each pair member sits a short individual interview, <strong>5 minutes per person</strong>.</p>
 <div class="fragment">
 <ul>
 <li class="fragment">“Walk me through one function you (personally) wrote. What does it return?”</li>
@@ -701,7 +739,7 @@ tests/test_basics.py .                                                   [100%]
 <li class="fragment"><label><input type="checkbox">You know your TestPyPI username and have an API token.</label></li>
 <li class="fragment"><label><input type="checkbox">You have a paper sketch of your poster.</label></li>
 <li class="fragment"><label><input type="checkbox"><strong>Both partners have completed the fit interview today.</strong></label></li>
-<li class="fragment"><label><input type="checkbox">You know the showcase is on Tuesday 25 May (B301-G10).</label></li>
+<li class="fragment"><label><input type="checkbox">You know the showcase is on Monday 25 May (B301-G10).</label></li>
 </ul>
 </section>
 <section id="further-reading" class="slide level2">
@@ -711,6 +749,7 @@ tests/test_basics.py .                                                   [100%]
 <li>Textbook 4.2, <strong>Testing and code quality</strong></li>
 <li>Textbook 4.5, <strong>Assignment 3 briefs</strong></li>
 <li>pytest documentation, https://docs.pytest.org/</li>
+<li>Setting up testing with pytest and uv, https://pydevtools.com/handbook/tutorial/setting-up-testing-with-pytest-and-uv/</li>
 <li><code>uv publish</code> guide, https://docs.astral.sh/uv/guides/publish/</li>
 <li>TestPyPI, https://test.pypi.org/</li>
 </ul>
@@ -723,7 +762,7 @@ tests/test_basics.py .                                                   [100%]
 <p>The Week 10 lab walks you through tests, the publish step, the poster sketch, and the short fit interview itself. Everything we just talked about, hands on the keyboard.</p>
 </div>
 <div class="fragment">
-<p>Next week, <strong>poster showcase week</strong>. Tuesday 25 May, B301-G10.</p>
+<p>Next week, <strong>poster showcase week</strong>. Monday 25 May, B301-G10.</p>
 
 </div>
 </section></section>

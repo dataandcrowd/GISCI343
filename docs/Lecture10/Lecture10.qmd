@@ -29,7 +29,7 @@ jupyter: python3
 ## Today's plan (90 min)
 
 1. Recap of Week 9
-2. Why we test geospatial code (silent failures)
+2. A simple module to test
 3. pytest in three commands
 4. Three test patterns you will actually use
 5. **Hands-on**: write one test for your A3 package
@@ -41,16 +41,12 @@ jupyter: python3
 
 ## Recap of Week 9
 
-Last week your pair did the following.
-
-. . .
-
-::: {.incremental}
 * Drew one of the five A3 briefs in the raffle.
 * Built `geohello-yourname` in pairs (`uv init --lib`, edit, `uv build`).
-* Scaffolded your A3 package on GitHub (Week 9 lab).
+* ~~Scaffolded your A3 package on GitHub~~.
 * Implemented one function and wrote one test that passes.
-:::
+
+
 
 . . .
 
@@ -64,89 +60,71 @@ This week we go from "one test that passes" to "a TestPyPI release that someone 
 |------|--------------|-------------|
 | 9 | Build skeleton, first function | Repo + one passing test |
 | **10** | **Tests, TestPyPI, short fit interview** | **TestPyPI release + interview done** |
-| 11 | Polish + poster showcase (Tue 25 May) | A1 poster on the wall |
+| 11 | Polish + poster showcase (Mon 25 May) | A1 poster on the wall |
 | 12 | Production PyPI | Published package |
 
 . . .
 
 By Friday this week, your package should install for anyone with `pip install --index-url https://test.pypi.org/simple/ your-package-name`.
 
-# Part 1: Why we test geospatial code
+## A simple module to test
+
+Before we write tests, we need something to test. Add this function to your `__init__.py`, below `hello()`.
+
+```python
+import pandas as pd
+
+def filter_by_month(df, month: int):
+    """Return rows for a given month (1-12)."""
+    dates = pd.to_datetime(df["Date"], errors="coerce")
+    return df[dates.dt.month == month]
+```
+
+. . .
+
+Create `demo_filter.py` in your project root:
+
+```python
+# demo_filter.py
+from geohello import load_data, filter_by_month
+
+df = load_data()
+print("All rows:", len(df))
+print("March only:", len(filter_by_month(df, month=3)))
+```
+
+```bash
+uv run python demo_filter.py
+# All rows: 8795
+# March only: 744
+```
+
+. . .
+
+Now you have two functions worth testing: `hello()` and `filter_by_month()`.
+
+# Part 1: pytest in three commands
 
 ---
 
-## Silent geospatial failures
+## What is an assertion in testing?
 
-The dangerous bugs in spatial code are the ones that **do not crash**.
-
-. . .
-
-::: {.incremental}
-* A spatial join silently drops 5 zones.
-* Distance returns 0.05 (degrees), not 5000 (metres).
-* A negative buffer produces an empty geometry.
-* A `groupby` aggregation drops `NaN` rows you wanted to count.
-:::
+An assertion confirms that a programme functions as intended by examining whether specific conditions are met during execution.
 
 . . .
 
-None of these raise an error. You only notice when the map looks wrong, often after the deadline.
-
----
-
-## The missing-zones bug
-
-```python
-import geopandas as gpd
-
-# Boundaries: 100 SA2 zones
-# Census: 100 rows, but two have stale codes
-
-result = gpd.sjoin(boundaries, census, predicate="intersects")
-
-print(len(boundaries))   # 100
-print(len(result))       # 95
-```
-
-. . .
-
-Five zones quietly disappeared. No traceback. The choropleth still renders.
-
-. . .
-
-A two-line test catches this every time.
-
-```python
-def test_join_keeps_all_zones():
-    result = validate_join(boundaries, census, key="SA2_code")
-    assert len(result) == len(boundaries)
-```
-
----
-
-## The wrong-CRS bug
-
-```python
-gdf_4326 = boundaries.to_crs("EPSG:4326")     # geographic
-distance = gdf_4326.geometry[0].distance(
-    gdf_4326.geometry[1]
-)
-print(distance)   # 0.05  (degrees, not metres)
-```
-
-. . .
-
-Your map looks fine. Every distance calculation downstream is wrong by five orders of magnitude.
+Each test should have **only one reason to fail or succeed**.
 
 . . .
 
 ```python
-def test_distance_in_metres():
-    d = compute_distance(gdf_a, gdf_b)
-    assert 100 < d < 100_000   # plausible metre range
+assert 2 + 2 == 4        # passes — condition is True
+assert 2 + 2 == 5        # fails  — condition is False
 ```
 
-# Part 2: pytest in three commands
+. . .
+
+If `assert` passes, nothing happens. If it fails, pytest reports exactly which line failed and what the values were.
 
 ---
 
@@ -189,16 +167,19 @@ uv run pytest -v
 
 . . .
 
+**Without `-v`** — dots only:
 ```
-============================= test session starts ==============================
-collected 1 item
-
 tests/test_basics.py .                                                   [100%]
-
-============================== 1 passed in 0.05s ===============================
 ```
 
-A dot means pass. An `F` means fail, with a clear explanation underneath.
+**With `-v`** — each test name and result:
+```
+tests/test_basics.py::test_two_plus_two PASSED                           [100%]
+```
+
+. . .
+
+`-v` stands for **verbose**. Use it so you can see exactly which test passed or failed.
 
 ---
 
@@ -222,9 +203,31 @@ def test_hello_returns_string():
     assert isinstance(hello(), str)
 ```
 
+
+---
+
+## What happens when a test fails?
+
+```python
+def test_hello_wrong_city():
+    result = hello()
+    assert "Wellington" in result   # wrong on purpose
+```
+
 . . .
 
-Three tests, three dots, three seconds.
+```
+FAILED test_fail_demo.py::test_hello_wrong_city
+
+    def test_hello_wrong_city():
+        result = hello()
+>       assert "Wellington" in result
+E       AssertionError: assert 'Wellington' in 'Hello from Auckland!'
+```
+
+. . .
+
+pytest shows the **exact line**, the **expected value**, and the **actual value**. No guessing.
 
 ---
 
@@ -236,7 +239,17 @@ Three tests, three dots, three seconds.
 * **Keep tests tiny.** A test that takes 2 minutes will not get run.
 :::
 
-# Part 3: Three patterns you will actually use
+# Part 2: Three patterns you will actually use
+
+---
+
+## When do I use each pattern?
+
+| Pattern | When to use | Example |
+|---------|-------------|---------|
+| **CRS guard** | Your function loads or returns spatial data | Check the output is in EPSG:2193 |
+| **Fixture** | Multiple tests need the same input data | Create a small DataFrame once, reuse in 5 tests |
+| **Parametrise** | Same logic, different inputs | Test `hello()` with Auckland, Tokyo, Wellington |
 
 ---
 
@@ -250,7 +263,6 @@ def test_output_has_correct_crs():
     assert result.crs.to_string() == "EPSG:2193"
 ```
 
-. . .
 
 If `function_one` ever forgets to reproject, the test fails. You see it in seconds, not weeks.
 
@@ -262,22 +274,26 @@ A **fixture** is reusable test data, set up once and shared across tests.
 
 ```python
 import pytest
-import geopandas as gpd
-from shapely.geometry import Point
+import pandas as pd
+from geohello import filter_by_month
 
 
 @pytest.fixture
-def small_sample():
-    return gpd.GeoDataFrame(
-        {"id": [1, 2]},
-        geometry=[Point(174.76, -36.85), Point(174.78, -36.86)],
-        crs="EPSG:4326",
-    )
+def sample_df():
+    return pd.DataFrame({
+        "Date": ["2024-01-15", "2024-01-20", "2024-03-10"],
+        "Count": [100, 200, 150],
+    })
 
 
-def test_function_with_fixture(small_sample):
-    result = function_two(small_sample)
-    assert len(result) == len(small_sample)
+def test_filter_returns_only_january(sample_df):
+    result = filter_by_month(sample_df, month=1)
+    assert len(result) == 2
+
+
+def test_filter_empty_month(sample_df):
+    result = filter_by_month(sample_df, month=7)
+    assert len(result) == 0
 ```
 
 ---
@@ -300,27 +316,7 @@ def test_hello_for_many_places(place, expected):
 
 One test definition, three test runs. Very useful for "this should work for any of these CRS / years / sensor IDs".
 
----
-
-## Hands-on (10 min): one test for your A3 function {.smaller}
-
-With your A3 partner, do the following.
-
-::: {.incremental}
-1. Open the function you implemented in the Week 9 lab.
-2. Write **one** test that uses one of the three patterns above:
-   * a CRS guard (if your function returns a GeoDataFrame), or
-   * a fixture (if your function takes a GeoDataFrame), or
-   * a `parametrize` over two or three inputs.
-3. Run `uv run pytest -v` until it passes.
-4. Push the test to GitHub.
-:::
-
-. . .
-
-Demonstrators will help. If you finish early, write a second test using a different pattern.
-
-# Part 4: TestPyPI rehearsal
+# Part 3: TestPyPI rehearsal
 
 ---
 
@@ -367,19 +363,55 @@ The `--extra-index-url` is needed because `pandas`, `geopandas`, and friends onl
 
 ---
 
-## API token, the part everyone gets stuck on
+## Step 1: Create a TestPyPI account
 
 ::: {.incremental}
-1. Register at https://test.pypi.org/account/register/.
-2. Verify your email.
-3. Account Settings, then API Tokens.
-4. "Add API token", scope "Entire account".
-5. Copy the token (starts with `pypi-`). Save it now, it is shown once.
+1. Go to https://test.pypi.org/account/register/.
+2. Fill in username, email, password.
+3. Verify your email (check spam).
 :::
+
+---
+
+## Step 2: Generate an API token
+
+::: {.incremental}
+1. Log in to https://test.pypi.org/.
+2. Click your username (top right) → **Account settings**.
+3. Scroll down to **API tokens** → click **"Add API token"**.
+4. Token name: `uv-publish` (or anything you like).
+5. Scope: **"Entire account"** (first time; you can scope to a project later).
+6. Click **"Create token"**.
+7. **Copy the token now** — it starts with `pypi-` and is shown **only once**.
+:::
+
+---
+
+## Step 3: Publish with the token
+
+```bash
+# Build first
+uv build
+
+# Publish — paste your token when prompted for password
+uv publish --publish-url https://test.pypi.org/legacy/
+```
 
 . . .
 
-Authenticate with username `__token__` and the token as the password. Or set `UV_PUBLISH_TOKEN` as an environment variable.
+When prompted:
+
+- Username: `__token__`
+- Password: paste the `pypi-...` token
+
+. . .
+
+Or skip the prompt by setting an environment variable:
+
+```bash
+export UV_PUBLISH_TOKEN=pypi-YOUR_TOKEN_HERE
+uv publish --publish-url https://test.pypi.org/legacy/
+```
 
 ---
 
@@ -396,16 +428,16 @@ Authenticate with username `__token__` and the token as the password. Or set `UV
 
 These are not rare bugs. Every cohort sees all four. Knowing the fix in advance saves you 30 minutes each.
 
-# Part 5: Poster design
+# Part 4: Poster design
 
 ---
 
 ## The poster showcase
 
 ::: {.incremental}
-* **When**, Tuesday 25 May.
+* **When**, Monday 25 May.
 * **Where**, B301-G10.
-* **What**, A1 portrait poster, printed.
+* **What**, A2 portrait poster, printed.
 * **Format**, two-minute pitch from each pair, then circulating Q&A.
 :::
 
@@ -415,15 +447,15 @@ Today you draft the layout on paper. Polish happens next week.
 
 ---
 
-## A1 size, in plain language
+## A2 size, in plain language
 
-A1 is **594 mm by 841 mm**. Read from two metres away.
+A2 is **240 mm by 594 mm**. Read from two metres away.
 
 . . .
 
 ::: {.incremental}
-* Title text, **72 pt or larger**.
-* Body text, **24 pt or larger**.
+* Title text, **50 pt or larger**.
+* Body text, **20 pt or larger**.
 * One dominant figure, not five small ones.
 * Plenty of white space.
 * Most weak posters have **too much text**.
@@ -463,19 +495,20 @@ A working poster answers three questions in 30 seconds.
 1. What problem does this solve?
 2. What does the package look like in practice?
 3. Where can I find it?
+
 :::
 
 . . .
 
 Everything else is for the conversation, not the poster.
 
-# Part 6: Fit interview, today in the lab
+# Part 5: Fit interview, Tomorrow in the lab
 
 ---
 
 ## What the fit interview is
 
-In **today's lab**, each pair member sits a short individual interview, **3 to 5 minutes per person**.
+In **today's lab**, each pair member sits a short individual interview, **5 minutes per person**.
 
 . . .
 
@@ -483,6 +516,7 @@ In **today's lab**, each pair member sits a short individual interview, **3 to 5
 * "Walk me through one function you (personally) wrote. What does it return?"
 * "Why did you choose this CRS, this default, or this optional dependency?"
 * "What would happen if I passed an empty GeoDataFrame to this function?"
+
 :::
 
 . . .
@@ -516,6 +550,7 @@ Why now, in Week 10? So uneven contribution can be caught and corrected before W
 * Can you describe what the function returns and why?
 * Can you defend one design choice instead of just listing what you did?
 * When you do not know, can you say "I do not know, but I would check..."?
+
 :::
 
 . . .
@@ -544,7 +579,7 @@ Hesitating, looking at your screen, or saying "let me check the docstring" are a
 - [ ] You know your TestPyPI username and have an API token.
 - [ ] You have a paper sketch of your poster.
 - [ ] **Both partners have completed the fit interview today.**
-- [ ] You know the showcase is on Tuesday 25 May (B301-G10).
+- [ ] You know the showcase is on Monday 25 May (B301-G10).
 :::
 
 ---
@@ -555,6 +590,7 @@ Hesitating, looking at your screen, or saying "let me check the docstring" are a
 * Textbook 4.2, **Testing and code quality**
 * Textbook 4.5, **Assignment 3 briefs**
 * pytest documentation, https://docs.pytest.org/
+* Setting up testing with pytest and uv, https://pydevtools.com/handbook/tutorial/setting-up-testing-with-pytest-and-uv/
 * `uv publish` guide, https://docs.astral.sh/uv/guides/publish/
 * TestPyPI, https://test.pypi.org/
 :::
@@ -571,4 +607,4 @@ The Week 10 lab walks you through tests, the publish step, the poster sketch, an
 
 . . .
 
-Next week, **poster showcase week**. Tuesday 25 May, B301-G10.
+Next week, **poster showcase week**. Monday 25 May, B301-G10.
