@@ -63,11 +63,10 @@ This week we go from "one test that passes" to "a TestPyPI release that someone 
 | 11 | Polish + poster showcase (Mon 25 May) | A1 poster on the wall |
 | 12 | Production PyPI | Published package |
 
-. . .
 
-By Friday this week, your package should install for anyone with `pip install --index-url https://test.pypi.org/simple/ your-package-name`.
+By Friday this week, your package should install for anyone with `pip install -i https://test.pypi.org/simple/ your-package-name`.
 
-## A simple module to test
+## A simple module to test {.smaller}
 
 Before we write tests, we need something to test. Add this function to your `__init__.py`, below `hello()`.
 
@@ -298,12 +297,12 @@ def test_filter_empty_month(sample_df):
 
 ---
 
-## Pattern 3: parametrize
+## Pattern 3: parametrise
 
 Run the **same test** with several inputs.
 
 ```python
-@pytest.mark.parametrize("place,expected", [
+@pytest.mark.parametrise("place,expected", [
     ("Auckland", "Hello from Auckland!"),
     ("Tokyo", "Hello from Tokyo!"),
     ("Wellington", "Hello from Wellington!"),
@@ -332,6 +331,58 @@ One test definition, three test runs. Very useful for "this should work for any 
 . . .
 
 Do this **this week**, before the real PyPI publish in Week 12.
+
+---
+
+## One thing first: a licence {.smaller}
+
+![](https://miro.medium.com/v2/resize:fit:1400/format:webp/0*KdQOisGhiSBA-fMF.jpeg)
+
+Without a licence, default copyright applies — legally **nobody may
+reuse your code**, even after you publish it.
+
+. . .
+
+For a course package, **MIT** is the simple, safe choice. It lets
+anyone use, modify, and redistribute your code, as long as they keep
+your name in the licence file.
+
+. . .
+
+| Licence | In one line |
+|---------|-------------|
+| **MIT** | Do anything, just keep my name. Most Python packages. |
+| **Apache 2.0** | Like MIT, plus an explicit patent grant. |
+| **GPL-3.0** | Anyone reusing your code must also open-source theirs. |
+
+. . .
+
+Pick one at <https://choosealicense.com>. For A3, use MIT unless you
+have a reason not to.
+
+---
+
+## Adding the licence to your package {.smaller}
+
+![](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FbBuaKY%2FbtsLIyDRi3v%2FAAAAAAAAAAAAAAAAAAAAAC5xqomcNelu1TI40aB-oFu-551RRT6sXsw2CZ7DecfN%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1780239599%26allow_ip%3D%26allow_referer%3D%26signature%3DkcqIbkGvbqwkpU%252BJWl2%252FXzwt9zM%253D)
+
+```bash
+# 1. Create the LICENSE file (GitHub: "Add file" → it offers templates)
+# 2. Declare it in pyproject.toml:
+```
+
+```toml
+[project]
+name = "geohello-yourname"
+version = "0.1.1"
+license = "MIT"
+authors = [{ name = "Your Name" }]
+```
+
+. . .
+
+The licence then shows on your TestPyPI project page — so anyone
+who finds your package knows they are allowed to use it.
 
 ---
 
