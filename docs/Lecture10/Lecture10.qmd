@@ -402,15 +402,8 @@ uv publish --publish-url https://test.pypi.org/legacy/
 uv venv /tmp/test-install
 source /tmp/test-install/bin/activate
 
-uv pip install \
-    --index-url https://test.pypi.org/simple/ \
-    --extra-index-url https://pypi.org/simple/ \
-    your-package-name
+uv pip install -i https://test.pypi.org/simple/ your-package
 ```
-
-. . .
-
-The `--extra-index-url` is needed because `pandas`, `geopandas`, and friends only live on real PyPI.
 
 ---
 
@@ -574,53 +567,6 @@ In **today's lab**, each pair member sits a short individual interview, **5 minu
 
 Bring your laptop with the package open. The interview is not a memory test and it is not a final exam. It is a quick check that both partners are contributing and that you understand the code your name is on.
 
----
-
-## How it runs in the lab
-
-Pairs cluster into groups of four. Each pair interviews the other pair, one person at a time, while a demonstrator floats between groups to listen in.
-
-. . .
-
-::: {.incremental}
-* One person sits, one person from the other pair asks the three questions.
-* Three to five minutes per person, four people total per group, around 20 minutes.
-* The demonstrator sits in on at least one interview per group.
-* Swap so all four people get a turn.
-:::
-
-. . .
-
-Why now, in Week 10? So uneven contribution can be caught and corrected before Week 11 polish and Week 12 PyPI release.
-
----
-
-## What we are listening for
-
-::: {.incremental}
-* Can you describe what the function returns and why?
-* Can you defend one design choice instead of just listing what you did?
-* When you do not know, can you say "I do not know, but I would check..."?
-
-:::
-
-. . .
-
-Hesitating, looking at your screen, or saying "let me check the docstring" are all fine. Saying "my partner wrote that bit and I am not sure how it works" is what we are listening to catch early.
-
-# Wrap-up
-
----
-
-## What to do this week
-
-::: {.incremental}
-* **In today's lab**: write four meaningful tests, publish to TestPyPI, draft your poster, **sit the short fit interview**.
-* **By Friday**: confirm a clean install of your TestPyPI release works in a throwaway venv.
-* **Before next lecture**: each partner writes a 150 to 200 word reflection on (a) the hardest test to write, (b) the TestPyPI error that taught you the most, (c) the weakest part of the package right now.
-:::
-
----
 
 ## Wrap-up checklist
 
